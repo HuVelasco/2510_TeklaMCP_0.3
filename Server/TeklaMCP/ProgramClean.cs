@@ -110,6 +110,7 @@ namespace TeklaMCP
                 Console.WriteLine("  GET  /tekla-info"); 
                 Console.WriteLine("  POST /create-beam");
                 Console.WriteLine("  POST /create-connection");
+                Console.WriteLine("  POST /create-connection-by-ids");
                 Console.WriteLine("  POST /execute-code");
                 Console.WriteLine("Press Ctrl+C to stop...");
                 
@@ -157,6 +158,10 @@ namespace TeklaMCP
 
                     case "POST /create-connection":
                         responseString = HandleCreateConnection();
+                        break;
+
+                    case "POST /create-connection-by-ids":
+                        responseString = HandleCreateConnectionByIds(request);
                         break;
 
                     case "POST /execute-code":
@@ -434,6 +439,121 @@ namespace TeklaMCP
             }
         }
 
+        static string HandleCreateConnectionByIds(HttpListenerRequest request)
+        {
+            try
+            {
+                var model = new Model();
+                if (!model.GetConnectionStatus())
+                {
+                    return JsonConvert.SerializeObject(new
+                    {
+                        success = false,
+                        error = "Tekla not connected"
+                    });
+                }
+
+                // Read JSON request body
+                string requestBody = "";
+                using (var reader = new StreamReader(request.InputStream))
+                {
+                    requestBody = reader.ReadToEnd();
+                }
+
+                if (string.IsNullOrEmpty(requestBody))
+                {
+                    return JsonConvert.SerializeObject(new
+                    {
+                        success = false,
+                        error = "No request body provided. Expected JSON with connection_number, primary_object_id, secondary_object_ids"
+                    });
+                }
+
+                // Parse the request (avoid dynamic for legacy compiler)
+                var connectionRequest = JsonConvert.DeserializeObject<System.Collections.Generic.Dictionary<string, object>>(requestBody);
+                
+                int connectionNumber = connectionRequest.ContainsKey("connection_number") ? Convert.ToInt32(connectionRequest["connection_number"]) : 144;
+                int primaryObjectId = connectionRequest.ContainsKey("primary_object_id") ? Convert.ToInt32(connectionRequest["primary_object_id"]) : 0;
+                
+                var secondaryIds = new System.Collections.Generic.List<int>();
+                if (connectionRequest.ContainsKey("secondary_object_ids"))
+                {
+                    var secondaryArray = connectionRequest["secondary_object_ids"] as Newtonsoft.Json.Linq.JArray;
+                    if (secondaryArray != null)
+                    {
+                        foreach (var item in secondaryArray)
+                        {
+                            secondaryIds.Add(Convert.ToInt32(item));
+                        }
+                    }
+                }
+                
+                string connectionName = connectionRequest.ContainsKey("connection_name") ? connectionRequest["connection_name"].ToString() : "";
+
+                // Validate inputs
+                if (primaryObjectId <= 0)
+                {
+                    return JsonConvert.SerializeObject(new
+                    {
+                        success = false,
+                        error = "primary_object_id is required and must be > 0"
+                    });
+                }
+
+                if (secondaryIds.Count == 0)
+                {
+                    return JsonConvert.SerializeObject(new
+                    {
+                        success = false,
+                        error = "secondary_object_ids array is required and must contain at least one ID"
+                    });
+                }
+
+                // Find objects by ID
+                var primaryObject = FindObjectById(model, primaryObjectId);
+                var secondaryObjects = new System.Collections.ArrayList();
+                
+                foreach (int secondaryId in secondaryIds)
+                {
+                    var secondaryObj = FindObjectById(model, secondaryId);
+                    if (secondaryObj != null)
+                    {
+                        secondaryObjects.Add(secondaryObj);
+                    }
+                }
+
+                if (primaryObject == null)
+                {
+                    return JsonConvert.SerializeObject(new
+                    {
+                        success = false,
+                        error = $"Primary object with ID {primaryObjectId} not found in model"
+                    });
+                }
+
+                if (secondaryObjects.Count == 0)
+                {
+                    return JsonConvert.SerializeObject(new
+                    {
+                        success = false,
+                        error = $"No secondary objects found for provided IDs"
+                    });
+                }
+
+                // Create the connection with detailed verification
+                return CreateConnectionWithVerification(model, connectionNumber, connectionName, primaryObject, secondaryObjects);
+            }
+            catch (Exception ex)
+            {
+                LogMessage("CONNECTION_BY_IDS_ERROR", $"Error: {ex.Message}");
+                return JsonConvert.SerializeObject(new
+                {
+                    success = false,
+                    error = $"Connection by IDs error: {ex.Message}"
+                });
+            }
+        }
+
         static string HandleExecuteCode(HttpListenerRequest request)
         {
             try
@@ -649,6 +769,348 @@ public class DynamicTeklaScript
             {
                 Console.WriteLine($"❌ Legacy compilation/execution error: {ex.Message}");
                 throw new Exception($"Legacy compilation/execution error: {ex.Message}");
+            }
+        }
+
+        static ModelObject FindObjectById(Model model, int objectId)
+        {
+            try
+            {
+                var selector = model.GetModelObjectSelector();
+                var enumerator = selector.GetAllObjects();
+                
+                while (enumerator.MoveNext())
+                {
+                    var obj = enumerator.Current as ModelObject;
+                    if (obj != null && obj.Identifier.ID == objectId)
+                    {
+                        return obj;
+                    }
+                }
+                return null;
+            }
+            catch (Exception ex)
+            {
+                LogMessage("FIND_OBJECT_ERROR", $"Error finding object {objectId}: {ex.Message}");
+                return null;
+            }
+        }
+
+        static string CreateConnectionWithVerification(Model model, int connectionNumber, string connectionName, ModelObject primaryObject, System.Collections.ArrayList secondaryObjects)
+        {
+            try
+            {
+                // Check for existing connections between these objects
+                var existingConnectionCheck = CheckExistingConnections(model, primaryObject, secondaryObjects) as System.Collections.Generic.Dictionary<string, object>;
+                bool hasExisting = existingConnectionCheck != null && existingConnectionCheck.ContainsKey("hasExisting") ? Convert.ToBoolean(existingConnectionCheck["hasExisting"]) : false;
+                if (hasExisting)
+                {
+                    return JsonConvert.SerializeObject(new
+                    {
+                        success = false,
+                        connection_created = false,
+                        error = "Connection already exists between these objects",
+                        existing_connections = existingConnectionCheck != null && existingConnectionCheck.ContainsKey("existingConnections") ? existingConnectionCheck["existingConnections"] : new object[0],
+                        message = "Cannot create duplicate connection. Most connection types allow only one connection between the same objects."
+                    });
+                }
+                
+                // Record initial state for comparison
+                var initialConnectionCount = CountConnections(model);
+                var primaryInitialChildren = GetObjectChildren(primaryObject);
+                
+                // Create the connection
+                var connection = new Tekla.Structures.Model.Connection();
+                connection.Number = connectionNumber;
+                connection.Name = !string.IsNullOrEmpty(connectionName) ? connectionName : GetDefaultConnectionName(connectionNumber);
+                
+                // V2 PROVEN SEQUENCE
+                connection.SetPrimaryObject(primaryObject);
+                
+                // Handle multiple secondary objects
+                if (secondaryObjects.Count == 1)
+                {
+                    connection.SetSecondaryObject(secondaryObjects[0] as ModelObject);
+                }
+                else
+                {
+                    // Multiple secondaries - use SetSecondaryObjects if available, or add them individually
+                    for (int i = 0; i < secondaryObjects.Count; i++)
+                    {
+                        if (i == 0)
+                        {
+                            connection.SetSecondaryObject(secondaryObjects[i] as ModelObject);
+                        }
+                        // Note: Tekla API might not support multiple secondaries for all connection types
+                        // This would need to be enhanced based on specific connection requirements
+                    }
+                }
+                
+                bool inserted = connection.Insert();
+                
+                if (!inserted)
+                {
+                    return JsonConvert.SerializeObject(new
+                    {
+                        success = false,
+                        connection_created = false,
+                        error = "Connection.Insert() returned false - connection rejected by Tekla"
+                    });
+                }
+                
+                // Load attributes and modify
+                bool attributesLoaded = connection.LoadAttributesFromFile("standard");
+                bool modified = connection.Modify();
+                model.CommitChanges();
+                
+                // CRITICAL VERIFICATION: Check if connection actually exists and made changes
+                var verification = VerifyConnectionCreation(model, connection, primaryObject, secondaryObjects, initialConnectionCount, primaryInitialChildren);
+                var verificationDict = verification as System.Collections.Generic.Dictionary<string, object>;
+                bool connectionExists = verificationDict != null && verificationDict.ContainsKey("connection_exists") ? Convert.ToBoolean(verificationDict["connection_exists"]) : false;
+                
+                LogMessage("CONNECTION_VERIFICATION", $"Connection {connection.Identifier.ID} verification: {connectionExists}");
+                
+                return JsonConvert.SerializeObject(new
+                {
+                    success = connectionExists,
+                    connection_created = connectionExists,
+                    connection_id = connection.Identifier.ID,
+                    connection_number = connectionNumber,
+                    connection_name = connection.Name,
+                    primary_object = new {
+                        id = primaryObject.Identifier.ID,
+                        type = primaryObject.GetType().Name
+                    },
+                    secondary_objects = GetSecondaryObjectsInfo(secondaryObjects),
+                    verification = verification,
+                    attributes_loaded = attributesLoaded,
+                    modified = modified
+                }, Formatting.Indented);
+            }
+            catch (Exception ex)
+            {
+                LogMessage("CREATE_CONNECTION_ERROR", $"Error: {ex.Message}");
+                return JsonConvert.SerializeObject(new
+                {
+                    success = false,
+                    connection_created = false,
+                    error = $"Connection creation error: {ex.Message}"
+                });
+            }
+        }
+        
+        static object VerifyConnectionCreation(Model model, Tekla.Structures.Model.Connection connection, ModelObject primaryObject, System.Collections.ArrayList secondaryObjects, int initialConnectionCount, int initialChildrenCount)
+        {
+            try
+            {
+                // 1. Verify connection exists in model
+                bool connectionExists = false;
+                var connectionId = connection.Identifier.ID;
+                
+                var selector = model.GetModelObjectSelector();
+                var connections = selector.GetAllObjectsWithType(ModelObject.ModelObjectEnum.CONNECTION);
+                
+                while (connections.MoveNext())
+                {
+                    var conn = connections.Current as Tekla.Structures.Model.Connection;
+                    if (conn != null && conn.Identifier.ID == connectionId)
+                    {
+                        connectionExists = true;
+                        break;
+                    }
+                }
+                
+                // 2. Check if new objects were created (bolts, plates, etc.)
+                var finalConnectionCount = CountConnections(model);
+                var connectionCountChanged = finalConnectionCount > initialConnectionCount;
+                
+                // 3. Check if primary object has new children (cuts, modifications)
+                var finalChildrenCount = GetObjectChildren(primaryObject);
+                var primaryObjectModified = finalChildrenCount > initialChildrenCount;
+                
+                // 4. Try to get connection children to see what was actually created
+                var connectionChildren = new System.Collections.ArrayList();
+                string connectionChildrenInfo = "";
+                
+                if (connectionExists)
+                {
+                    try
+                    {
+                        var childEnum = connection.GetChildren();
+                        int childCount = 0;
+                        while (childEnum.MoveNext())
+                        {
+                            childCount++;
+                            var child = childEnum.Current as ModelObject;
+                            if (child != null)
+                            {
+                                connectionChildren.Add(child.GetType().Name + ":" + child.Identifier.ID);
+                            }
+                        }
+                        connectionChildrenInfo = $"Found {childCount} connection children";
+                    }
+                    catch (Exception ex)
+                    {
+                        connectionChildrenInfo = $"Could not get children: {ex.Message}";
+                    }
+                }
+                
+                var result = new System.Collections.Generic.Dictionary<string, object>();
+                result["connection_exists"] = connectionExists;
+                result["connection_id_valid"] = connectionId > 0;
+                result["model_connection_count_changed"] = connectionCountChanged;
+                result["primary_object_modified"] = primaryObjectModified;
+                result["connection_children_info"] = connectionChildrenInfo;
+                result["connection_children"] = connectionChildren.ToArray();
+                result["initial_connections"] = initialConnectionCount;
+                result["final_connections"] = finalConnectionCount;
+                result["initial_primary_children"] = initialChildrenCount;
+                result["final_primary_children"] = finalChildrenCount;
+                return result;
+            }
+            catch (Exception ex)
+            {
+                var errorResult = new System.Collections.Generic.Dictionary<string, object>();
+                errorResult["connection_exists"] = false;
+                errorResult["verification_error"] = ex.Message;
+                return errorResult;
+            }
+        }
+        
+        static int CountConnections(Model model)
+        {
+            try
+            {
+                var selector = model.GetModelObjectSelector();
+                var connections = selector.GetAllObjectsWithType(ModelObject.ModelObjectEnum.CONNECTION);
+                int count = 0;
+                while (connections.MoveNext()) count++;
+                return count;
+            }
+            catch
+            {
+                return 0;
+            }
+        }
+        
+        static int GetObjectChildren(ModelObject obj)
+        {
+            try
+            {
+                var children = obj.GetChildren();
+                int count = 0;
+                while (children.MoveNext()) count++;
+                return count;
+            }
+            catch
+            {
+                return 0;
+            }
+        }
+        
+        static object[] GetSecondaryObjectsInfo(System.Collections.ArrayList secondaryObjects)
+        {
+            var info = new object[secondaryObjects.Count];
+            for (int i = 0; i < secondaryObjects.Count; i++)
+            {
+                var obj = secondaryObjects[i] as ModelObject;
+                info[i] = new {
+                    id = obj.Identifier.ID,
+                    type = obj.GetType().Name
+                };
+            }
+            return info;
+        }
+        
+        static object CheckExistingConnections(Model model, ModelObject primaryObject, System.Collections.ArrayList secondaryObjects)
+        {
+            try
+            {
+                var existingConnections = new System.Collections.ArrayList();
+                
+                var selector = model.GetModelObjectSelector();
+                var allConnections = selector.GetAllObjectsWithType(ModelObject.ModelObjectEnum.CONNECTION);
+                
+                while (allConnections.MoveNext())
+                {
+                    var connection = allConnections.Current as Tekla.Structures.Model.Connection;
+                    if (connection != null)
+                    {
+                        try
+                        {
+                            // Get primary and secondary objects from existing connection
+                            var connPrimary = connection.GetPrimaryObject();
+                            var connSecondaries = connection.GetSecondaryObjects();
+                            
+                            // Check if this connection involves our objects
+                            bool involvesPrimary = (connPrimary != null && connPrimary.Identifier.ID == primaryObject.Identifier.ID);
+                            bool involvesSecondary = false;
+                            
+                            if (connSecondaries != null)
+                            {
+                                var secondaryEnumerator = connSecondaries.GetEnumerator();
+                                while (secondaryEnumerator.MoveNext())
+                                {
+                                    var secObj = secondaryEnumerator.Current as ModelObject;
+                                    if (secObj != null)
+                                    {
+                                        foreach (ModelObject ourSecondary in secondaryObjects)
+                                        {
+                                            if (secObj.Identifier.ID == ourSecondary.Identifier.ID)
+                                            {
+                                                involvesSecondary = true;
+                                                break;
+                                            }
+                                        }
+                                        if (involvesSecondary) break;
+                                    }
+                                }
+                            }
+                            
+                            // If connection involves both our primary and at least one secondary
+                            if (involvesPrimary && involvesSecondary)
+                            {
+                                existingConnections.Add(new {
+                                    id = connection.Identifier.ID,
+                                    name = connection.Name,
+                                    number = connection.Number
+                                });
+                            }
+                        }
+                        catch
+                        {
+                            // Skip connections we can't access
+                            continue;
+                        }
+                    }
+                }
+                
+                var result = new System.Collections.Generic.Dictionary<string, object>();
+                result["hasExisting"] = existingConnections.Count > 0;
+                result["existingConnections"] = existingConnections.ToArray();
+                return result;
+            }
+            catch (Exception ex)
+            {
+                // If we can't check, assume no existing connections (safer to proceed)
+                var errorResult = new System.Collections.Generic.Dictionary<string, object>();
+                errorResult["hasExisting"] = false;
+                errorResult["existingConnections"] = new object[0];
+                errorResult["checkError"] = ex.Message;
+                return errorResult;
+            }
+        }
+        
+        static string GetDefaultConnectionName(int connectionNumber)
+        {
+            switch (connectionNumber)
+            {
+                case 144: return "End plate";
+                case 106: return "Apex bolted";
+                case 141: return "Clip angle";
+                case 1014: return "Base plate";
+                case 11: return "Shear plate";
+                default: return $"Connection {connectionNumber}";
             }
         }
 

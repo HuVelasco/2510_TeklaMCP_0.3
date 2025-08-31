@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dotnet build:*)",
+      "Bash(dotnet run:*)",
+      "Bash(git checkout:*)",
+      "Read(C:\\Users\\hugov\\ClaudeProjects\\2506_TeklaMCP.V2\\docs\\Test results by Detailer Agent\\2025.08.07 - Modeling Tests/**)",
+      "Read(C:\\Users\\hugov\\ClaudeProjects\\2506_TeklaMCP.V2\\docs\\Test results by Detailer Agent\\2025.08.07 - Modeling Tests/**)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "WebFetch(domain:developer.tekla.com)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
