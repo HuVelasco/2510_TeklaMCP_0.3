@@ -151,7 +151,7 @@ namespace TeklaMCP
                 // Try to load Tekla assemblies dynamically
                 try
                 {
-                    var teklaAssembly = System.Reflection.Assembly.LoadFrom(@"C:\Program Files\Tekla Structures\2023.0\bin\Tekla.Structures.Model.dll");
+                    var teklaAssembly = System.Reflection.Assembly.LoadFrom(@"C:\TeklaStructures\2024.0\bin\Tekla.Structures.Model.dll");
                     var modelType = teklaAssembly.GetType("Tekla.Structures.Model.Model");
                     var model = Activator.CreateInstance(modelType);
                     
@@ -401,8 +401,8 @@ namespace TeklaMCP
             // Try to execute Tekla operations via reflection to avoid compilation dependencies
             try
             {
-                var teklaAssembly = System.Reflection.Assembly.LoadFrom(@"C:\Program Files\Tekla Structures\2023.0\bin\Tekla.Structures.Model.dll");
-                var geometryAssembly = System.Reflection.Assembly.LoadFrom(@"C:\Program Files\Tekla Structures\2023.0\bin\Tekla.Structures.Geometry3d.dll");
+                var teklaAssembly = System.Reflection.Assembly.LoadFrom(@"C:\TeklaStructures\2024.0\bin\Tekla.Structures.Model.dll");
+                var geometryAssembly = System.Reflection.Assembly.LoadFrom(@"C:\TeklaStructures\2024.0\bin\Tekla.Structures.Geometry3d.dll");
                 
                 var modelType = teklaAssembly.GetType("Tekla.Structures.Model.Model");
                 var beamType = teklaAssembly.GetType("Tekla.Structures.Model.Beam");

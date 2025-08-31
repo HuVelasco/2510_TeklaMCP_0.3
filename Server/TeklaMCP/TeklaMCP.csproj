@@ -15,13 +15,13 @@
 
   <ItemGroup>
     <Reference Include="Tekla.Structures">
-      <HintPath>C:\Program Files\Tekla Structures\2023.0\bin\Tekla.Structures.dll</HintPath>
+      <HintPath>C:\TeklaStructures\2024.0\bin\Tekla.Structures.dll</HintPath>
     </Reference>
     <Reference Include="Tekla.Structures.Model">
-      <HintPath>C:\Program Files\Tekla Structures\2023.0\bin\Tekla.Structures.Model.dll</HintPath>
+      <HintPath>C:\TeklaStructures\2024.0\bin\Tekla.Structures.Model.dll</HintPath>
     </Reference>
     <Reference Include="Tekla.Structures.Geometry3d">
-      <HintPath>C:\Program Files\Tekla Structures\2023.0\bin\Tekla.Structures.Geometry3d.dll</HintPath>
+      <HintPath>C:\TeklaStructures\2024.0\bin\Tekla.Structures.Geometry3d.dll</HintPath>
     </Reference>
   </ItemGroup>
 
