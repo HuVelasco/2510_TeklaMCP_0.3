@@ -1,0 +1,7 @@
+C:\Users\hugov\ClaudeProjects\2510_TeklaMCP_0.3\Server\TeklaMCP\obj\Debug\net48\TeklaMCP.csproj.AssemblyReference.cache
+C:\Users\hugov\ClaudeProjects\2510_TeklaMCP_0.3\Server\TeklaMCP\obj\Debug\net48\TeklaMCP.csproj.SuggestedBindingRedirects.cache
+C:\Users\hugov\ClaudeProjects\2510_TeklaMCP_0.3\Server\TeklaMCP\obj\Debug\net48\TeklaMCP.exe.config
+C:\Users\hugov\ClaudeProjects\2510_TeklaMCP_0.3\Server\TeklaMCP\obj\Debug\net48\TeklaMCP.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\hugov\ClaudeProjects\2510_TeklaMCP_0.3\Server\TeklaMCP\obj\Debug\net48\TeklaMCP.AssemblyInfoInputs.cache
+C:\Users\hugov\ClaudeProjects\2510_TeklaMCP_0.3\Server\TeklaMCP\obj\Debug\net48\TeklaMCP.AssemblyInfo.cs
+C:\Users\hugov\ClaudeProjects\2510_TeklaMCP_0.3\Server\TeklaMCP\obj\Debug\net48\TeklaMCP.csproj.CoreCompileInputs.cache

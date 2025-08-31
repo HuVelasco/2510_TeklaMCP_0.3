@@ -1,0 +1,24 @@
+# Build outputs
+bin/
+obj/
+*.exe
+*.dll
+*.pdb
+
+# Visual Studio
+.vs/
+*.suo
+*.user
+*.sln.docstates
+
+# Logs
+*.log
+C:/temp/tekla_mcp_*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temp files
+*.tmp
+*.temp
