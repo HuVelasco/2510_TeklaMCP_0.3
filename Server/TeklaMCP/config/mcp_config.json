@@ -1,0 +1,32 @@
+{
+  "server": {
+    "name": "TeklaMCP Phase 1 Server",
+    "version": "1.0.0",
+    "description": "Production MCP server for Tekla Structures integration"
+  },
+  "tekla_backend": {
+    "url": "http://localhost:8081",
+    "timeout": 30,
+    "retry_attempts": 3
+  },
+  "tools": {
+    "specialized": [
+      "create_beam",
+      "create_column", 
+      "create_brace"
+    ],
+    "utility": [
+      "get_tekla_status",
+      "get_element_info",
+      "list_profiles"
+    ],
+    "custom": [
+      "custom_tekla_operation",
+      "create_multiple_elements"
+    ]
+  },
+  "logging": {
+    "level": "INFO",
+    "format": "[%(asctime)s] %(levelname)s: %(message)s"
+  }
+}
