@@ -4,7 +4,7 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>net48</TargetFramework>
     <LangVersion>8.0</LangVersion>
-    <StartupObject>TeklaMCP.ProgramSimple</StartupObject>
+    <StartupObject>TeklaMCP.Server.Program</StartupObject>
   </PropertyGroup>
 
   <ItemGroup>
@@ -12,12 +12,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Remove="Program.cs" />
-    <Compile Remove="Core\**" />
-    <Compile Remove="Endpoints\**" />
-    <Compile Remove="Models\**" />
-    <Compile Remove="Utils\**" />
-    <Compile Remove="Services\**" />
+    <Reference Include="Tekla.Structures">
+      <HintPath>C:\TeklaStructures\2024.0\bin\Tekla.Structures.dll</HintPath>
+    </Reference>
+    <Reference Include="Tekla.Structures.Model">
+      <HintPath>C:\TeklaStructures\2024.0\bin\Tekla.Structures.Model.dll</HintPath>
+    </Reference>
+    <Reference Include="Tekla.Structures.Geometry3d">
+      <HintPath>C:\TeklaStructures\2024.0\bin\Tekla.Structures.Geometry3d.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>
