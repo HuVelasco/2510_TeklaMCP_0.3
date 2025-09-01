@@ -19,7 +19,8 @@
       "Read(C:\\Users\\hugov\\AppData\\Roaming\\Claude/**)",
       "Bash(taskkill:*)",
       "mcp__tekla__get_tekla_status",
-      "mcp__tekla__create_beam"
+      "mcp__tekla__create_beam",
+      "Bash(git ls-tree:*)"
     ],
     "deny": [],
     "ask": []

@@ -75,9 +75,9 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\hugov\\ClaudeProjects\\2510_TeklaMCP_0.3\\Server\\TeklaMCP\\TeklaMCPSimple.csproj",
-      "projectName": "TeklaMCPSimple",
-      "projectPath": "C:\\Users\\hugov\\ClaudeProjects\\2510_TeklaMCP_0.3\\Server\\TeklaMCP\\TeklaMCPSimple.csproj",
+      "projectUniqueName": "C:\\Users\\hugov\\ClaudeProjects\\2510_TeklaMCP_0.3\\Server\\TeklaMCP\\TeklaMCPClean.csproj",
+      "projectName": "TeklaMCPClean",
+      "projectPath": "C:\\Users\\hugov\\ClaudeProjects\\2510_TeklaMCP_0.3\\Server\\TeklaMCP\\TeklaMCPClean.csproj",
       "packagesPath": "C:\\Users\\hugov\\.nuget\\packages\\",
       "outputPath": "C:\\Users\\hugov\\ClaudeProjects\\2510_TeklaMCP_0.3\\Server\\TeklaMCP\\obj\\",
       "projectStyle": "PackageReference",
