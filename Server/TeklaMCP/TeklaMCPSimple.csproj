@@ -4,7 +4,7 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>net48</TargetFramework>
     <LangVersion>8.0</LangVersion>
-    <StartupObject>TeklaMCP.Server.Program</StartupObject>
+    <StartupObject>TeklaMCP.Server.ProgramSingleFile</StartupObject>
   </PropertyGroup>
 
   <ItemGroup>

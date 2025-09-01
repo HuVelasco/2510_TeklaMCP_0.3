@@ -16,7 +16,8 @@
       "Bash(python:*)",
       "Read(C:\\Users\\hugov\\.claude/**)",
       "Bash(timeout:*)",
-      "Read(C:\\Users\\hugov\\AppData\\Roaming\\Claude/**)"
+      "Read(C:\\Users\\hugov\\AppData\\Roaming\\Claude/**)",
+      "Bash(taskkill:*)"
     ],
     "deny": [],
     "ask": []
