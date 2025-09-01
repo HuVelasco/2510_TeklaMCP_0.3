@@ -31,8 +31,8 @@ async def ensure_http_server_running():
                     return True  # Server is running
     except:
         # Server not running - start it for development
-        print(f"🔧 HTTP server not detected on {TEKLA_SERVER_URL}")
-        print("🚀 Auto-starting HTTP server for development...")
+        print(f"HTTP server not detected on {TEKLA_SERVER_URL}")
+        print("Auto-starting HTTP server for development...")
         
         try:
             # Get the HTTP server directory (development setup)
@@ -53,22 +53,22 @@ async def ensure_http_server_running():
                 )
             
             # Give HTTP server time to start
-            print("⏳ Waiting for HTTP server startup...")
+            print("Waiting for HTTP server startup...")
             await asyncio.sleep(4)
             
             # Verify it started successfully
             async with aiohttp.ClientSession() as session:
                 async with session.get(f"{TEKLA_SERVER_URL}/test", timeout=aiohttp.ClientTimeout(total=3)) as response:
                     if response.status == 200:
-                        print("✅ HTTP server started successfully!")
+                        print("HTTP server started successfully!")
                         return True
             
-            print("❌ HTTP server failed to start properly")
+            print("HTTP server failed to start properly")
             return False
             
         except Exception as e:
-            print(f"❌ Failed to auto-start HTTP server: {e}")
-            print("💡 Please manually start: cd Server/TeklaMCP && dotnet run")
+            print(f"Failed to auto-start HTTP server: {e}")
+            print("Please manually start: cd Server/TeklaMCP && dotnet run")
             return False
     
     return False
@@ -113,7 +113,7 @@ async def call_endpoint(endpoint: str, method: str = "GET", params=None):
                         
     except aiohttp.ClientError as e:
         # Try auto-start one more time on connection failure
-        print("🔧 Connection failed, attempting HTTP server restart...")
+        print("Connection failed, attempting HTTP server restart...")
         if await ensure_http_server_running():
             # Retry the request once after auto-start
             try:
