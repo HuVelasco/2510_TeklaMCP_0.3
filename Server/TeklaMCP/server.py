@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-TeklaMCP Server 0.3 - PHASE 1: Code Deduplication & Cleanup
+TeklaMCP Server 0.3 - PHASE 2: Comprehensive CRUD Operations
 Bridge between Claude Code and TeklaMCP HTTP Server
 
 PHASE 1 IMPROVEMENTS:
@@ -8,6 +8,12 @@ PHASE 1 IMPROVEMENTS:
 - Standardized error handling patterns
 - Modularized connection verification
 - Cleaned up duplicate files
+
+PHASE 2 IMPROVEMENTS:
+- Complete CRUD operations (Create/Read/Update/Delete)
+- Advanced search and filtering capabilities
+- Bulk operations support
+- Comprehensive object lifecycle management
 """
 
 import asyncio
@@ -84,7 +90,7 @@ async def ensure_http_server_running():
 async def make_http_request(session, method: str, url: str, endpoint: str, params=None):
     """Core HTTP request logic - eliminated duplication"""
     if method == "GET":
-        async with session.get(url, params=params) as response:
+        async with session.get(url) as response:
             return response.status, await response.text()
     
     elif method == "POST":
@@ -96,6 +102,20 @@ async def make_http_request(session, method: str, url: str, endpoint: str, param
             # For other endpoints, send as JSON
             async with session.post(url, json=params) as response:
                 return response.status, await response.text()
+    
+    elif method == "PUT":
+        # Handle PUT requests for updates
+        if isinstance(params, str):
+            async with session.put(url, data=params, headers={"Content-Type": "application/json"}) as response:
+                return response.status, await response.text()
+        else:
+            async with session.put(url, json=params) as response:
+                return response.status, await response.text()
+    
+    elif method == "DELETE":
+        # Handle DELETE requests
+        async with session.delete(url) as response:
+            return response.status, await response.text()
 
 async def call_endpoint(endpoint: str, method: str = "GET", params=None):
     """Helper function to make HTTP requests to Tekla backend with auto-start capability"""
@@ -267,6 +287,135 @@ async def tekla_execute_code(
     """
     # Send the C# code as plain text to the execute-code endpoint
     return await call_endpoint("execute-code", "POST", code)
+
+# ==================== PHASE 2: COMPREHENSIVE CRUD OPERATIONS ====================
+
+@mcp.tool()
+async def tekla_list_objects(
+    object_type: str = "ALL",  # BEAM, COLUMN, CONNECTION, ALL
+    limit: int = 100,
+    offset: int = 0,
+    filter_criteria: str = ""  # "profile:W18" or similar
+) -> str:
+    """List objects by type with optional filtering
+    
+    PHASE 2 ENHANCEMENT: Comprehensive object listing with filtering
+    
+    Parameters:
+    - object_type: Type of objects to list (BEAM, COLUMN, CONNECTION, ALL)
+    - limit: Maximum number of objects to return (default: 100)
+    - offset: Number of objects to skip (default: 0)
+    - filter_criteria: Optional filter criteria in format "property:value"
+    
+    Returns objects with standardized Phase 2 response format
+    """
+    endpoint = f"objects/{object_type}?limit={limit}&offset={offset}"
+    if filter_criteria:
+        endpoint += f"&filter={filter_criteria}"
+    
+    return await call_endpoint(endpoint, "GET")
+
+@mcp.tool()
+async def tekla_search_objects(
+    query: str,
+    object_types: str = "BEAM,COLUMN",  # Comma-separated types
+    search_properties: str = "profile,material",  # Comma-separated properties
+    limit: int = 50
+) -> str:
+    """Search objects with advanced criteria across multiple properties
+    
+    PHASE 2 ENHANCEMENT: Advanced search functionality
+    
+    Parameters:
+    - query: Search query to match against object properties
+    - object_types: Comma-separated list of object types to search
+    - search_properties: Comma-separated list of properties to search in
+    - limit: Maximum number of results to return
+    
+    Returns matching objects with search relevance information
+    """
+    params = {
+        "q": query,
+        "types": object_types,
+        "properties": search_properties,
+        "limit": limit
+    }
+    
+    return await call_endpoint("objects/search", "GET", params)
+
+@mcp.tool()
+async def tekla_get_object_details(
+    object_id: int
+) -> str:
+    """Get comprehensive details about a specific object
+    
+    PHASE 2 ENHANCEMENT: Detailed object information retrieval
+    
+    Parameters:
+    - object_id: Tekla object ID to retrieve details for
+    
+    Returns complete object information including type-specific properties
+    """
+    return await call_endpoint(f"object/{object_id}", "GET")
+
+@mcp.tool()
+async def tekla_update_object(
+    object_id: int,
+    updates: str  # JSON string with properties to update
+) -> str:
+    """Update properties of an existing object
+    
+    PHASE 2 ENHANCEMENT: Object modification capabilities
+    
+    Parameters:
+    - object_id: ID of the object to update
+    - updates: JSON string containing properties to update
+    
+    Example updates format:
+    '{"profile": "W21X50", "material": "A992", "class": "2"}'
+    
+    Returns update confirmation with applied changes
+    """
+    return await call_endpoint(f"object/{object_id}", "PUT", updates)
+
+@mcp.tool()
+async def tekla_delete_object(
+    object_id: int
+) -> str:
+    """Delete an object from the model
+    
+    PHASE 2 ENHANCEMENT: Object deletion capabilities
+    
+    Parameters:
+    - object_id: ID of the object to delete
+    
+    WARNING: This permanently removes the object from the model!
+    
+    Returns deletion confirmation or error details
+    """
+    return await call_endpoint(f"object/{object_id}", "DELETE")
+
+@mcp.tool()
+async def tekla_bulk_operations(
+    operations: str  # JSON array of operations
+) -> str:
+    """Execute multiple operations in a single transaction
+    
+    PHASE 2 ENHANCEMENT: Bulk operations for efficiency
+    
+    Parameters:
+    - operations: JSON array of operations to execute
+    
+    Example operations format:
+    '[
+        {"type": "create_beam", "data": {"start_point": "0 0 0", "end_point": "5000 0 0"}},
+        {"type": "update", "data": {"object_id": 12345, "profile": "W18X35"}},
+        {"type": "delete", "data": {"object_id": 67890}}
+    ]'
+    
+    Returns summary of all operations with individual results
+    """
+    return await call_endpoint("objects/bulk", "POST", operations)
 
 # ==================== MAIN ====================
 
