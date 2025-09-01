@@ -14,6 +14,50 @@ using System.CodeDom.Compiler;
 namespace TeklaMCP
 {
     /// <summary>
+    /// BeamRequest - Type-safe data model for beam creation
+    /// Follows engineered architecture from old commits
+    /// </summary>
+    public class BeamRequest
+    {
+        // Core geometry
+        public double StartPointX { get; set; }
+        public double StartPointY { get; set; }
+        public double StartPointZ { get; set; }
+        public double EndPointX { get; set; }
+        public double EndPointY { get; set; }
+        public double EndPointZ { get; set; }
+
+        // Material and profile
+        public string Profile { get; set; }
+        public string Material { get; set; } = "A992";
+
+        // Properties  
+        public string Class { get; set; } = "1";        // User-defined organizational number
+        public string Name { get; set; } = "BEAM";      // Display name
+        public string Finish { get; set; } = "";
+
+        // Position parameters (strings converted to Tekla enums)
+        public string PositionDepth { get; set; } = "MIDDLE";      // FRONT, MIDDLE, BEHIND
+        public string PositionPlane { get; set; } = "MIDDLE";      // LEFT, MIDDLE, RIGHT
+        public string PositionRotation { get; set; } = "FRONT";    // TOP, FRONT, BACK, BELOW
+
+        // Point offsets (optional)
+        public double StartPointOffsetDx { get; set; } = 0.0;
+        public double StartPointOffsetDy { get; set; } = 0.0;
+        public double StartPointOffsetDz { get; set; } = 0.0;
+        public double EndPointOffsetDx { get; set; } = 0.0;
+        public double EndPointOffsetDy { get; set; } = 0.0;
+        public double EndPointOffsetDz { get; set; } = 0.0;
+
+        // Position offsets (optional)
+        public double PositionDepthOffset { get; set; } = 0.0;
+        public double PositionPlaneOffset { get; set; } = 0.0;
+        public double PositionRotationOffset { get; set; } = 0.0;
+
+        // Advanced properties
+        public int PourPhase { get; set; } = 0;
+    }
+    /// <summary>
     /// TeklaMCP 0.3 - CLEAN VERSION with Legacy Dynamic Execution
     /// 
     /// ARCHITECTURE OVERVIEW:
@@ -109,8 +153,6 @@ namespace TeklaMCP
                 Console.WriteLine("  GET  /test");
                 Console.WriteLine("  GET  /tekla-info"); 
                 Console.WriteLine("  POST /create-beam");
-                Console.WriteLine("  POST /create-connection");
-                Console.WriteLine("  POST /create-connection-by-ids");
                 Console.WriteLine("  POST /execute-code");
                 Console.WriteLine("Press Ctrl+C to stop...");
                 
@@ -153,15 +195,7 @@ namespace TeklaMCP
                         break;
 
                     case "POST /create-beam":
-                        responseString = HandleCreateBeam();
-                        break;
-
-                    case "POST /create-connection":
-                        responseString = HandleCreateConnection();
-                        break;
-
-                    case "POST /create-connection-by-ids":
-                        responseString = HandleCreateConnectionByIds(request);
+                        responseString = HandleCreateBeam(request);
                         break;
 
                     case "POST /execute-code":
@@ -266,7 +300,7 @@ namespace TeklaMCP
             }
         }
 
-        static string HandleCreateBeam()
+        static string HandleCreateBeam(HttpListenerRequest request)
         {
             try
             {
@@ -280,28 +314,98 @@ namespace TeklaMCP
                     });
                 }
 
-                var beam = new Beam();
-                beam.StartPoint = new Point(0, 0, 0);
-                beam.EndPoint = new Point(6000, 0, 0);
-                beam.Profile.ProfileString = "W21X50";
-                beam.Material.MaterialString = "A992";
-                beam.Class = "1";
-                beam.Name = "CLEAN_BEAM";
+                // Read JSON request body
+                string requestBody = "";
+                using (var reader = new StreamReader(request.InputStream))
+                {
+                    requestBody = reader.ReadToEnd();
+                }
+
+                if (string.IsNullOrEmpty(requestBody))
+                {
+                    return JsonConvert.SerializeObject(new
+                    {
+                        success = false,
+                        error = "No request body provided. Expected JSON with BeamRequest parameters."
+                    });
+                }
+
+                // Parse to type-safe BeamRequest
+                var beamRequest = JsonConvert.DeserializeObject<BeamRequest>(requestBody);
                 
+                // Create Tekla Beam object
+                var beam = new Beam();
+                
+                // Core geometry using Tekla Point directly
+                beam.StartPoint = new Point(beamRequest.StartPointX, beamRequest.StartPointY, beamRequest.StartPointZ);
+                beam.EndPoint = new Point(beamRequest.EndPointX, beamRequest.EndPointY, beamRequest.EndPointZ);
+                
+                // Point offsets using existing Tekla offset properties
+                beam.StartPointOffset.Dx = beamRequest.StartPointOffsetDx;
+                beam.StartPointOffset.Dy = beamRequest.StartPointOffsetDy;
+                beam.StartPointOffset.Dz = beamRequest.StartPointOffsetDz;
+                beam.EndPointOffset.Dx = beamRequest.EndPointOffsetDx;
+                beam.EndPointOffset.Dy = beamRequest.EndPointOffsetDy;
+                beam.EndPointOffset.Dz = beamRequest.EndPointOffsetDz;
+                
+                // Material and profile
+                beam.Profile.ProfileString = beamRequest.Profile;
+                beam.Material.MaterialString = beamRequest.Material;
+                
+                // Properties
+                beam.Class = beamRequest.Class;
+                beam.Name = beamRequest.Name;
+                beam.Finish = beamRequest.Finish;
+                beam.PourPhase = beamRequest.PourPhase;
+                
+                // Position parameters - convert strings to Tekla enums (following old commits pattern)
+                if (!string.IsNullOrEmpty(beamRequest.PositionDepth))
+                {
+                    beam.Position.Depth = (Position.DepthEnum)Enum.Parse(typeof(Position.DepthEnum), beamRequest.PositionDepth.ToUpper());
+                }
+                
+                if (!string.IsNullOrEmpty(beamRequest.PositionPlane))
+                {
+                    beam.Position.Plane = (Position.PlaneEnum)Enum.Parse(typeof(Position.PlaneEnum), beamRequest.PositionPlane.ToUpper());
+                }
+                
+                if (!string.IsNullOrEmpty(beamRequest.PositionRotation))
+                {
+                    beam.Position.Rotation = (Position.RotationEnum)Enum.Parse(typeof(Position.RotationEnum), beamRequest.PositionRotation.ToUpper());
+                }
+                
+                // Position offsets
+                beam.Position.DepthOffset = beamRequest.PositionDepthOffset;
+                beam.Position.PlaneOffset = beamRequest.PositionPlaneOffset;
+                beam.Position.RotationOffset = beamRequest.PositionRotationOffset;
+                
+                // Insert beam into model
                 bool success = beam.Insert();
                 model.CommitChanges();
                 
                 if (success)
                 {
-                    LogMessage("BEAM_CREATED", $"Beam created successfully, ID: {beam.Identifier.ID}");
+                    LogMessage("BEAM_CREATED", $"Type-safe beam created, ID: {beam.Identifier.ID}");
                     return JsonConvert.SerializeObject(new
                     {
                         success = true,
-                        message = "Beam created successfully with direct Tekla API",
+                        message = "Beam created with type-safe BeamRequest",
                         beam_id = beam.Identifier.ID,
                         profile = beam.Profile.ProfileString,
-                        material = beam.Material.MaterialString
-                    });
+                        material = beam.Material.MaterialString,
+                        class_value = beam.Class,
+                        name = beam.Name,
+                        position = new {
+                            depth = beam.Position.Depth.ToString(),
+                            plane = beam.Position.Plane.ToString(),
+                            rotation = beam.Position.Rotation.ToString(),
+                            depth_offset = beam.Position.DepthOffset,
+                            plane_offset = beam.Position.PlaneOffset,
+                            rotation_offset = beam.Position.RotationOffset
+                        },
+                        start_point = new { x = beam.StartPoint.X, y = beam.StartPoint.Y, z = beam.StartPoint.Z },
+                        end_point = new { x = beam.EndPoint.X, y = beam.EndPoint.Y, z = beam.EndPoint.Z }
+                    }, Formatting.Indented);
                 }
                 else
                 {

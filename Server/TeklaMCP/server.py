@@ -71,42 +71,77 @@ async def tekla_create_beam(
     profile: str = "W21X50",
     material: str = "A992",
     position_depth: str = "MIDDLE",    # FRONT, MIDDLE, BEHIND
-    position_plane: str = "MIDDLE",    # LEFT, MIDDLE, RIGHT
-    position_rotation: str = "FRONT"   # FRONT, TOP, BACK, BELOW
+    position_plane: str = "TOP",       # LEFT, MIDDLE, RIGHT (TOP for beams - beam top aligned with floor)
+    position_rotation: str = "BEHIND", # FRONT, TOP, BACK, BELOW (BEHIND for beams)
+    class_value: str = "1",
+    name: str = "BEAM"
 ) -> str:
-    """Create a beam with full position control using Tekla enums"""
+    """Create a beam with full position control - calls HTTP beam endpoint"""
     # Parse coordinates
     start_coords = start_point.split()
     end_coords = end_point.split()
     
-    # Generate C# code with proper Position.DepthEnum syntax
-    code = f'''
-var beam = new Tekla.Structures.Model.Beam();
-beam.StartPoint = new Tekla.Structures.Geometry3d.Point({start_coords[0]}, {start_coords[1]}, {start_coords[2]});
-beam.EndPoint = new Tekla.Structures.Geometry3d.Point({end_coords[0]}, {end_coords[1]}, {end_coords[2]});
-beam.Profile.ProfileString = "{profile}";
-beam.Material.MaterialString = "{material}";
-beam.Name = "BEAM";
-beam.Class = "1";
-
-beam.Position.Depth = Tekla.Structures.Model.Position.DepthEnum.{position_depth.upper()};
-beam.Position.Plane = Tekla.Structures.Model.Position.PlaneEnum.{position_plane.upper()};  
-beam.Position.Rotation = Tekla.Structures.Model.Position.RotationEnum.{position_rotation.upper()};
-
-if (beam.Insert())
-{{
-    var teklaModel = new Tekla.Structures.Model.Model();
-    teklaModel.CommitChanges();
-    return "SUCCESS: Beam created with ID " + beam.Identifier.ID.ToString() + " - Profile: {profile}, Position: {position_depth}/{position_plane}/{position_rotation}";
-}}
-else
-{{
-    return "ERROR: Failed to create beam";
-}}
-'''
+    # Build BeamRequest payload
+    beam_request = {
+        "StartPointX": float(start_coords[0]),
+        "StartPointY": float(start_coords[1]),
+        "StartPointZ": float(start_coords[2]),
+        "EndPointX": float(end_coords[0]),
+        "EndPointY": float(end_coords[1]),
+        "EndPointZ": float(end_coords[2]),
+        "Profile": profile,
+        "Material": material,
+        "Class": class_value,
+        "Name": name,
+        "PositionDepth": position_depth,
+        "PositionPlane": position_plane,
+        "PositionRotation": position_rotation
+    }
     
-    return await call_endpoint("execute-code", "POST", code)
+    return await call_endpoint("create-beam", "POST", beam_request)
 
+
+
+@mcp.tool()
+async def tekla_create_column(
+    base_point: str,   # "3000 3000 0"
+    height: str = "3000",
+    profile: str = "W14X90",
+    material: str = "A992",
+    position_depth: str = "MIDDLE",
+    position_plane: str = "MIDDLE",     # MIDDLE for columns (centered)
+    position_rotation: str = "TOP",     # TOP for columns (centered)
+    class_value: str = "1",
+    name: str = "COLUMN"
+) -> str:
+    """Create vertical column using beam endpoint - calls HTTP beam endpoint"""
+    # Parse base point coordinates
+    base_coords = base_point.split()
+    height_val = float(height)
+    
+    # Calculate end point (vertical: same x,y but z + height)
+    end_x = float(base_coords[0])
+    end_y = float(base_coords[1]) 
+    end_z = float(base_coords[2]) + height_val
+    
+    # Build BeamRequest payload with column-specific defaults
+    beam_request = {
+        "StartPointX": float(base_coords[0]),
+        "StartPointY": float(base_coords[1]),
+        "StartPointZ": float(base_coords[2]),
+        "EndPointX": end_x,
+        "EndPointY": end_y,
+        "EndPointZ": end_z,
+        "Profile": profile,
+        "Material": material,
+        "Class": class_value,
+        "Name": name,
+        "PositionDepth": position_depth,
+        "PositionPlane": position_plane,
+        "PositionRotation": position_rotation
+    }
+    
+    return await call_endpoint("create-beam", "POST", beam_request)
 
 
 @mcp.tool()
