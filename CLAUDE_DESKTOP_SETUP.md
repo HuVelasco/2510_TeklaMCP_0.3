@@ -8,25 +8,50 @@
    - Windows: `C:\Users\[USERNAME]\AppData\Roaming\Claude\claude_desktop_config.json`
    - Mac: `~/Library/Application Support/Claude/claude_desktop_config.json`
 
-2. Update or add the TeklaMCP server configuration:
+2. Update your existing configuration to use the new TeklaMCP 0.3 server:
 
 ```json
 {
   "mcpServers": {
+    "blender": {
+      "command": "uvx",
+      "args": ["blender-mcp"]
+    },
     "tekla": {
       "command": "python",
       "args": [
-        "C:\\Users\\hugov\\ClaudeProjects\\2510_TeklaMCP_0.3\\Server\\TeklaMCP\\start_mcp_server.py"
+        "C:\\Users\\hugov\\ClaudeProjects\\2510_TeklaMCP_0.3\\Server\\TeklaMCP\\server.py"
       ],
       "env": {
         "PYTHONIOENCODING": "utf-8"
       }
+    },
+    "etabs-clean": {
+      "command": "C:\\Users\\hugov\\ClaudeProjects\\2509_EtabsMCP_0.3\\.venv\\Scripts\\python.exe",
+      "args": [
+        "-m",
+        "etabs-mcp-clean.server"
+      ],
+      "cwd": "C:\\Users\\hugov\\ClaudeProjects\\2509_EtabsMCP_0.3",
+      "env": {
+        "PYTHONIOENCODING": "utf-8"
+      }
+    },
+    "_etabs-mcp-old": {
+      "command": "python",
+      "args": [
+        "C:/Users/hugov/ClaudeProjects/2508_structural-mcp-servers/servers/etabs_mcp/PRODUCTION/server.py"
+      ],
+      "env": {
+        "PYTHONPATH": "C:/Users/hugov/ClaudeProjects/2508_structural-mcp-servers/servers/etabs_mcp/PRODUCTION"
+      }
     }
-  }
+  },
+  "isUsingBuiltInNodeForMcp": false
 }
 ```
 
-**Important:** Replace `C:\\Users\\hugov\\` with your actual username path.
+**Key Change:** Update the "tekla" server args path from the old V2 location to the new TeklaMCP 0.3 server.py (automatically manages both HTTP backend and MCP server).
 
 ### Step 2: Ensure Prerequisites
 
@@ -47,17 +72,19 @@
 ## Alternative Startup Methods
 
 ### Option 1: One-Click Startup (Windows)
-Double-click `TeklaMCP_Start.bat` in the project root to start both servers automatically.
+Double-click `TeklaMCP_Start.bat` in the project root (launches `launcher.py` for development use).
 
 ### Option 2: Manual Command Line
 ```bash
 cd Server/TeklaMCP
-python start_mcp_server.py
+python server.py      # Main server (used by Claude Desktop)
+# OR
+python launcher.py    # Development launcher (backwards compatibility)
 ```
 
-## What the Autostart Solution Does
+## What the Server Does
 
-The enhanced `start_mcp_server.py` automatically:
+The `server.py` automatically:
 
 1. **Starts HTTP Backend (C#)**:
    - Handles all Tekla Structures API communication

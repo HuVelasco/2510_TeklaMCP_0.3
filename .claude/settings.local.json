@@ -13,7 +13,10 @@
       "WebSearch",
       "Bash(curl:*)",
       "Bash(python test_mcp_servers.py:*)",
-      "Bash(python:*)"
+      "Bash(python:*)",
+      "Read(C:\\Users\\hugov\\.claude/**)",
+      "Bash(timeout:*)",
+      "Read(C:\\Users\\hugov\\AppData\\Roaming\\Claude/**)"
     ],
     "deny": [],
     "ask": []

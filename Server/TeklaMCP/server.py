@@ -6,6 +6,11 @@ Clean, focused tools for Tekla operations
 
 import asyncio
 import aiohttp
+import subprocess
+import sys
+import os
+import time
+import atexit
 from fastmcp import FastMCP
 from pydantic import BaseModel, Field
 from typing import Optional
@@ -15,6 +20,69 @@ mcp = FastMCP("TeklaMCP Phase 1 Server")
 
 # HTTP backend configuration
 TEKLA_SERVER_URL = "http://localhost:8081"
+
+# Global process management
+http_backend_process = None
+
+def start_http_backend():
+    """Start the C# HTTP backend server"""
+    global http_backend_process
+    
+    try:
+        # Get the directory of this script
+        server_dir = os.path.dirname(os.path.abspath(__file__))
+        
+        print(f"Starting HTTP backend from: {server_dir}", file=sys.stderr)
+        
+        http_backend_process = subprocess.Popen(
+            ["dotnet", "run", "--project", "TeklaMCPSimple.csproj"],
+            cwd=server_dir,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True
+        )
+        
+        # Wait for HTTP backend to be ready
+        for attempt in range(20):  # 10 second timeout
+            try:
+                import requests
+                response = requests.get(f"{TEKLA_SERVER_URL}/test", timeout=1)
+                if response.status_code == 200:
+                    print("HTTP backend ready", file=sys.stderr)
+                    return True
+            except:
+                pass
+            
+            if http_backend_process.poll() is not None:
+                # Process has terminated
+                print("HTTP backend failed to start", file=sys.stderr)
+                return False
+                
+            time.sleep(0.5)
+        
+        print("HTTP backend startup timeout", file=sys.stderr)
+        return False
+        
+    except Exception as e:
+        print(f"Error starting HTTP backend: {e}", file=sys.stderr)
+        return False
+
+def cleanup_http_backend():
+    """Clean up HTTP backend process"""
+    global http_backend_process
+    if http_backend_process:
+        try:
+            http_backend_process.terminate()
+            try:
+                http_backend_process.wait(timeout=5)
+            except subprocess.TimeoutExpired:
+                http_backend_process.kill()
+            print("HTTP backend stopped", file=sys.stderr)
+        except Exception as e:
+            print(f"Error stopping HTTP backend: {e}", file=sys.stderr)
+
+# Register cleanup function
+atexit.register(cleanup_http_backend)
 
 # ==================== DATA MODELS ====================
 
@@ -240,16 +308,33 @@ async def create_multiple_elements(
 # ==================== SERVER STARTUP ====================
 
 if __name__ == "__main__":
-    print("Starting TeklaMCP Phase 1 Server")
-    print(f"Backend URL: {TEKLA_SERVER_URL}")
-    print("Available tools:")
-    print("  - create_beam: Create structural beams")
-    print("  - create_column: Create vertical columns")
-    print("  - create_brace: Create diagonal braces")
-    print("  - get_tekla_status: Check connection status")
-    print("  - get_element_info: Get element details")
-    print("  - list_profiles: List available profiles")
-    print("  - custom_tekla_operation: Execute custom C# code")
-    print("  - create_multiple_elements: Batch element creation")
+    print("TeklaMCP Phase 1 Server - Starting...", file=sys.stderr)
+    print(f"Backend URL: {TEKLA_SERVER_URL}", file=sys.stderr)
     
-    mcp.run()
+    # Start HTTP backend first
+    print("Starting HTTP backend...", file=sys.stderr)
+    if not start_http_backend():
+        print("FAILED: Could not start HTTP backend. Tekla tools will not work.", file=sys.stderr)
+        print("Make sure Tekla Structures is running and .NET SDK is installed.", file=sys.stderr)
+        sys.exit(1)
+    
+    print("Available tools:", file=sys.stderr)
+    print("  - create_beam: Create structural beams", file=sys.stderr)
+    print("  - create_column: Create vertical columns", file=sys.stderr)
+    print("  - create_brace: Create diagonal braces", file=sys.stderr)
+    print("  - get_tekla_status: Check connection status", file=sys.stderr)
+    print("  - get_element_info: Get element details", file=sys.stderr)
+    print("  - list_profiles: List available profiles", file=sys.stderr)
+    print("  - custom_tekla_operation: Execute custom C# code", file=sys.stderr)
+    print("  - create_multiple_elements: Batch element creation", file=sys.stderr)
+    print("", file=sys.stderr)
+    print("TeklaMCP Server ready for Claude Desktop", file=sys.stderr)
+    
+    try:
+        mcp.run()
+    except KeyboardInterrupt:
+        print("Shutting down TeklaMCP Server...", file=sys.stderr)
+    except Exception as e:
+        print(f"Server error: {e}", file=sys.stderr)
+    finally:
+        cleanup_http_backend()
