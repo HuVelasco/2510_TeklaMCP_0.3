@@ -20,9 +20,15 @@
       "Bash(taskkill:*)",
       "mcp__tekla__get_tekla_status",
       "mcp__tekla__create_beam",
-      "Bash(git ls-tree:*)"
+      "Bash(git ls-tree:*)",
+      "mcp__tekla__tekla_create_beam",
+      "mcp__tekla__tekla_execute_code"
     ],
     "deny": [],
     "ask": []
-  }
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "tekla"
+  ]
 }

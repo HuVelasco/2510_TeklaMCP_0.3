@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "tekla": {
+      "command": "python",
+      "args": [
+        "./PythonBridge/modern_tekla_mcp_server.py"
+      ],
+      "description": "Modern TeklaMCP Server - FastMCP-based bridge to Tekla Structures"
+    }
+  }
+}

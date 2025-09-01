@@ -1,0 +1,3 @@
+{
+  "code": "var model = new Model(); var beam = new Beam(); beam.StartPoint = new Point3d(6096, 0, 0); beam.EndPoint = new Point3d(6096, 0, 3048); beam.Profile.ProfileString = \"W14X90\"; beam.Insert(); model.CommitChanges(); return \"SUCCESS: Column created at (6096,0) height 3048\";"
+}
