@@ -77,6 +77,22 @@ if endpoint == "execute-code" and isinstance(params, str):
    - Uses legacy CSharpCodeProvider for .NET Framework compatibility
    - Full Tekla API access
 
+### MCP Tools (3/6 Still Need Fixing)
+4. **`mcp__tekla__tekla_create_grid`** ❌ **BROKEN**
+   - Currently calls non-existent `/create-grid` endpoint
+   - **Fix Required**: Update to use `/execute-code` with Grid creation C# code
+   - **Implementation**: Generate C# code to parse coordinates and create Grid object
+
+5. **`mcp__tekla__tekla_create_column`** ❌ **BROKEN**
+   - Currently calls non-existent `/create-column` endpoint  
+   - **Fix Required**: Update to use `/execute-code` with Beam creation C# code
+   - **Implementation**: Generate C# code to create vertical Beam (column) at grid location
+
+6. **`mcp__tekla__tekla_modify_column`** ❌ **BROKEN**
+   - Currently calls non-existent `/modify-column` endpoint
+   - **Fix Required**: Update to use `/execute-code` with beam modification C# code
+   - **Implementation**: Generate C# code to find and modify existing beam profile
+
 ### HTTP Endpoints (6/6 Available)
 1. `GET /test` - Connectivity test
 2. `GET /tekla-info` - Model information ✅ **USED BY MCP**
@@ -157,30 +173,70 @@ Server/
 
 ---
 
-## 🎯 Next Phase Ready
+## 🎯 Phase 2 TODO: Complete All Tools
 
-### Immediate Capabilities
-- ✅ Full dynamic C# code execution in Tekla
-- ✅ Can implement any missing MCP tool using `tekla_execute_code`
-- ✅ Solid foundation for advanced Tekla operations
+### CRITICAL: Not Fully Operational Yet
+**Current Status**: 3/6 MCP tools working (50% complete)
+**Remaining Work**: Fix 3 broken MCP tools
 
-### Future Implementation (Phase 2)
-- Fix remaining 3 MCP tools to use `tekla_execute_code`:
-  - `tekla_create_grid` (use dynamic grid creation code)
-  - `tekla_create_column` (use dynamic beam creation code)  
-  - `tekla_modify_column` (use dynamic modification code)
+### Phase 2 Implementation Plan
+**Priority 1: Fix Broken MCP Tools**
+1. **`tekla_create_grid`**
+   ```python
+   # Replace current broken call_endpoint("create-grid", "GET", params) with:
+   code = f"""
+   var grid = new Grid();
+   grid.Name = "{name}";
+   // Parse coordinates and add to grid.CoordinateX/Y
+   grid.Insert();
+   return "Grid created successfully";
+   """
+   return await call_endpoint("execute-code", "POST", code)
+   ```
+
+2. **`tekla_create_column`**  
+   ```python
+   # Replace current broken call_endpoint("create-column", "GET", params) with:
+   code = f"""
+   var beam = new Beam();
+   beam.StartPoint = new Tekla.Structures.Geometry3d.Point(x, y, 0);
+   beam.EndPoint = new Tekla.Structures.Geometry3d.Point(x, y, {height});
+   beam.Profile.ProfileString = "{profile}";
+   beam.Insert();
+   return "Column created at {location}";
+   """
+   return await call_endpoint("execute-code", "POST", code)
+   ```
+
+3. **`tekla_modify_column`**
+   ```python
+   # Replace current broken call_endpoint("modify-column", "GET", params) with:
+   code = f"""
+   var modelObjectEnumerator = model.GetModelObjectSelector().GetAllObjects();
+   // Find and modify beam profile
+   return "Column modified successfully";
+   """
+   return await call_endpoint("execute-code", "POST", code)
+   ```
+
+**Priority 2: File Structure Cleanup**
+- Move working `TeklaMCP_Clean/` to replace confusing `TeklaMCP/` 
+- Remove duplicate and broken files
+- Update `.mcp.json` paths
+
+**Priority 3: Additional Tools**
 - Expose orphan endpoints as MCP tools:
   - `tekla_create_connection`
   - `tekla_create_connection_by_ids`
 
 ---
 
-## 🏆 Success Metrics
+## 🏆 Current Success Metrics
 
-- **MCP Integration**: ✅ 100% Working with modern Claude Code
-- **HTTP Server**: ✅ 100% Stable and responsive  
-- **Tekla Connection**: ✅ 100% Connected to live model
-- **Dynamic Execution**: ✅ 100% Working with legacy compiler
-- **Real Object Creation**: ✅ 100% Verified in live Tekla model
+- **MCP Integration**: ✅ Working with modern Claude Code
+- **HTTP Server**: ✅ Stable and responsive  
+- **Tekla Connection**: ✅ Connected to live model
+- **Dynamic Execution**: ✅ Working with legacy compiler
+- **Tool Completion**: ⚠️  **50% (3/6 tools working)**
 
-**Overall Status: MISSION ACCOMPLISHED** 🎯
+**Overall Status: PHASE 1 FOUNDATION COMPLETE - PHASE 2 NEEDED** ⚠️
