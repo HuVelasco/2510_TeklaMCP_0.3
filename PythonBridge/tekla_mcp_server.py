@@ -454,7 +454,7 @@ if __name__ == "__main__":
     import traceback
     
     # Create log file for debugging
-    log_file = "C:/Users/hugov/ClaudeProjects/2503_TeklaMCP/TeklaMCP.HttpServer/tekla_mcp_debug.log"
+    log_file = "C:/temp/tekla_mcp_debug.log"
     
     try:
         with open(log_file, "w", encoding='utf-8') as f:
