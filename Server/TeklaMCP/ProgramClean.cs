@@ -124,12 +124,48 @@ namespace TeklaMCP
     /// 6. Commit changes to Tekla model
     /// 
     /// PROVEN STABILITY: Based on working V2 implementation with dependency conflicts resolved
+    /// 
+    /// PHASE 1 IMPROVEMENTS:
+    /// - Standardized error response builder eliminates duplication
+    /// - Modularized connection verification code
+    /// - Cleaned up monolithic patterns
     /// </summary>
     class ProgramClean
     {
         private static HttpListener listener;
         private static string logFile = @"C:\temp\tekla_mcp_clean.log";
 
+        // ==================== STANDARDIZED RESPONSE BUILDERS ====================
+        
+        /// <summary>
+        /// Standardized success response builder - eliminates 25+ lines of duplication
+        /// </summary>
+        private static string BuildSuccessResponse(object data, string message = null)
+        {
+            return JsonConvert.SerializeObject(new
+            {
+                success = true,
+                message = message ?? "Operation completed successfully",
+                data = data,
+                timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
+            }, Formatting.Indented);
+        }
+        
+        /// <summary>
+        /// Standardized error response builder - eliminates duplication and ensures consistency
+        /// </summary>
+        private static string BuildErrorResponse(string error, string operation = null, object details = null)
+        {
+            return JsonConvert.SerializeObject(new
+            {
+                success = false,
+                error = error,
+                operation = operation,
+                details = details,
+                timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
+            }, Formatting.Indented);
+        }
+        
         static void Main(string[] args)
         {
             Directory.CreateDirectory(@"C:\temp");
@@ -245,16 +281,16 @@ namespace TeklaMCP
 
         static string HandleTest()
         {
-            var result = new
-            {
-                success = true,
-                message = "TeklaMCP 0.3 CLEAN Server is working!",
-                server_type = "Clean - Direct Tekla API",
-                timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
-            };
-
             LogMessage("TEST_SUCCESS", "Test endpoint called successfully");
-            return JsonConvert.SerializeObject(result, Formatting.Indented);
+            return BuildSuccessResponse(new {
+                server_type = "Clean - Direct Tekla API - Phase 1",
+                phase = "Code Deduplication & Cleanup",
+                improvements = new[] {
+                    "Eliminated HTTP request duplication",
+                    "Standardized error responses", 
+                    "Modularized connection verification"
+                }
+            }, "TeklaMCP 0.3 CLEAN Server is working!");
         }
 
         static string HandleTeklaInfo()
@@ -267,36 +303,24 @@ namespace TeklaMCP
                 if (isConnected)
                 {
                     var modelInfo = model.GetInfo();
-                    var result = new
-                    {
-                        success = true,
+                    LogMessage("TEKLA_INFO_SUCCESS", $"Retrieved model info: {modelInfo.ModelName}");
+                    return BuildSuccessResponse(new {
                         tekla_connected = true,
                         model_name = modelInfo.ModelName,
                         model_path = modelInfo.ModelPath,
-                        server_type = "Clean - Direct API"
-                    };
-                    
-                    LogMessage("TEKLA_INFO_SUCCESS", $"Retrieved model info: {modelInfo.ModelName}");
-                    return JsonConvert.SerializeObject(result, Formatting.Indented);
+                        server_type = "Clean - Direct API - Phase 1"
+                    });
                 }
                 else
                 {
                     LogMessage("TEKLA_NOT_CONNECTED", "Tekla not connected");
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = "Tekla Structures not running or no model open"
-                    });
+                    return BuildErrorResponse("Tekla Structures not running or no model open", "tekla-info");
                 }
             }
             catch (Exception ex)
             {
                 LogMessage("TEKLA_INFO_ERROR", $"Error: {ex.Message}");
-                return JsonConvert.SerializeObject(new
-                {
-                    success = false,
-                    error = $"Tekla info error: {ex.Message}"
-                });
+                return BuildErrorResponse($"Tekla info error: {ex.Message}", "tekla-info", new { exception = ex.GetType().Name });
             }
         }
 
@@ -307,11 +331,7 @@ namespace TeklaMCP
                 var model = new Model();
                 if (!model.GetConnectionStatus())
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = "Tekla not connected"
-                    });
+                    return BuildErrorResponse("Tekla not connected", "create-beam");
                 }
 
                 // Read JSON request body
@@ -323,11 +343,7 @@ namespace TeklaMCP
 
                 if (string.IsNullOrEmpty(requestBody))
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = "No request body provided. Expected JSON with BeamRequest parameters."
-                    });
+                    return BuildErrorResponse("No request body provided. Expected JSON with BeamRequest parameters.", "create-beam");
                 }
 
                 // Parse to type-safe BeamRequest
@@ -386,10 +402,7 @@ namespace TeklaMCP
                 if (success)
                 {
                     LogMessage("BEAM_CREATED", $"Type-safe beam created, ID: {beam.Identifier.ID}");
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = true,
-                        message = "Beam created with type-safe BeamRequest",
+                    return BuildSuccessResponse(new {
                         beam_id = beam.Identifier.ID,
                         profile = beam.Profile.ProfileString,
                         material = beam.Material.MaterialString,
@@ -405,25 +418,17 @@ namespace TeklaMCP
                         },
                         start_point = new { x = beam.StartPoint.X, y = beam.StartPoint.Y, z = beam.StartPoint.Z },
                         end_point = new { x = beam.EndPoint.X, y = beam.EndPoint.Y, z = beam.EndPoint.Z }
-                    }, Formatting.Indented);
+                    }, "Beam created with type-safe BeamRequest");
                 }
                 else
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = "Failed to insert beam into model"
-                    });
+                    return BuildErrorResponse("Failed to insert beam into model", "create-beam");
                 }
             }
             catch (Exception ex)
             {
                 LogMessage("BEAM_ERROR", $"Error: {ex.Message}");
-                return JsonConvert.SerializeObject(new
-                {
-                    success = false,
-                    error = $"Beam creation error: {ex.Message}"
-                });
+                return BuildErrorResponse($"Beam creation error: {ex.Message}", "create-beam", new { exception = ex.GetType().Name });
             }
         }
 
@@ -442,11 +447,7 @@ namespace TeklaMCP
 
                 if (string.IsNullOrEmpty(code))
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        error = "No code provided"
-                    });
+                    return BuildErrorResponse("No code provided", "execute-code");
                 }
 
                 Console.WriteLine($"📝 Code to execute: {code.Substring(0, Math.Min(100, code.Length))}...");
@@ -472,37 +473,25 @@ namespace TeklaMCP
                         
                         LogMessage("EXECUTE_SUCCESS", $"Code executed: {result}");
                         
-                        return JsonConvert.SerializeObject(new
-                        {
-                            success = true,
+                        return BuildSuccessResponse(new {
                             result = result,
                             console_output = capturedOutput,
-                            message = "Clean execution with direct Tekla API",
                             code_length = code.Length
-                        }, Formatting.Indented);
+                        }, "Clean execution with direct Tekla API");
                     }
                     catch (Exception ex)
                     {
                         Console.SetOut(originalOut);
                         LogMessage("EXECUTE_ERROR", $"Error: {ex.Message}");
                         
-                        return JsonConvert.SerializeObject(new
-                        {
-                            success = false,
-                            error = ex.Message,
-                            console_output = consoleOutput.ToString()
-                        });
+                        return BuildErrorResponse(ex.Message, "execute-code", new { console_output = consoleOutput.ToString() });
                     }
                 }
             }
             catch (Exception ex)
             {
                 LogMessage("EXECUTE_WRAPPER_ERROR", $"Error: {ex.Message}");
-                return JsonConvert.SerializeObject(new
-                {
-                    success = false,
-                    error = $"Execute wrapper error: {ex.Message}"
-                });
+                return BuildErrorResponse($"Execute wrapper error: {ex.Message}", "execute-code", new { exception = ex.GetType().Name });
             }
         }
 
@@ -671,83 +660,50 @@ public class DynamicTeklaScript
             }
         }
 
+        // ==================== MODULAR CONNECTION MANAGEMENT ====================
+        
+        /// <summary>
+        /// Main connection creation with verification - now modular and clean
+        /// </summary>
         static string CreateConnectionWithVerification(Model model, int connectionNumber, string connectionName, ModelObject primaryObject, System.Collections.ArrayList secondaryObjects)
         {
             try
             {
-                // Check for existing connections between these objects
-                var existingConnectionCheck = CheckExistingConnections(model, primaryObject, secondaryObjects) as System.Collections.Generic.Dictionary<string, object>;
-                bool hasExisting = existingConnectionCheck != null && existingConnectionCheck.ContainsKey("hasExisting") ? Convert.ToBoolean(existingConnectionCheck["hasExisting"]) : false;
-                if (hasExisting)
+                // Check for existing connections
+                var existingCheck = CheckExistingConnections(model, primaryObject, secondaryObjects) as System.Collections.Generic.Dictionary<string, object>;
+                if (HasExistingConnection(existingCheck))
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        connection_created = false,
-                        error = "Connection already exists between these objects",
-                        existing_connections = existingConnectionCheck != null && existingConnectionCheck.ContainsKey("existingConnections") ? existingConnectionCheck["existingConnections"] : new object[0],
-                        message = "Cannot create duplicate connection. Most connection types allow only one connection between the same objects."
-                    });
-                }
-                
-                // Record initial state for comparison
-                var initialConnectionCount = CountConnections(model);
-                var primaryInitialChildren = GetObjectChildren(primaryObject);
-                
-                // Create the connection
-                var connection = new Tekla.Structures.Model.Connection();
-                connection.Number = connectionNumber;
-                connection.Name = !string.IsNullOrEmpty(connectionName) ? connectionName : GetDefaultConnectionName(connectionNumber);
-                
-                // V2 PROVEN SEQUENCE
-                connection.SetPrimaryObject(primaryObject);
-                
-                // Handle multiple secondary objects
-                if (secondaryObjects.Count == 1)
-                {
-                    connection.SetSecondaryObject(secondaryObjects[0] as ModelObject);
-                }
-                else
-                {
-                    // Multiple secondaries - use SetSecondaryObjects if available, or add them individually
-                    for (int i = 0; i < secondaryObjects.Count; i++)
-                    {
-                        if (i == 0)
-                        {
-                            connection.SetSecondaryObject(secondaryObjects[i] as ModelObject);
+                    return BuildErrorResponse(
+                        "Connection already exists between these objects",
+                        "create-connection",
+                        new {
+                            existing_connections = GetExistingConnectionsData(existingCheck),
+                            message = "Cannot create duplicate connection. Most connection types allow only one connection between the same objects."
                         }
-                        // Note: Tekla API might not support multiple secondaries for all connection types
-                        // This would need to be enhanced based on specific connection requirements
-                    }
+                    );
                 }
                 
-                bool inserted = connection.Insert();
+                // Record initial state
+                var initialState = RecordInitialState(model, primaryObject);
                 
-                if (!inserted)
+                // Create and configure connection
+                var connection = CreateAndConfigureConnection(connectionNumber, connectionName, primaryObject, secondaryObjects);
+                
+                if (!connection.Insert())
                 {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        success = false,
-                        connection_created = false,
-                        error = "Connection.Insert() returned false - connection rejected by Tekla"
-                    });
+                    return BuildErrorResponse("Connection.Insert() returned false - connection rejected by Tekla", "create-connection");
                 }
                 
-                // Load attributes and modify
-                bool attributesLoaded = connection.LoadAttributesFromFile("standard");
-                bool modified = connection.Modify();
-                model.CommitChanges();
+                // Finalize connection
+                var finalized = FinalizeConnection(connection, model);
                 
-                // CRITICAL VERIFICATION: Check if connection actually exists and made changes
-                var verification = VerifyConnectionCreation(model, connection, primaryObject, secondaryObjects, initialConnectionCount, primaryInitialChildren);
-                var verificationDict = verification as System.Collections.Generic.Dictionary<string, object>;
-                bool connectionExists = verificationDict != null && verificationDict.ContainsKey("connection_exists") ? Convert.ToBoolean(verificationDict["connection_exists"]) : false;
+                // Verify creation
+                var verification = VerifyConnectionCreation(model, connection, primaryObject, secondaryObjects, initialState.connectionCount, initialState.childrenCount);
+                var connectionExists = IsConnectionVerified(verification);
                 
                 LogMessage("CONNECTION_VERIFICATION", $"Connection {connection.Identifier.ID} verification: {connectionExists}");
                 
-                return JsonConvert.SerializeObject(new
-                {
-                    success = connectionExists,
+                return BuildSuccessResponse(new {
                     connection_created = connectionExists,
                     connection_id = connection.Identifier.ID,
                     connection_number = connectionNumber,
@@ -758,20 +714,89 @@ public class DynamicTeklaScript
                     },
                     secondary_objects = GetSecondaryObjectsInfo(secondaryObjects),
                     verification = verification,
-                    attributes_loaded = attributesLoaded,
-                    modified = modified
-                }, Formatting.Indented);
+                    finalization = finalized
+                });
             }
             catch (Exception ex)
             {
                 LogMessage("CREATE_CONNECTION_ERROR", $"Error: {ex.Message}");
-                return JsonConvert.SerializeObject(new
-                {
-                    success = false,
-                    connection_created = false,
-                    error = $"Connection creation error: {ex.Message}"
-                });
+                return BuildErrorResponse($"Connection creation error: {ex.Message}", "create-connection", new { exception = ex.GetType().Name });
             }
+        }
+        
+        /// <summary>
+        /// Helper to check if existing connections were found
+        /// </summary>
+        private static bool HasExistingConnection(System.Collections.Generic.Dictionary<string, object> existingCheck)
+        {
+            return existingCheck != null && existingCheck.ContainsKey("hasExisting") && Convert.ToBoolean(existingCheck["hasExisting"]);
+        }
+        
+        /// <summary>
+        /// Helper to extract existing connections data
+        /// </summary>
+        private static object GetExistingConnectionsData(System.Collections.Generic.Dictionary<string, object> existingCheck)
+        {
+            return existingCheck != null && existingCheck.ContainsKey("existingConnections") ? existingCheck["existingConnections"] : new object[0];
+        }
+        
+        /// <summary>
+        /// Record initial model state for comparison
+        /// </summary>
+        private static (int connectionCount, int childrenCount) RecordInitialState(Model model, ModelObject primaryObject)
+        {
+            return (CountConnections(model), GetObjectChildren(primaryObject));
+        }
+        
+        /// <summary>
+        /// Create and configure connection object
+        /// </summary>
+        private static Tekla.Structures.Model.Connection CreateAndConfigureConnection(int connectionNumber, string connectionName, ModelObject primaryObject, System.Collections.ArrayList secondaryObjects)
+        {
+            var connection = new Tekla.Structures.Model.Connection();
+            connection.Number = connectionNumber;
+            connection.Name = !string.IsNullOrEmpty(connectionName) ? connectionName : GetDefaultConnectionName(connectionNumber);
+            
+            // V2 PROVEN SEQUENCE
+            connection.SetPrimaryObject(primaryObject);
+            
+            // Handle secondary objects
+            if (secondaryObjects.Count == 1)
+            {
+                connection.SetSecondaryObject(secondaryObjects[0] as ModelObject);
+            }
+            else
+            {
+                // Multiple secondaries - first one only for now (API limitation)
+                connection.SetSecondaryObject(secondaryObjects[0] as ModelObject);
+            }
+            
+            return connection;
+        }
+        
+        /// <summary>
+        /// Finalize connection with attributes and modifications
+        /// </summary>
+        private static object FinalizeConnection(Tekla.Structures.Model.Connection connection, Model model)
+        {
+            bool attributesLoaded = connection.LoadAttributesFromFile("standard");
+            bool modified = connection.Modify();
+            model.CommitChanges();
+            
+            return new {
+                attributes_loaded = attributesLoaded,
+                modified = modified,
+                committed = true
+            };
+        }
+        
+        /// <summary>
+        /// Helper to check if connection verification passed
+        /// </summary>
+        private static bool IsConnectionVerified(object verification)
+        {
+            var verificationDict = verification as System.Collections.Generic.Dictionary<string, object>;
+            return verificationDict != null && verificationDict.ContainsKey("connection_exists") && Convert.ToBoolean(verificationDict["connection_exists"]);
         }
         
         static object VerifyConnectionCreation(Model model, Tekla.Structures.Model.Connection connection, ModelObject primaryObject, System.Collections.ArrayList secondaryObjects, int initialConnectionCount, int initialChildrenCount)
