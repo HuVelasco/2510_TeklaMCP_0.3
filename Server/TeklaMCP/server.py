@@ -7,6 +7,8 @@ Bridge between Claude Code and TeklaMCP HTTP Server
 import asyncio
 import aiohttp
 import sys
+import subprocess
+import os
 from fastmcp import FastMCP
 from pydantic import BaseModel, Field
 from typing import Optional
@@ -17,10 +19,68 @@ mcp = FastMCP("TeklaMCP Server")
 # HTTP backend configuration
 TEKLA_SERVER_URL = "http://localhost:8080"
 
+# ==================== HTTP SERVER AUTOMATION ====================
+
+async def ensure_http_server_running():
+    """Automatically detect and start HTTP server if not running (DEVELOPMENT ONLY)"""
+    try:
+        # Quick health check with short timeout
+        async with aiohttp.ClientSession() as session:
+            async with session.get(f"{TEKLA_SERVER_URL}/test", timeout=aiohttp.ClientTimeout(total=2)) as response:
+                if response.status == 200:
+                    return True  # Server is running
+    except:
+        # Server not running - start it for development
+        print(f"🔧 HTTP server not detected on {TEKLA_SERVER_URL}")
+        print("🚀 Auto-starting HTTP server for development...")
+        
+        try:
+            # Get the HTTP server directory (development setup)
+            current_dir = os.path.dirname(__file__)
+            server_path = current_dir  # Server/TeklaMCP directory
+            
+            # Start HTTP server in new console window (Windows development)
+            if os.name == 'nt':  # Windows
+                subprocess.Popen(
+                    ["dotnet", "run"], 
+                    cwd=server_path,
+                    creationflags=subprocess.CREATE_NEW_CONSOLE
+                )
+            else:  # Linux/Mac (if needed)
+                subprocess.Popen(
+                    ["dotnet", "run"], 
+                    cwd=server_path
+                )
+            
+            # Give HTTP server time to start
+            print("⏳ Waiting for HTTP server startup...")
+            await asyncio.sleep(4)
+            
+            # Verify it started successfully
+            async with aiohttp.ClientSession() as session:
+                async with session.get(f"{TEKLA_SERVER_URL}/test", timeout=aiohttp.ClientTimeout(total=3)) as response:
+                    if response.status == 200:
+                        print("✅ HTTP server started successfully!")
+                        return True
+            
+            print("❌ HTTP server failed to start properly")
+            return False
+            
+        except Exception as e:
+            print(f"❌ Failed to auto-start HTTP server: {e}")
+            print("💡 Please manually start: cd Server/TeklaMCP && dotnet run")
+            return False
+    
+    return False
+
 # ==================== HTTP HELPER ====================
 
 async def call_endpoint(endpoint: str, method: str = "GET", params=None):
-    """Helper function to make HTTP requests to Tekla backend"""
+    """Helper function to make HTTP requests to Tekla backend with auto-start capability"""
+    
+    # Ensure HTTP server is running (auto-start for development)
+    await ensure_http_server_running()
+    
     try:
         async with aiohttp.ClientSession() as session:
             url = f"{TEKLA_SERVER_URL}/{endpoint}"
@@ -52,7 +112,34 @@ async def call_endpoint(endpoint: str, method: str = "GET", params=None):
                             return f"ERROR: HTTP {response.status}: {await response.text()}"
                         
     except aiohttp.ClientError as e:
-        return f"ERROR: Connection failed - {e}. Make sure HTTP server is running on {TEKLA_SERVER_URL}"
+        # Try auto-start one more time on connection failure
+        print("🔧 Connection failed, attempting HTTP server restart...")
+        if await ensure_http_server_running():
+            # Retry the request once after auto-start
+            try:
+                async with aiohttp.ClientSession() as session:
+                    url = f"{TEKLA_SERVER_URL}/{endpoint}"
+                    
+                    if method == "GET":
+                        async with session.get(url, params=params) as response:
+                            if response.status == 200:
+                                result = await response.text()
+                                return f"SUCCESS: {result}"
+                    elif method == "POST":
+                        if endpoint == "execute-code" and isinstance(params, str):
+                            async with session.post(url, data=params, headers={"Content-Type": "text/plain"}) as response:
+                                if response.status == 200:
+                                    result = await response.text()
+                                    return f"SUCCESS: {result}"
+                        else:
+                            async with session.post(url, json=params) as response:
+                                if response.status == 200:
+                                    result = await response.text()
+                                    return f"SUCCESS: {result}"
+            except:
+                pass
+        
+        return f"ERROR: Connection failed - {e}. Auto-start attempted but failed. Please manually start: cd Server/TeklaMCP && dotnet run"
     except Exception as e:
         return f"ERROR: Unexpected error - {e}"
 
