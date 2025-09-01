@@ -63,19 +63,6 @@ async def tekla_get_model_info() -> str:
     """Get information about the current Tekla Structures model"""
     return await call_endpoint("tekla-info", "GET")
 
-@mcp.tool()
-async def tekla_create_grid(
-    name: str = "Grid",
-    x_coordinates: str = "0.00 2*6096.00", 
-    y_coordinates: str = "0.00 2*6096.00"
-) -> str:
-    """Create a comprehensive grid system in Tekla Structures"""
-    params = {
-        "name": name,
-        "x_coordinates": x_coordinates,
-        "y_coordinates": y_coordinates
-    }
-    return await call_endpoint("create-grid", "GET", params)
 
 @mcp.tool()
 async def tekla_create_beam(
@@ -93,33 +80,7 @@ async def tekla_create_beam(
     }
     return await call_endpoint("create-beam", "POST", params)
 
-@mcp.tool()
-async def tekla_create_column(
-    location: str = "A-1",
-    profile: str = "W14X90", 
-    height: str = "3048.00",
-    material: str = "A992"
-) -> str:
-    """Create a column at a specified grid intersection"""
-    params = {
-        "location": location,
-        "profile": profile,
-        "height": height,
-        "material": material
-    }
-    return await call_endpoint("create-column", "GET", params)
 
-@mcp.tool() 
-async def tekla_modify_column(
-    location: str,
-    profile: str
-) -> str:
-    """Modify an existing column's profile at a specified grid location"""
-    params = {
-        "location": location,
-        "profile": profile
-    }
-    return await call_endpoint("modify-column", "GET", params)
 
 @mcp.tool()
 async def tekla_execute_code(
