@@ -1,35 +1,134 @@
 # TeklaMCP Development Guidelines
+*Proven methodology from successful Phase 1-2.7 development*
 
-## 1. CRITICAL: File Management
+## 1. File Management (CRITICAL)
 - **ONE server file:** `Server/TeklaMCP/server.py` - NEVER create duplicates
 - **ONE HTTP backend:** `Server/TeklaMCP/ProgramClean.cs`
 - **NO file renaming** - Both Claude Code & Desktop use same paths
 
-## 2. Version Control Safety
-- **Before major changes:** Create branch `git checkout -b backup/[date]`
-- **Quick recovery:** `git checkout HEAD -- [file]`
-- **View changes:** `git diff HEAD`
+## 2. Version Control Methodology
+
+### **Phased Branch Strategy**
+```bash
+# Pattern: improvements_[topic]_[phase]_[description]  
+git checkout -b improvements_deduplication_01_code_cleanup
+git checkout -b improvements_crud_02_operations
+git checkout -b improvements_orphan_cleanup_025
+git checkout -b improvements_tool_modernization_027
+git checkout -b improvements_architecture_03_handlers
+```
+
+### **Commit Standards**
+- **Detailed commit messages** with impact assessment
+- **Document what changed** and why
+- **Include test results** and verification
+- **Never commit untested code**
+
+### **Safety Practices**
+- **Create branch before major changes** - always
+- **Commit frequently** during development phases
+- **Test before commit** - verify all functionality
 - **NEVER force push or rebase main branches**
 
-## 3. Testing Protocol
-- **Start HTTP server first:** `cd Server/TeklaMCP && dotnet run`
-- **Test ALL MCP tools after changes** - not just subset
-- **Verify both Claude Code and Desktop connections**
-- **Document new tools in server.py docstrings**
+## 3. Server Architecture Requirements
 
-## 4. Tekla API Reference
-- **For class hierarchy and implementation priority:** See `@HugoNotes\07.Model-Object-Tekla-Info.md`
-- **Priority objects marked with `*` in inheritance trees**
+### **CRUD Completeness**
+- ✅ **Create:** Full object creation with all parameters
+- ✅ **Read:** List, search, filter, detailed object info
+- ✅ **Update:** Modify existing object properties  
+- ✅ **Delete:** Safe removal with verification
+- ✅ **Bulk:** Batch operations for efficiency
+
+### **Agent-Friendly Design**
+- **Direct parameters:** `start_x: float` not `start_point: str`
+- **Minimal complexity:** Smart defaults, fewer required params
+- **Clear naming:** Intuitive names AI agents understand
+- **Consistent patterns:** Similar tools use same structure
+- **Rich docs:** Examples and usage in docstrings
+
+### **Response Standardization**
+```python
+# Use these helpers consistently
+BuildSuccessResponse(data, message)
+BuildErrorResponse(error, operation, details)
+```
+
+## 4. Code Quality Standards
+
+### **Eliminate Repetition**
+- **Extract helpers:** Common patterns into functions
+- **Standardize handling:** Consistent parameter processing
+- **Remove duplicates:** Delete unused/orphan code immediately
+- **Regular cleanup:** Phase 2.5 demonstrated 58% reduction possible
+
+### **Maintainability Principles**
+- **Single responsibility** per method/endpoint
+- **Direct API calls** - no unnecessary abstraction
+- **Comprehensive error handling** with context
+- **Type safety** with proper Tekla types
+
+## 5. Testing Protocol
+
+### **Development Testing**
+```bash
+# 1. Start server
+cd Server/TeklaMCP && dotnet run
+
+# 2. Test HTTP endpoints directly  
+curl -X GET "http://localhost:8080/test"
+curl -X POST "http://localhost:8080/create-beam" -d '{...}'
+
+# 3. Test MCP tools
+# Use actual MCP tools to verify functionality
+
+# 4. Document results
+# Record what was tested and outcomes
+```
+
+### **Integration Testing**
+- **Restart Claude Code** after tool signature changes
+- **Test real workflows** with actual usage scenarios  
+- **Verify round-trip** - create then read objects
+- **Both Claude Code AND Desktop** if available
+
+## 6. Tekla API Integration
 - **Key namespaces:** `Tekla.Structures.Model`, `Tekla.Structures.Geometry3d`
+- **Always commit changes:** `Model.CommitChanges()` after Insert/Modify
+- **Reference guide:** See `@HugoNotes\07.Model-Object-Tekla-Info.md`
+- **Priority objects:** Look for `*` markers in inheritance trees
 
-## 5. Architecture Principles
-- **Direct API calls** - No unnecessary abstraction layers
-- **Single responsibility** - Each endpoint does one thing
-- **Model.CommitChanges()** after Insert/Modify operations
-- **Error handling** with clear messages
+## 7. Development Session Workflow
+*The proven 5-phase methodology:*
 
-## 6. Common Pitfalls to Avoid
-- Creating multiple server versions
-- Changing file paths without updating configs
-- Missing Model.CommitChanges() after operations
-- Testing only partial tool functionality
+1. **Analysis** - TodoWrite to plan, identify issues/improvements
+2. **Implementation** - Focused changes with helper functions
+3. **Testing** - HTTP + MCP verification before commit
+4. **Documentation** - Detailed commit with impact assessment  
+5. **Cleanup** - Remove orphan code, eliminate repetition
+
+### **Communication Style**
+- **Direct & technical** - clear problem identification
+- **Immediate implementation** - solve as discussed
+- **Comprehensive testing** - verify everything works
+- **Document everything** - commits tell full story
+
+## 8. Critical Anti-Patterns
+❌ **Never Do:**
+- Create multiple server file versions
+- Complex string parsing (use direct numeric params)
+- Skip `Model.CommitChanges()` after Tekla operations
+- Test only partial functionality  
+- Commit without testing
+- Large monolithic code blocks
+- Inconsistent tool parameter patterns
+- Missing documentation of changes
+
+## 9. Documentation Requirements
+- **All changes documented** in commit messages
+- **Test results recorded** - what worked/failed
+- **Tool signatures updated** when parameters change
+- **Architecture decisions** captured with rationale
+- **Change impact** clearly communicated
+
+---
+*This methodology successfully delivered 4 major phases with 90% CRUD completeness, 58% code reduction, and agent-friendly modernization.*
