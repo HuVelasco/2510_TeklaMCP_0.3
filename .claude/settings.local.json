@@ -23,7 +23,8 @@
       "Bash(git ls-tree:*)",
       "mcp__tekla__tekla_create_beam",
       "mcp__tekla__tekla_execute_code",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "mcp__tekla__tekla_create_column"
     ],
     "deny": [],
     "ask": []

@@ -36,9 +36,9 @@ namespace TeklaMCP
         public string Name { get; set; } = "BEAM";
 
         // Position parameters
-        public string PositionDepth { get; set; } = "MIDDLE";
+        public string PositionDepth { get; set; } = "BEHIND";
         public string PositionPlane { get; set; } = "MIDDLE";
-        public string PositionRotation { get; set; } = "FRONT";
+        public string PositionRotation { get; set; } = "TOP";
     }
 
     /// <summary>

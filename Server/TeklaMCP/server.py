@@ -168,9 +168,9 @@ async def tekla_create_beam(
     end_point: str,    # "6000 0 0"
     profile: str = "W21X50",
     material: str = "A992",
-    position_depth: str = "MIDDLE",    # FRONT, MIDDLE, BEHIND
+    position_depth: str = "BEHIND",    # FRONT, MIDDLE, BEHIND
     position_plane: str = "MIDDLE",    # LEFT, MIDDLE, RIGHT 
-    position_rotation: str = "FRONT",  # FRONT, TOP, BACK, BELOW
+    position_rotation: str = "TOP",    # FRONT, TOP, BACK, BELOW
     class_value: str = "1",
     name: str = "BEAM"
 ) -> str:
