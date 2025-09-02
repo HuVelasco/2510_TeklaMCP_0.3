@@ -24,7 +24,8 @@
       "mcp__tekla__tekla_create_beam",
       "mcp__tekla__tekla_execute_code",
       "Bash(rm:*)",
-      "mcp__tekla__tekla_create_column"
+      "mcp__tekla__tekla_create_column",
+      "Bash(dotnet clean:*)"
     ],
     "deny": [],
     "ask": []

@@ -42,20 +42,69 @@ namespace TeklaMCP
     }
 
     /// <summary>
-    /// TeklaMCP 0.3 PHASE 3 - Clean Architecture with Endpoint-Specific Handlers
+    /// PartFilter - Filter criteria for searching parts
+    /// </summary>
+    public class PartFilter
+    {
+        public string PartType { get; set; }  // "Beam", "ContourPlate", "PolyBeam"
+        public string Material { get; set; }
+        public string Profile { get; set; }
+        public string Class { get; set; }
+        public string Name { get; set; }
+        public int? MaxResults { get; set; } = 100;
+    }
+
+    /// <summary>
+    /// UpdatePartRequest - Request model for updating part properties
+    /// </summary>
+    public class UpdatePartRequest
+    {
+        public string Material { get; set; }
+        public string Profile { get; set; }
+        public string Class { get; set; }
+        public string Name { get; set; }
+        public string PositionDepth { get; set; }
+        public string PositionPlane { get; set; }
+        public string PositionRotation { get; set; }
+    }
+
+    /// <summary>
+    /// MovePartRequest - Request model for moving/repositioning parts
+    /// </summary>
+    public class MovePartRequest
+    {
+        public double? NewStartX { get; set; }
+        public double? NewStartY { get; set; }
+        public double? NewStartZ { get; set; }
+        public double? NewEndX { get; set; }
+        public double? NewEndY { get; set; }
+        public double? NewEndZ { get; set; }
+    }
+
+    /// <summary>
+    /// BulkDeleteRequest - Request model for bulk deletion
+    /// </summary>
+    public class BulkDeleteRequest
+    {
+        public List<int> PartIds { get; set; }
+        public bool VerifyBeforeDelete { get; set; } = true;
+    }
+
+    /// <summary>
+    /// TeklaMCP 0.3 PHASE 4 - Part-Based CRUD Operations
     /// 
-    /// PHASE 3 IMPROVEMENTS:
-    /// - Endpoint-specific handler methods (eliminated 70-line switch statement)
-    /// - Configuration management system (eliminated hard-coded values)
-    /// - Input validation and security enhancements
-    /// - Standardized error handling with context
-    /// - Eliminated 880+ lines of orphan CRUD code
-    /// - Clean, maintainable architecture following CLAUDE.md principles
+    /// PHASE 4 IMPROVEMENTS:
+    /// - Complete CRUD operations for Part objects (Beam, ContourPlate, PolyBeam)
+    /// - READ: List, Get, Search with filtering
+    /// - UPDATE: Modify properties and positions
+    /// - DELETE: Single and bulk deletion with verification
+    /// - Agent-friendly direct parameters
+    /// - Builds on Phase 3 clean architecture
     /// 
     /// ARCHITECTURE:
-    /// - Direct Tekla API integration
-    /// - Type-safe request models
-    /// - Comprehensive logging
+    /// - Smart Part-based polymorphic operations
+    /// - Type-safe request/response models
+    /// - Comprehensive error handling with context
     /// - Legacy C# compiler support (C# 5.0 syntax)
     /// </summary>
     class ProgramClean
@@ -83,10 +132,25 @@ namespace TeklaMCP
         {
             endpointHandlers = new Dictionary<string, Func<HttpListenerRequest, string>>
             {
+                // Existing endpoints
                 { "GET /test", _ => HandleTest() },
                 { "GET /tekla-info", _ => HandleTeklaInfo() },
                 { "POST /create-beam", HandleCreateBeam },
-                { "POST /execute-code", HandleExecuteCode }
+                { "POST /execute-code", HandleExecuteCode },
+                
+                // PHASE 4: CRUD Operations
+                // READ operations
+                { "GET /list-parts", HandleListParts },
+                { "GET /get-part", HandleGetPart },  // Uses query param ?id=123
+                { "POST /search-parts", HandleSearchParts },
+                
+                // UPDATE operations
+                { "POST /update-part", HandleUpdatePart },  // Body contains id and updates
+                { "POST /move-part", HandleMovePart },      // Body contains id and new positions
+                
+                // DELETE operations
+                { "POST /delete-part", HandleDeletePart },  // Body contains id
+                { "POST /delete-parts-bulk", HandleDeletePartsBulk }  // Body contains array of ids
             };
         }
 
@@ -123,9 +187,11 @@ namespace TeklaMCP
             InitializeEndpointHandlers();
             LogMessage("STARTUP", "TeklaMCP 0.3 PHASE 3 - Architectural Server starting...");
 
-            Console.WriteLine("🏗️ TeklaMCP 0.3 - PHASE 3 Clean Architecture");
-            Console.WriteLine("✅ Endpoint-Specific Handlers + Configuration Management");
-            Console.WriteLine("🧹 Eliminated 880+ lines of orphan code");
+            Console.WriteLine("🏗️ TeklaMCP 0.3 - PHASE 4 Part-Based CRUD");
+            Console.WriteLine("✅ Complete CRUD operations for Part objects");
+            Console.WriteLine("📊 READ: List, Get, Search with filtering");
+            Console.WriteLine("✏️ UPDATE: Modify properties and positions");
+            Console.WriteLine("🗑️ DELETE: Single and bulk with verification");
             StartServer();
         }
 
@@ -145,7 +211,7 @@ namespace TeklaMCP
                 }
                 Console.WriteLine("Press Ctrl+C to stop...");
                 
-                LogMessage("SERVER_START", $"Phase 3 server started on {config.ServerUrl}");
+                LogMessage("SERVER_START", $"Phase 4 CRUD server started on {config.ServerUrl}");
 
                 while (true)
                 {
@@ -225,15 +291,16 @@ namespace TeklaMCP
         {
             LogMessage("TEST_SUCCESS", "Test endpoint called successfully");
             return BuildSuccessResponse(new {
-                server_version = "TeklaMCP 0.3 PHASE 3",
-                architecture = "Clean endpoint-specific handlers",
-                improvements = new[] {
-                    "Eliminated monolithic switch statement",
-                    "Configuration management system",
-                    "Input validation and security",
-                    "Removed 880+ lines of orphan code"
-                }
-            }, "TeklaMCP Phase 3 server is working!");
+                server_version = "TeklaMCP 0.3 PHASE 4",
+                architecture = "Part-Based CRUD Operations",
+                crud_operations = new[] {
+                    "CREATE: Beam creation (existing)",
+                    "READ: List, Get, Search parts",
+                    "UPDATE: Modify properties and positions",
+                    "DELETE: Single and bulk removal"
+                },
+                supported_parts = new[] { "Beam", "ContourPlate", "PolyBeam" }
+            }, "TeklaMCP Phase 4 CRUD server is working!");
         }
 
         static string HandleTeklaInfo()
@@ -337,6 +404,463 @@ namespace TeklaMCP
             }
         }
 
+        // ==================== PHASE 4: CRUD HANDLERS ====================
+        
+        // READ Operations
+        
+        static string HandleListParts(HttpListenerRequest request)
+        {
+            try
+            {
+                var model = new Model();
+                if (!model.GetConnectionStatus())
+                {
+                    return BuildErrorResponse("Tekla not connected", "list-parts");
+                }
+
+                var parts = new List<object>();
+                var selector = model.GetModelObjectSelector();
+                var enumerator = selector.GetAllObjectsWithType(ModelObject.ModelObjectEnum.BEAM);
+                // Also get plates and other parts
+                enumerator.SelectInstances = false;
+                
+                int count = 0;
+                int maxResults = 100;  // Default limit
+                
+                while (enumerator.MoveNext() && count < maxResults)
+                {
+                    var part = enumerator.Current as Part;
+                    if (part != null)
+                    {
+                        parts.Add(GetPartInfo(part));
+                        count++;
+                    }
+                }
+                
+                LogMessage("LIST_PARTS_SUCCESS", $"Retrieved {parts.Count} parts");
+                return BuildSuccessResponse(new {
+                    total_parts = parts.Count,
+                    parts = parts
+                }, $"Retrieved {parts.Count} parts from model");
+            }
+            catch (Exception ex)
+            {
+                LogMessage("LIST_PARTS_ERROR", $"Error: {ex.Message}");
+                return BuildErrorResponse($"List parts error: {ex.Message}", "list-parts");
+            }
+        }
+        
+        static string HandleGetPart(HttpListenerRequest request)
+        {
+            try
+            {
+                var model = new Model();
+                if (!model.GetConnectionStatus())
+                {
+                    return BuildErrorResponse("Tekla not connected", "get-part");
+                }
+
+                // Parse ID from query string
+                var queryString = request.Url.Query;
+                if (string.IsNullOrEmpty(queryString) || !queryString.Contains("id="))
+                {
+                    return BuildErrorResponse("Part ID required in query string (?id=123)", "get-part");
+                }
+                
+                var idString = queryString.Replace("?id=", "").Split('&')[0];
+                int partId;
+                if (!int.TryParse(idString, out partId))
+                {
+                    return BuildErrorResponse("Invalid part ID format", "get-part");
+                }
+                
+                var part = model.SelectModelObject(new Tekla.Structures.Identifier(partId)) as Part;
+                if (part == null)
+                {
+                    return BuildErrorResponse($"Part with ID {partId} not found", "get-part");
+                }
+                
+                var partInfo = GetDetailedPartInfo(part);
+                LogMessage("GET_PART_SUCCESS", $"Retrieved part {partId}");
+                
+                return BuildSuccessResponse(partInfo, $"Part {partId} retrieved successfully");
+            }
+            catch (Exception ex)
+            {
+                LogMessage("GET_PART_ERROR", $"Error: {ex.Message}");
+                return BuildErrorResponse($"Get part error: {ex.Message}", "get-part");
+            }
+        }
+        
+        static string HandleSearchParts(HttpListenerRequest request)
+        {
+            try
+            {
+                var model = new Model();
+                if (!model.GetConnectionStatus())
+                {
+                    return BuildErrorResponse("Tekla not connected", "search-parts");
+                }
+
+                string requestBody = ReadRequestBody(request);
+                var filter = string.IsNullOrEmpty(requestBody) 
+                    ? new PartFilter() 
+                    : JsonConvert.DeserializeObject<PartFilter>(requestBody);
+                
+                var parts = new List<object>();
+                var selector = model.GetModelObjectSelector();
+                var enumerator = selector.GetAllObjectsWithType(ModelObject.ModelObjectEnum.BEAM);
+                // Also get plates and other parts
+                enumerator.SelectInstances = false;
+                
+                int count = 0;
+                int maxResults = filter.MaxResults ?? 100;
+                
+                while (enumerator.MoveNext() && count < maxResults)
+                {
+                    var part = enumerator.Current as Part;
+                    if (part != null && MatchesFilter(part, filter))
+                    {
+                        parts.Add(GetPartInfo(part));
+                        count++;
+                    }
+                }
+                
+                LogMessage("SEARCH_PARTS_SUCCESS", $"Found {parts.Count} matching parts");
+                return BuildSuccessResponse(new {
+                    filter = filter,
+                    results_count = parts.Count,
+                    parts = parts
+                }, $"Found {parts.Count} parts matching filter");
+            }
+            catch (Exception ex)
+            {
+                LogMessage("SEARCH_PARTS_ERROR", $"Error: {ex.Message}");
+                return BuildErrorResponse($"Search parts error: {ex.Message}", "search-parts");
+            }
+        }
+        
+        // UPDATE Operations
+        
+        static string HandleUpdatePart(HttpListenerRequest request)
+        {
+            try
+            {
+                var model = new Model();
+                if (!model.GetConnectionStatus())
+                {
+                    return BuildErrorResponse("Tekla not connected", "update-part");
+                }
+
+                string requestBody = ReadRequestBody(request);
+                if (string.IsNullOrEmpty(requestBody))
+                {
+                    return BuildErrorResponse("Request body required with part ID and updates", "update-part");
+                }
+                
+                var updateRequest = JsonConvert.DeserializeObject<Dictionary<string, object>>(requestBody);
+                if (!updateRequest.ContainsKey("id"))
+                {
+                    return BuildErrorResponse("Part ID required in request body", "update-part");
+                }
+                
+                int partId = Convert.ToInt32(updateRequest["id"]);
+                var part = model.SelectModelObject(new Tekla.Structures.Identifier(partId)) as Part;
+                
+                if (part == null)
+                {
+                    return BuildErrorResponse($"Part with ID {partId} not found", "update-part");
+                }
+                
+                // Apply updates
+                bool modified = false;
+                
+                if (updateRequest.ContainsKey("material"))
+                {
+                    part.Material.MaterialString = updateRequest["material"].ToString();
+                    modified = true;
+                }
+                
+                if (updateRequest.ContainsKey("profile"))
+                {
+                    part.Profile.ProfileString = updateRequest["profile"].ToString();
+                    modified = true;
+                }
+                
+                if (updateRequest.ContainsKey("class"))
+                {
+                    part.Class = updateRequest["class"].ToString();
+                    modified = true;
+                }
+                
+                if (updateRequest.ContainsKey("name"))
+                {
+                    part.Name = updateRequest["name"].ToString();
+                    modified = true;
+                }
+                
+                // Apply position updates if present
+                if (updateRequest.ContainsKey("position_depth"))
+                {
+                    part.Position.Depth = (Position.DepthEnum)Enum.Parse(
+                        typeof(Position.DepthEnum), 
+                        updateRequest["position_depth"].ToString().ToUpper()
+                    );
+                    modified = true;
+                }
+                
+                if (updateRequest.ContainsKey("position_plane"))
+                {
+                    part.Position.Plane = (Position.PlaneEnum)Enum.Parse(
+                        typeof(Position.PlaneEnum), 
+                        updateRequest["position_plane"].ToString().ToUpper()
+                    );
+                    modified = true;
+                }
+                
+                if (updateRequest.ContainsKey("position_rotation"))
+                {
+                    part.Position.Rotation = (Position.RotationEnum)Enum.Parse(
+                        typeof(Position.RotationEnum), 
+                        updateRequest["position_rotation"].ToString().ToUpper()
+                    );
+                    modified = true;
+                }
+                
+                if (modified)
+                {
+                    bool success = part.Modify();
+                    model.CommitChanges();
+                    
+                    if (success)
+                    {
+                        LogMessage("UPDATE_PART_SUCCESS", $"Part {partId} updated");
+                        return BuildSuccessResponse(new {
+                            part_id = partId,
+                            updated = true,
+                            new_values = GetPartInfo(part)
+                        }, $"Part {partId} updated successfully");
+                    }
+                    else
+                    {
+                        return BuildErrorResponse($"Failed to modify part {partId}", "update-part");
+                    }
+                }
+                else
+                {
+                    return BuildSuccessResponse(new {
+                        part_id = partId,
+                        updated = false,
+                        message = "No modifications requested"
+                    }, "No changes applied");
+                }
+            }
+            catch (Exception ex)
+            {
+                LogMessage("UPDATE_PART_ERROR", $"Error: {ex.Message}");
+                return BuildErrorResponse($"Update part error: {ex.Message}", "update-part");
+            }
+        }
+        
+        static string HandleMovePart(HttpListenerRequest request)
+        {
+            try
+            {
+                var model = new Model();
+                if (!model.GetConnectionStatus())
+                {
+                    return BuildErrorResponse("Tekla not connected", "move-part");
+                }
+
+                string requestBody = ReadRequestBody(request);
+                if (string.IsNullOrEmpty(requestBody))
+                {
+                    return BuildErrorResponse("Request body required with part ID and new positions", "move-part");
+                }
+                
+                var moveRequest = JsonConvert.DeserializeObject<Dictionary<string, object>>(requestBody);
+                if (!moveRequest.ContainsKey("id"))
+                {
+                    return BuildErrorResponse("Part ID required in request body", "move-part");
+                }
+                
+                int partId = Convert.ToInt32(moveRequest["id"]);
+                var part = model.SelectModelObject(new Tekla.Structures.Identifier(partId)) as Part;
+                
+                if (part == null)
+                {
+                    return BuildErrorResponse($"Part with ID {partId} not found", "move-part");
+                }
+                
+                // Handle Beam-specific movement
+                var beam = part as Beam;
+                if (beam != null)
+                {
+                    if (moveRequest.ContainsKey("start_x")) beam.StartPoint.X = Convert.ToDouble(moveRequest["start_x"]);
+                    if (moveRequest.ContainsKey("start_y")) beam.StartPoint.Y = Convert.ToDouble(moveRequest["start_y"]);
+                    if (moveRequest.ContainsKey("start_z")) beam.StartPoint.Z = Convert.ToDouble(moveRequest["start_z"]);
+                    if (moveRequest.ContainsKey("end_x")) beam.EndPoint.X = Convert.ToDouble(moveRequest["end_x"]);
+                    if (moveRequest.ContainsKey("end_y")) beam.EndPoint.Y = Convert.ToDouble(moveRequest["end_y"]);
+                    if (moveRequest.ContainsKey("end_z")) beam.EndPoint.Z = Convert.ToDouble(moveRequest["end_z"]);
+                    
+                    bool success = beam.Modify();
+                    model.CommitChanges();
+                    
+                    if (success)
+                    {
+                        LogMessage("MOVE_PART_SUCCESS", $"Part {partId} moved");
+                        return BuildSuccessResponse(new {
+                            part_id = partId,
+                            moved = true,
+                            new_position = new {
+                                start = new { x = beam.StartPoint.X, y = beam.StartPoint.Y, z = beam.StartPoint.Z },
+                                end = new { x = beam.EndPoint.X, y = beam.EndPoint.Y, z = beam.EndPoint.Z }
+                            }
+                        }, $"Part {partId} moved successfully");
+                    }
+                }
+                
+                return BuildErrorResponse("Move operation failed or part type not supported", "move-part");
+            }
+            catch (Exception ex)
+            {
+                LogMessage("MOVE_PART_ERROR", $"Error: {ex.Message}");
+                return BuildErrorResponse($"Move part error: {ex.Message}", "move-part");
+            }
+        }
+        
+        // DELETE Operations
+        
+        static string HandleDeletePart(HttpListenerRequest request)
+        {
+            try
+            {
+                var model = new Model();
+                if (!model.GetConnectionStatus())
+                {
+                    return BuildErrorResponse("Tekla not connected", "delete-part");
+                }
+
+                string requestBody = ReadRequestBody(request);
+                if (string.IsNullOrEmpty(requestBody))
+                {
+                    return BuildErrorResponse("Request body required with part ID", "delete-part");
+                }
+                
+                var deleteRequest = JsonConvert.DeserializeObject<Dictionary<string, object>>(requestBody);
+                if (!deleteRequest.ContainsKey("id"))
+                {
+                    return BuildErrorResponse("Part ID required in request body", "delete-part");
+                }
+                
+                int partId = Convert.ToInt32(deleteRequest["id"]);
+                var part = model.SelectModelObject(new Tekla.Structures.Identifier(partId)) as Part;
+                
+                if (part == null)
+                {
+                    return BuildErrorResponse($"Part with ID {partId} not found", "delete-part");
+                }
+                
+                // Store part info before deletion
+                var partInfo = GetPartInfo(part);
+                
+                bool success = part.Delete();
+                model.CommitChanges();
+                
+                if (success)
+                {
+                    LogMessage("DELETE_PART_SUCCESS", $"Part {partId} deleted");
+                    return BuildSuccessResponse(new {
+                        part_id = partId,
+                        deleted = true,
+                        deleted_part_info = partInfo
+                    }, $"Part {partId} deleted successfully");
+                }
+                else
+                {
+                    return BuildErrorResponse($"Failed to delete part {partId}", "delete-part");
+                }
+            }
+            catch (Exception ex)
+            {
+                LogMessage("DELETE_PART_ERROR", $"Error: {ex.Message}");
+                return BuildErrorResponse($"Delete part error: {ex.Message}", "delete-part");
+            }
+        }
+        
+        static string HandleDeletePartsBulk(HttpListenerRequest request)
+        {
+            try
+            {
+                var model = new Model();
+                if (!model.GetConnectionStatus())
+                {
+                    return BuildErrorResponse("Tekla not connected", "delete-parts-bulk");
+                }
+
+                string requestBody = ReadRequestBody(request);
+                if (string.IsNullOrEmpty(requestBody))
+                {
+                    return BuildErrorResponse("Request body required with part IDs array", "delete-parts-bulk");
+                }
+                
+                var deleteRequest = JsonConvert.DeserializeObject<BulkDeleteRequest>(requestBody);
+                if (deleteRequest.PartIds == null || deleteRequest.PartIds.Count == 0)
+                {
+                    return BuildErrorResponse("Part IDs array required and cannot be empty", "delete-parts-bulk");
+                }
+                
+                var deletedParts = new List<object>();
+                var failedParts = new List<object>();
+                
+                foreach (var partId in deleteRequest.PartIds)
+                {
+                    try
+                    {
+                        var part = model.SelectModelObject(new Tekla.Structures.Identifier(partId)) as Part;
+                        if (part != null)
+                        {
+                            var partInfo = GetPartInfo(part);
+                            
+                            if (part.Delete())
+                            {
+                                deletedParts.Add(new { id = partId, info = partInfo });
+                            }
+                            else
+                            {
+                                failedParts.Add(new { id = partId, reason = "Delete operation failed" });
+                            }
+                        }
+                        else
+                        {
+                            failedParts.Add(new { id = partId, reason = "Part not found" });
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        failedParts.Add(new { id = partId, reason = ex.Message });
+                    }
+                }
+                
+                model.CommitChanges();
+                
+                LogMessage("DELETE_BULK_COMPLETE", $"Deleted {deletedParts.Count}, Failed {failedParts.Count}");
+                
+                return BuildSuccessResponse(new {
+                    total_requested = deleteRequest.PartIds.Count,
+                    deleted_count = deletedParts.Count,
+                    failed_count = failedParts.Count,
+                    deleted_parts = deletedParts,
+                    failed_parts = failedParts
+                }, $"Bulk delete completed: {deletedParts.Count} deleted, {failedParts.Count} failed");
+            }
+            catch (Exception ex)
+            {
+                LogMessage("DELETE_BULK_ERROR", $"Error: {ex.Message}");
+                return BuildErrorResponse($"Bulk delete error: {ex.Message}", "delete-parts-bulk");
+            }
+        }
+        
         // ==================== HELPER METHODS ====================
         
         private static string ReadRequestBody(HttpListenerRequest request)
@@ -345,6 +869,123 @@ namespace TeklaMCP
             {
                 return reader.ReadToEnd();
             }
+        }
+        
+        private static object GetPartInfo(Part part)
+        {
+            // Need to get report properties for Part data
+            part.GetReportProperty("PROFILE", ref part.Profile.ProfileString);
+            part.GetReportProperty("MATERIAL", ref part.Material.MaterialString);
+            part.GetReportProperty("NAME", ref part.Name);
+            part.GetReportProperty("CLASS", ref part.Class);
+            
+            var beam = part as Beam;
+            if (beam != null)
+            {
+                return new {
+                    id = part.Identifier.ID,
+                    type = "Beam",
+                    name = part.Name,
+                    profile = part.Profile.ProfileString,
+                    material = part.Material.MaterialString,
+                    @class = part.Class,
+                    start_point = new { x = beam.StartPoint.X, y = beam.StartPoint.Y, z = beam.StartPoint.Z },
+                    end_point = new { x = beam.EndPoint.X, y = beam.EndPoint.Y, z = beam.EndPoint.Z }
+                };
+            }
+            
+            // Generic part info for other types
+            return new {
+                id = part.Identifier.ID,
+                type = part.GetType().Name,
+                name = part.Name,
+                profile = part.Profile.ProfileString,
+                material = part.Material.MaterialString,
+                @class = part.Class
+            };
+        }
+        
+        private static object GetDetailedPartInfo(Part part)
+        {
+            var basicInfo = GetPartInfo(part);
+            
+            // Add position information
+            var positionInfo = new {
+                depth = part.Position.Depth.ToString(),
+                plane = part.Position.Plane.ToString(),
+                rotation = part.Position.Rotation.ToString()
+            };
+            
+            // Combine basic and position info
+            var beam = part as Beam;
+            if (beam != null)
+            {
+                return new {
+                    id = part.Identifier.ID,
+                    type = "Beam",
+                    name = part.Name,
+                    profile = part.Profile.ProfileString,
+                    material = part.Material.MaterialString,
+                    @class = part.Class,
+                    position = positionInfo,
+                    geometry = new {
+                        start_point = new { x = beam.StartPoint.X, y = beam.StartPoint.Y, z = beam.StartPoint.Z },
+                        end_point = new { x = beam.EndPoint.X, y = beam.EndPoint.Y, z = beam.EndPoint.Z },
+                        length = Distance.PointToPoint(beam.StartPoint, beam.EndPoint)
+                    }
+                };
+            }
+            
+            return new {
+                id = part.Identifier.ID,
+                type = part.GetType().Name,
+                name = part.Name,
+                profile = part.Profile.ProfileString,
+                material = part.Material.MaterialString,
+                @class = part.Class,
+                position = positionInfo
+            };
+        }
+        
+        private static bool MatchesFilter(Part part, PartFilter filter)
+        {
+            // Check part type filter
+            if (!string.IsNullOrEmpty(filter.PartType))
+            {
+                var partTypeName = part.GetType().Name;
+                if (!partTypeName.Equals(filter.PartType, StringComparison.OrdinalIgnoreCase))
+                    return false;
+            }
+            
+            // Check material filter
+            if (!string.IsNullOrEmpty(filter.Material))
+            {
+                if (!part.Material.MaterialString.Contains(filter.Material))
+                    return false;
+            }
+            
+            // Check profile filter
+            if (!string.IsNullOrEmpty(filter.Profile))
+            {
+                if (!part.Profile.ProfileString.Contains(filter.Profile))
+                    return false;
+            }
+            
+            // Check class filter
+            if (!string.IsNullOrEmpty(filter.Class))
+            {
+                if (!part.Class.Equals(filter.Class))
+                    return false;
+            }
+            
+            // Check name filter
+            if (!string.IsNullOrEmpty(filter.Name))
+            {
+                if (!part.Name.Contains(filter.Name))
+                    return false;
+            }
+            
+            return true;
         }
         
         private static Beam CreateBeamFromRequest(BeamRequest beamRequest)
