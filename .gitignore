@@ -10,15 +10,71 @@ obj/
 *.suo
 *.user
 *.sln.docstates
+*.cache
+*.ilk
+*.meta
+*.ncb
+*.pch
+*.pdb
+*.pgc
+*.pgd
+*.rsp
+*.sbr
+*.tlb
+*.tli
+*.tlh
+*.tmp_proj
+*.vcproj.*.user
+*.vcxproj.user
 
-# Logs
+# NuGet
+packages/
+*.nupkg
+project.lock.json
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+.pytest_cache/
+.coverage
+
+# Logs and diagnostics
 *.log
 C:/temp/tekla_mcp_*.log
+logs/
+*.trace
 
 # OS files
 .DS_Store
 Thumbs.db
+desktop.ini
 
 # Temp files
 *.tmp
 *.temp
+*.swp
+*.swo
+*~
+
+# Backup files
+*.bak
+backup/*/
+
+# IDE files
+.vscode/settings.json
+.idea/
+*.code-workspace
+
+# Test outputs
+TestResults/
+coverage/
+
+# Tekla specific
+*.db1
+*.db1.$*
+*.db1-*
+*.db.lock
