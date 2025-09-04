@@ -874,10 +874,20 @@ namespace TeklaMCP
         private static object GetPartInfo(Part part)
         {
             // Need to get report properties for Part data
-            part.GetReportProperty("PROFILE", ref part.Profile.ProfileString);
-            part.GetReportProperty("MATERIAL", ref part.Material.MaterialString);
-            part.GetReportProperty("NAME", ref part.Name);
-            part.GetReportProperty("CLASS", ref part.Class);
+            string profileString = "";
+            string materialString = "";
+            string name = "";
+            string classValue = "";
+            
+            part.GetReportProperty("PROFILE", ref profileString);
+            part.GetReportProperty("MATERIAL", ref materialString);
+            part.GetReportProperty("NAME", ref name);
+            part.GetReportProperty("CLASS", ref classValue);
+            
+            part.Profile.ProfileString = profileString;
+            part.Material.MaterialString = materialString;
+            part.Name = name;
+            part.Class = classValue;
             
             var beam = part as Beam;
             if (beam != null)
