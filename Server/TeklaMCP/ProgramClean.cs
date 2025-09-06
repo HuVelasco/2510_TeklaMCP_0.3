@@ -91,6 +91,81 @@ namespace TeklaMCP
     }
 
     /// <summary>
+    /// ETABS-Tekla Bridge Data Models
+    /// </summary>
+    public class UBIMImportRequest
+    {
+        public UBIMData ubim_data { get; set; }
+        public int frame_count { get; set; }
+    }
+
+    public class UBIMData
+    {
+        public string version { get; set; }
+        public string source { get; set; }
+        public UBIMUnits units { get; set; }
+        public List<UBIMFrame> frames { get; set; }
+    }
+
+    public class UBIMUnits
+    {
+        public string length { get; set; }
+        public string force { get; set; }
+        public string angle { get; set; }
+    }
+
+    public class UBIMFrame
+    {
+        public string id { get; set; }
+        public string type { get; set; }
+        public UBIMGeometry geometry { get; set; }
+        public UBIMProperties properties { get; set; }
+        public UBIMOrientation orientation { get; set; }
+        public UBIMOffsets offsets { get; set; }
+    }
+
+    public class UBIMGeometry
+    {
+        public UBIMPoint start { get; set; }
+        public UBIMPoint end { get; set; }
+        public double length { get; set; }
+    }
+
+    public class UBIMPoint
+    {
+        public double x { get; set; }
+        public double y { get; set; }
+        public double z { get; set; }
+        public string point_id { get; set; }
+    }
+
+    public class UBIMProperties
+    {
+        public string profile { get; set; }
+        public string material { get; set; }
+        public string story { get; set; }
+    }
+
+    public class UBIMOrientation
+    {
+        public double rotation_x { get; set; }
+        public double rotation_y { get; set; }
+        public double rotation_z { get; set; }
+        public int cardinal_point { get; set; }
+    }
+
+    public class UBIMOffsets
+    {
+        public double start { get; set; }
+        public double end { get; set; }
+    }
+
+    public class ConnectTeklaRequest
+    {
+        public bool auto_start { get; set; } = false;
+    }
+
+    /// <summary>
     /// TeklaMCP 0.3 PHASE 4 - Part-Based CRUD Operations
     /// 
     /// PHASE 4 IMPROVEMENTS:
@@ -150,7 +225,11 @@ namespace TeklaMCP
                 
                 // DELETE operations
                 { "POST /delete-part", HandleDeletePart },  // Body contains id
-                { "POST /delete-parts-bulk", HandleDeletePartsBulk }  // Body contains array of ids
+                { "POST /delete-parts-bulk", HandleDeletePartsBulk },  // Body contains array of ids
+                
+                // ETABS-TEKLA BRIDGE operations
+                { "POST /import-ubim-frames", HandleImportUBIMFrames },
+                { "POST /connect-tekla", HandleConnectTekla }
             };
         }
 
@@ -187,11 +266,14 @@ namespace TeklaMCP
             InitializeEndpointHandlers();
             LogMessage("STARTUP", "TeklaMCP 0.3 PHASE 3 - Architectural Server starting...");
 
-            Console.WriteLine("🏗️ TeklaMCP 0.3 - PHASE 4 Part-Based CRUD");
+            Console.WriteLine("🏗️ TeklaMCP 0.3 - ETABS-Tekla Bridge");
             Console.WriteLine("✅ Complete CRUD operations for Part objects");
             Console.WriteLine("📊 READ: List, Get, Search with filtering");
             Console.WriteLine("✏️ UPDATE: Modify properties and positions");
             Console.WriteLine("🗑️ DELETE: Single and bulk with verification");
+            Console.WriteLine("🌉 BRIDGE: UBIM import from ETABS exports");
+            Console.WriteLine("📐 GEOMETRY: Exact coordinates (mm) preservation");
+            Console.WriteLine("🎯 POSITIONING: MIDDLE/MIDDLE/TOP for accuracy");
             StartServer();
         }
 
@@ -860,6 +942,155 @@ namespace TeklaMCP
                 return BuildErrorResponse($"Bulk delete error: {ex.Message}", "delete-parts-bulk");
             }
         }
+
+        // ==================== ETABS-TEKLA BRIDGE HANDLERS ====================
+        
+        static string HandleImportUBIMFrames(HttpListenerRequest request)
+        {
+            try
+            {
+                var model = new Model();
+                if (!model.GetConnectionStatus())
+                {
+                    return BuildErrorResponse("Tekla not connected", "import-ubim-frames");
+                }
+
+                string requestBody = ReadRequestBody(request);
+                if (string.IsNullOrEmpty(requestBody))
+                {
+                    return BuildErrorResponse("UBIM data required in request body", "import-ubim-frames");
+                }
+
+                var importRequest = JsonConvert.DeserializeObject<UBIMImportRequest>(requestBody);
+                var ubimData = importRequest.ubim_data;
+                
+                if (ubimData?.frames == null || ubimData.frames.Count == 0)
+                {
+                    return BuildErrorResponse("No frames found in UBIM data", "import-ubim-frames");
+                }
+
+                LogMessage("UBIM_IMPORT_START", $"Starting import of {ubimData.frames.Count} frames");
+
+                var createdBeams = new List<object>();
+                var failedFrames = new List<object>();
+                var stats = new Dictionary<string, int>
+                {
+                    ["total_frames"] = ubimData.frames.Count,
+                    ["beams"] = 0,
+                    ["columns"] = 0,
+                    ["braces"] = 0,
+                    ["created"] = 0,
+                    ["failed"] = 0
+                };
+
+                foreach (var frame in ubimData.frames)
+                {
+                    try
+                    {
+                        // Safe increment of frame type count
+                        if (stats.ContainsKey(frame.type))
+                        {
+                            stats[frame.type]++;
+                        }
+                        else
+                        {
+                            stats[frame.type] = 1;
+                        }
+                        
+                        // Create beam from UBIM frame
+                        var beam = CreateBeamFromUBIMFrame(frame);
+                        
+                        if (beam.Insert())
+                        {
+                            stats["created"]++;
+                            createdBeams.Add(new 
+                            {
+                                etabs_id = frame.id,
+                                tekla_id = beam.Identifier.ID,
+                                type = frame.type,
+                                profile = frame.properties.profile,
+                                material = frame.properties.material,
+                                story = frame.properties.story,
+                                start_point = new { x = beam.StartPoint.X, y = beam.StartPoint.Y, z = beam.StartPoint.Z },
+                                end_point = new { x = beam.EndPoint.X, y = beam.EndPoint.Y, z = beam.EndPoint.Z }
+                            });
+                        }
+                        else
+                        {
+                            stats["failed"]++;
+                            failedFrames.Add(new 
+                            {
+                                etabs_id = frame.id,
+                                type = frame.type,
+                                reason = "Failed to insert beam into model"
+                            });
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        stats["failed"]++;
+                        failedFrames.Add(new 
+                        {
+                            etabs_id = frame.id,
+                            type = frame.type,
+                            reason = ex.Message
+                        });
+                    }
+                }
+
+                // Commit all changes
+                model.CommitChanges();
+                
+                LogMessage("UBIM_IMPORT_COMPLETE", $"Import completed: {stats["created"]} created, {stats["failed"]} failed");
+
+                return BuildSuccessResponse(new 
+                {
+                    import_summary = stats,
+                    created_beams = createdBeams,
+                    failed_frames = failedFrames,
+                    source_file = "ETABS UBIM Import",
+                    positioning = "MIDDLE/MIDDLE/TOP for accuracy"
+                }, $"ETABS import completed: {stats["created"]} beams created from {stats["total_frames"]} frames");
+            }
+            catch (Exception ex)
+            {
+                LogMessage("UBIM_IMPORT_ERROR", $"Error: {ex.Message}");
+                return BuildErrorResponse($"UBIM import error: {ex.Message}", "import-ubim-frames");
+            }
+        }
+        
+        static string HandleConnectTekla(HttpListenerRequest request)
+        {
+            try
+            {
+                var model = new Model();
+                var connectionStatus = model.GetConnectionStatus();
+                
+                if (connectionStatus)
+                {
+                    var modelInfo = model.GetInfo();
+                    LogMessage("TEKLA_CONNECT_SUCCESS", $"Connected to model: {modelInfo.ModelName}");
+                    
+                    return BuildSuccessResponse(new 
+                    {
+                        tekla_connected = true,
+                        model_name = modelInfo.ModelName,
+                        model_path = modelInfo.ModelPath,
+                        ready_for_import = true,
+                        bridge_version = "ETABS-Tekla Bridge v1.0"
+                    }, "Tekla Structures connected and ready for ETABS import");
+                }
+                else
+                {
+                    return BuildErrorResponse("Tekla Structures not running or no model open", "connect-tekla");
+                }
+            }
+            catch (Exception ex)
+            {
+                LogMessage("TEKLA_CONNECT_ERROR", $"Error: {ex.Message}");
+                return BuildErrorResponse($"Connection error: {ex.Message}", "connect-tekla");
+            }
+        }
         
         // ==================== HELPER METHODS ====================
         
@@ -1018,6 +1249,39 @@ namespace TeklaMCP
             beam.Position.Depth = (Position.DepthEnum)Enum.Parse(typeof(Position.DepthEnum), beamRequest.PositionDepth.ToUpper());
             beam.Position.Plane = (Position.PlaneEnum)Enum.Parse(typeof(Position.PlaneEnum), beamRequest.PositionPlane.ToUpper());
             beam.Position.Rotation = (Position.RotationEnum)Enum.Parse(typeof(Position.RotationEnum), beamRequest.PositionRotation.ToUpper());
+            
+            return beam;
+        }
+
+        private static Beam CreateBeamFromUBIMFrame(UBIMFrame frame)
+        {
+            var beam = new Beam();
+            
+            // CRITICAL: Use exact coordinates from ETABS (already in mm)
+            beam.StartPoint = new Point(frame.geometry.start.x, frame.geometry.start.y, frame.geometry.start.z);
+            beam.EndPoint = new Point(frame.geometry.end.x, frame.geometry.end.y, frame.geometry.end.z);
+            
+            // Properties from UBIM frame
+            beam.Profile.ProfileString = frame.properties.profile;  // "W36X182"
+            beam.Material.MaterialString = frame.properties.material;  // "A992"
+            beam.Name = $"ETABS_{frame.id}";  // Preserve ETABS frame ID for traceability
+            beam.Class = "1";  // Default class
+            
+            // CRITICAL: MIDDLE/MIDDLE/TOP positioning for accuracy (per spec)
+            beam.Position.Depth = Position.DepthEnum.MIDDLE;
+            beam.Position.Plane = Position.PlaneEnum.MIDDLE;  
+            beam.Position.Rotation = Position.RotationEnum.TOP;
+            
+            // Handle rotations if present (future enhancement)
+            if (frame.orientation != null)
+            {
+                // For now, log rotation info - rotation handling can be enhanced later
+                if (frame.orientation.rotation_x != 0 || frame.orientation.rotation_y != 0 || frame.orientation.rotation_z != 0)
+                {
+                    LogMessage("ROTATION_DETECTED", $"Frame {frame.id} has rotation: X={frame.orientation.rotation_x}, Y={frame.orientation.rotation_y}, Z={frame.orientation.rotation_z}");
+                    // Future: Apply rotation transformations here
+                }
+            }
             
             return beam;
         }

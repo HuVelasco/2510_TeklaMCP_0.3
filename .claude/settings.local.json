@@ -25,7 +25,8 @@
       "mcp__tekla__tekla_execute_code",
       "Bash(rm:*)",
       "mcp__tekla__tekla_create_column",
-      "Bash(dotnet clean:*)"
+      "Bash(dotnet clean:*)",
+      "mcp__tekla__tekla_get_model_info"
     ],
     "deny": [],
     "ask": []

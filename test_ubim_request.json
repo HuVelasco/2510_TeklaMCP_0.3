@@ -1,0 +1,86 @@
+{
+  "ubim_data": {
+    "version": "1.0.0",
+    "source": "ETABS",
+    "units": {
+      "length": "mm",
+      "force": "N",
+      "angle": "degrees"
+    },
+    "frames": [
+      {
+        "id": "21",
+        "type": "column",
+        "geometry": {
+          "start": {"x": 0.0, "y": 0.0, "z": 0.0, "point_id": "41"},
+          "end": {"x": 0.0, "y": 0.0, "z": 3810.0, "point_id": "1"},
+          "length": 3810.0
+        },
+        "properties": {
+          "profile": "W36X182",
+          "material": "A992",
+          "story": "Story1"
+        },
+        "orientation": {
+          "rotation_x": 0.0,
+          "rotation_y": 0.0, 
+          "rotation_z": 0.0,
+          "cardinal_point": 0
+        },
+        "offsets": {
+          "start": 0.0,
+          "end": 0.0
+        }
+      },
+      {
+        "id": "22", 
+        "type": "beam",
+        "geometry": {
+          "start": {"x": 0.0, "y": 0.0, "z": 3810.0, "point_id": "1"},
+          "end": {"x": 6000.0, "y": 0.0, "z": 3810.0, "point_id": "2"},
+          "length": 6000.0
+        },
+        "properties": {
+          "profile": "W21X50",
+          "material": "A992", 
+          "story": "Story1"
+        },
+        "orientation": {
+          "rotation_x": 0.0,
+          "rotation_y": 0.0,
+          "rotation_z": 0.0,
+          "cardinal_point": 0
+        },
+        "offsets": {
+          "start": 0.0,
+          "end": 0.0
+        }
+      },
+      {
+        "id": "23",
+        "type": "brace",
+        "geometry": {
+          "start": {"x": 0.0, "y": 0.0, "z": 0.0, "point_id": "41"},
+          "end": {"x": 3000.0, "y": 3000.0, "z": 3810.0, "point_id": "3"}, 
+          "length": 5240.4
+        },
+        "properties": {
+          "profile": "HSS8X8X1/2",
+          "material": "A500",
+          "story": "Story1"
+        },
+        "orientation": {
+          "rotation_x": 0.0,
+          "rotation_y": 0.0,
+          "rotation_z": 0.0,
+          "cardinal_point": 0
+        },
+        "offsets": {
+          "start": 0.0,
+          "end": 0.0
+        }
+      }
+    ]
+  },
+  "frame_count": 3
+}

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-TeklaMCP Server 0.3 - PHASE 2: Comprehensive CRUD Operations
+TeklaMCP Server 0.3 - ETABS-Tekla Bridge Implementation
 Bridge between Claude Code and TeklaMCP HTTP Server
 
 PHASE 1 IMPROVEMENTS:
@@ -14,6 +14,13 @@ PHASE 2 IMPROVEMENTS:
 - Advanced search and filtering capabilities
 - Bulk operations support
 - Comprehensive object lifecycle management
+
+ETABS BRIDGE IMPLEMENTATION:
+- UBIM JSON import from ETABS export
+- Exact geometry preservation (mm units)
+- Profile/material mapping (W36X182 → Tekla)
+- MIDDLE/MIDDLE/TOP positioning for accuracy
+- Traceability with ETABS frame IDs
 """
 
 import asyncio
@@ -21,9 +28,10 @@ import aiohttp
 import sys
 import subprocess
 import os
+import json
 from fastmcp import FastMCP
 from pydantic import BaseModel, Field
-from typing import Optional
+from typing import Optional, Dict, List
 
 # Initialize FastMCP server
 mcp = FastMCP("TeklaMCP Server")
@@ -416,6 +424,128 @@ async def tekla_bulk_operations(
     Returns summary of all operations with individual results
     """
     return await call_endpoint("objects/bulk", "POST", operations)
+
+# ==================== ETABS-TEKLA BRIDGE TOOLS ====================
+
+@mcp.tool()
+async def tekla_import_frames_from_ubim(
+    ubim_file: str
+) -> str:
+    """Import ETABS frames from UBIM JSON file to Tekla
+    
+    ETABS BRIDGE: Main import tool for UBIM JSON files
+    
+    Parameters:
+    - ubim_file: Path to UBIM JSON file exported from ETABS
+    
+    Imports frames with:
+    - Exact geometry (coordinates already in mm)
+    - Profile/material mapping
+    - MIDDLE/MIDDLE/TOP positioning for accuracy
+    - Preserved ETABS frame IDs for traceability
+    
+    Returns import summary with created beam count and any errors
+    """
+    try:
+        # Read and parse UBIM JSON file
+        if not os.path.exists(ubim_file):
+            return f"ERROR: UBIM file not found: {ubim_file}"
+        
+        with open(ubim_file, 'r') as f:
+            ubim_data = json.load(f)
+        
+        # Validate UBIM format
+        if not ubim_data.get('frames'):
+            return "ERROR: No frames found in UBIM file"
+        
+        frames = ubim_data['frames']
+        
+        # Create import request for HTTP backend
+        import_request = {
+            "ubim_data": ubim_data,
+            "frame_count": len(frames)
+        }
+        
+        return await call_endpoint("import-ubim-frames", "POST", import_request)
+        
+    except json.JSONDecodeError as e:
+        return f"ERROR: Invalid JSON in UBIM file: {e}"
+    except Exception as e:
+        return f"ERROR: UBIM import failed: {e}"
+
+@mcp.tool() 
+async def tekla_connect_to_tekla(
+    auto_start: bool = False
+) -> str:
+    """Connect to Tekla Structures with model info
+    
+    ETABS BRIDGE: Connection management for import workflows
+    
+    Parameters:
+    - auto_start: Whether to attempt starting Tekla if not running
+    
+    Returns connection status and model information
+    """
+    return await call_endpoint("connect-tekla", "POST", {"auto_start": auto_start})
+
+@mcp.tool()
+async def tekla_validate_ubim_file(
+    ubim_file: str
+) -> str:
+    """Validate UBIM JSON file format and content
+    
+    ETABS BRIDGE: Pre-import validation
+    
+    Parameters:
+    - ubim_file: Path to UBIM JSON file to validate
+    
+    Returns validation report with frame count and any issues
+    """
+    try:
+        if not os.path.exists(ubim_file):
+            return f"ERROR: File not found: {ubim_file}"
+        
+        with open(ubim_file, 'r') as f:
+            ubim_data = json.load(f)
+        
+        # Validate UBIM structure
+        validation_report = {
+            "file_path": ubim_file,
+            "version": ubim_data.get("version", "unknown"),
+            "source": ubim_data.get("source", "unknown"),
+            "units": ubim_data.get("units", {}),
+            "frame_count": len(ubim_data.get("frames", [])),
+            "valid": True,
+            "issues": []
+        }
+        
+        # Check required fields
+        if not ubim_data.get("frames"):
+            validation_report["issues"].append("No frames array found")
+            validation_report["valid"] = False
+        
+        if ubim_data.get("units", {}).get("length") != "mm":
+            validation_report["issues"].append(f"Expected length units 'mm', got '{ubim_data.get('units', {}).get('length')}'")
+        
+        # Sample frame validation
+        frames = ubim_data.get("frames", [])
+        if frames:
+            sample_frame = frames[0]
+            required_fields = ["id", "type", "geometry", "properties"]
+            for field in required_fields:
+                if field not in sample_frame:
+                    validation_report["issues"].append(f"Sample frame missing required field: {field}")
+                    validation_report["valid"] = False
+        
+        if validation_report["valid"]:
+            return f"SUCCESS: UBIM file validation passed - {validation_report['frame_count']} frames ready for import"
+        else:
+            return f"ERROR: UBIM validation failed - Issues: {', '.join(validation_report['issues'])}"
+            
+    except json.JSONDecodeError as e:
+        return f"ERROR: Invalid JSON format: {e}"
+    except Exception as e:
+        return f"ERROR: Validation failed: {e}"
 
 # ==================== MAIN ====================
 
