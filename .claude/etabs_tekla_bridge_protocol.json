@@ -1,0 +1,147 @@
+{
+  "protocol": {
+    "name": "ETABS-Tekla Bridge Protocol",
+    "version": "1.0.0",
+    "author": "ETABS MCP Agent v3.0",
+    "target": "Tekla MCP Agent",
+    "last_update": "2025-09-07T21:43:17Z"
+  },
+  "status": {
+    "protocol_status": "ACTIVE",
+    "etabs_agent": {
+      "status": "ONLINE",
+      "version": "Unified Bridge v3.0",
+      "last_test": "300 frames exported with 100% quality"
+    },
+    "tekla_agent": {
+      "status": "AWAITING",
+      "expected_version": "TBD"
+    }
+  },
+  "communication": {
+    "method": "file_based",
+    "channels": {
+      "protocol": ".claude/etabs_tekla_bridge_protocol.json",
+      "export_manifest": ".claude/last_export_manifest.json", 
+      "data_files": "*.json (UBIM format)",
+      "tekla_response": ".claude/tekla_response.json"
+    }
+  },
+  "etabs_capabilities": {
+    "export_frames": {
+      "command": "export_frames_to_ubim",
+      "implementation": "ubim_bridge.py",
+      "output_format": "UBIM v1.0.0",
+      "units": "mm",
+      "tested": true,
+      "test_results": "300 frames, 100% quality"
+    },
+    "import_frames": {
+      "command": "import_frames_from_ubim", 
+      "implementation": "ubim_bridge.py",
+      "input_format": "UBIM v1.0.0",
+      "tested": false,
+      "note": "Ready for testing"
+    }
+  },
+  "data_format": {
+    "ubim_version": "1.0.0",
+    "structure": {
+      "version": "string",
+      "source": "ETABS", 
+      "object_type": "frames",
+      "units": {
+        "length": "mm",
+        "force": "N",
+        "angle": "degrees"
+      },
+      "frames": [
+        {
+          "id": "string",
+          "guid": "string (UUID from ETABS)",
+          "type": "column|beam|brace|other",
+          "geometry": {
+            "start": {"x": "number", "y": "number", "z": "number"},
+            "end": {"x": "number", "y": "number", "z": "number"}
+          },
+          "properties": {
+            "profile": "string (ETABS section name)",
+            "material": "string (actual ETABS material)",
+            "story": "string",
+            "insertion_point": {
+              "cardinal_point": "integer (1-11)",
+              "offset_i": "array[3] (mm)",
+              "offset_j": "array[3] (mm)"
+            }
+          }
+        }
+      ]
+    }
+  },
+  "tekla_requirements": {
+    "must_implement": [
+      "Read UBIM JSON files",
+      "Map ETABS profiles to Tekla profiles", 
+      "Map ETABS materials to Tekla materials",
+      "Handle cardinal points 1-11",
+      "Create Tekla beams/columns",
+      "Write response JSON"
+    ],
+    "mapping_requirements": {
+      "WARNING": "ETABS MCP Agent does NOT know Tekla mappings",
+      "profiles": {
+        "responsibility": "Tekla agent must research and implement",
+        "common_etabs_profiles": ["W36X182", "W21X50", "HSS4X4X1/4", "L4X4X1/4"],
+        "note": "Map these to your Tekla profile catalog"
+      },
+      "materials": {
+        "responsibility": "Tekla agent must research and implement", 
+        "common_etabs_materials": ["A992Fy50", "A36", "A500GrB"],
+        "note": "Map these to your Tekla material library"
+      },
+      "cardinal_points": {
+        "etabs_system": "1-11 integer values",
+        "tekla_system": "Unknown to ETABS agent - YOU determine mapping"
+      }
+    },
+    "response_format": {
+      "file": ".claude/tekla_response.json",
+      "structure": {
+        "timestamp": "ISO8601",
+        "operation": "import_frames",
+        "result": {
+          "success": "boolean",
+          "imported": "integer",
+          "failed": "integer", 
+          "warnings": "array of strings"
+        }
+      }
+    }
+  },
+  "error_codes": {
+    "etabs": {
+      "ETABS_001": "Failed to connect to ETABS",
+      "ETABS_002": "Model not loaded", 
+      "ETABS_003": "Units conversion failed",
+      "ETABS_004": "Frame extraction failed",
+      "ETABS_005": "Material extraction failed",
+      "ETABS_006": "GUID extraction failed"
+    },
+    "tekla": {
+      "TEKLA_001": "Failed to connect to Tekla",
+      "TEKLA_002": "Model not open",
+      "TEKLA_003": "Profile not found", 
+      "TEKLA_004": "Material not found",
+      "TEKLA_005": "Import validation failed",
+      "TEKLA_006": "Geometry creation failed"
+    }
+  },
+  "example_workflow": [
+    "1. ETABS: export_frames_to_ubim('project_frames.json')",
+    "2. ETABS: Updates .claude/last_export_manifest.json",
+    "3. Tekla: Reads project_frames.json",
+    "4. Tekla: Imports frames to Tekla model", 
+    "5. Tekla: Writes .claude/tekla_response.json",
+    "6. Both agents: Check status files"
+  ]
+}

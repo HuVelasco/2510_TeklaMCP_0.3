@@ -26,7 +26,8 @@
       "Bash(rm:*)",
       "mcp__tekla__tekla_create_column",
       "Bash(dotnet clean:*)",
-      "mcp__tekla__tekla_get_model_info"
+      "mcp__tekla__tekla_get_model_info",
+      "Read(//c/Users/hugov/ClaudeProjects/2509_EtabsMCP_0.3/.claude/**)"
     ],
     "deny": [],
     "ask": []
