@@ -117,6 +117,7 @@ namespace TeklaMCP
     public class UBIMFrame
     {
         public string id { get; set; }
+        public string guid { get; set; }  // NEW: ETABS GUID for change tracking
         public string type { get; set; }
         public UBIMGeometry geometry { get; set; }
         public UBIMProperties properties { get; set; }
@@ -144,6 +145,7 @@ namespace TeklaMCP
         public string profile { get; set; }
         public string material { get; set; }
         public string story { get; set; }
+        public UBIMInsertionPoint insertion_point { get; set; }  // NEW: Cardinal point and offsets
     }
 
     public class UBIMOrientation
@@ -152,12 +154,25 @@ namespace TeklaMCP
         public double rotation_y { get; set; }
         public double rotation_z { get; set; }
         public int cardinal_point { get; set; }
+        public double local_angle { get; set; }  // NEW: Local rotation angle from ETABS
+        public string design_orientation { get; set; }  // NEW: ETABS GetDesignOrientation (column/beam/brace)
     }
 
     public class UBIMOffsets
     {
         public double start { get; set; }
         public double end { get; set; }
+    }
+
+    /// <summary>
+    /// NEW: ETABS Insertion Point Data (GetInsertionPoint method)
+    /// </summary>
+    public class UBIMInsertionPoint
+    {
+        public int cardinal_point { get; set; }  // 1-11 from ETABS
+        public bool mirror_2 { get; set; }  // Mirror about local 2-axis
+        public double[] offset_i { get; set; }  // Offset at I-end [x,y,z] in mm
+        public double[] offset_j { get; set; }  // Offset at J-end [x,y,z] in mm
     }
 
     public class ConnectTeklaRequest
@@ -1263,27 +1278,131 @@ namespace TeklaMCP
             
             // Properties from UBIM frame
             beam.Profile.ProfileString = frame.properties.profile;  // "W36X182"
-            beam.Material.MaterialString = frame.properties.material;  // "A992"
-            beam.Name = $"ETABS_{frame.id}";  // Preserve ETABS frame ID for traceability
+            
+            // NEW: Handle actual ETABS materials (GetMaterial)
+            beam.Material.MaterialString = ConvertETABSMaterial(frame.properties.material);  // "A992Fy50" -> "A992"
+            
+            // NEW: Enhanced naming with GUID tracking
+            if (!string.IsNullOrEmpty(frame.guid))
+            {
+                beam.Name = $"ETABS_{frame.id}_{frame.guid.Substring(0, 8)}";  // Include GUID prefix for tracking
+            }
+            else
+            {
+                beam.Name = $"ETABS_{frame.id}";  // Fallback to frame ID only
+            }
             beam.Class = "1";  // Default class
             
-            // CRITICAL: MIDDLE/MIDDLE/TOP positioning for accuracy (per spec)
-            beam.Position.Depth = Position.DepthEnum.MIDDLE;
-            beam.Position.Plane = Position.PlaneEnum.MIDDLE;  
-            beam.Position.Rotation = Position.RotationEnum.TOP;
+            // NEW: Enhanced positioning using ETABS insertion point data
+            if (frame.properties?.insertion_point != null)
+            {
+                var insertionPoint = frame.properties.insertion_point;
+                var position = ConvertCardinalPointToTeklaPosition(insertionPoint.cardinal_point);
+                
+                beam.Position.Depth = position.Depth;
+                beam.Position.Plane = position.Plane;
+                beam.Position.Rotation = position.Rotation;
+                
+                LogMessage("CARDINAL_POINT_APPLIED", 
+                    $"Frame {frame.id}: Cardinal point {insertionPoint.cardinal_point} -> {position.Depth}/{position.Plane}/{position.Rotation}");
+            }
+            else
+            {
+                // Fallback: MIDDLE/MIDDLE/TOP positioning for accuracy (per original spec)
+                beam.Position.Depth = Position.DepthEnum.MIDDLE;
+                beam.Position.Plane = Position.PlaneEnum.MIDDLE;  
+                beam.Position.Rotation = Position.RotationEnum.TOP;
+            }
             
-            // Handle rotations if present (future enhancement)
+            // NEW: Handle local rotation angle from ETABS
+            if (frame.orientation != null && frame.orientation.local_angle != 0)
+            {
+                LogMessage("LOCAL_ANGLE_DETECTED", 
+                    $"Frame {frame.id}: Local angle {frame.orientation.local_angle} degrees");
+                
+                // Apply local rotation - convert degrees to radians if needed
+                // Note: Tekla rotation handling may need coordinate system conversion
+                // For now, log the value for verification
+            }
+            
+            // Legacy rotation handling (keep for compatibility)
             if (frame.orientation != null)
             {
-                // For now, log rotation info - rotation handling can be enhanced later
                 if (frame.orientation.rotation_x != 0 || frame.orientation.rotation_y != 0 || frame.orientation.rotation_z != 0)
                 {
-                    LogMessage("ROTATION_DETECTED", $"Frame {frame.id} has rotation: X={frame.orientation.rotation_x}, Y={frame.orientation.rotation_y}, Z={frame.orientation.rotation_z}");
-                    // Future: Apply rotation transformations here
+                    LogMessage("LEGACY_ROTATION_DETECTED", 
+                        $"Frame {frame.id} has legacy rotation: X={frame.orientation.rotation_x}, Y={frame.orientation.rotation_y}, Z={frame.orientation.rotation_z}");
                 }
             }
             
             return beam;
+        }
+
+        /// <summary>
+        /// Convert ETABS material names to Tekla material names
+        /// Simple conversion for common materials since both systems use similar profiles
+        /// </summary>
+        private static string ConvertETABSMaterial(string etabsMaterial)
+        {
+            if (string.IsNullOrEmpty(etabsMaterial))
+                return "A992"; // Default steel material
+            
+            // Handle ETABS GetMaterial format (e.g., "A992Fy50" -> "A992")
+            if (etabsMaterial.StartsWith("A992"))
+                return "A992";
+            if (etabsMaterial.StartsWith("A36"))
+                return "A36";
+            if (etabsMaterial.StartsWith("A500"))
+                return "A500B"; // A500GrB -> A500B
+            if (etabsMaterial.Contains("CONC") || etabsMaterial.Contains("C30"))
+                return "C30/37"; // Concrete grades
+            
+            // Log unmapped materials for future enhancement
+            LogMessage("MATERIAL_MAPPING", $"Unmapped ETABS material: {etabsMaterial}, using default A992");
+            return "A992"; // Safe default
+        }
+        
+        /// <summary>
+        /// Convert ETABS cardinal points (1-11) to Tekla Position enums
+        /// Based on ETABS cardinal point specification
+        /// </summary>
+        private static (Position.DepthEnum Depth, Position.PlaneEnum Plane, Position.RotationEnum Rotation) 
+            ConvertCardinalPointToTeklaPosition(int cardinalPoint)
+        {
+            // ETABS cardinal points (1-11):
+            // 1=bottom left, 2=bottom center, 3=bottom right
+            // 4=middle left, 5=middle center, 6=middle right  
+            // 7=top left, 8=top center, 9=top right
+            // 10=centroid, 11=shear center
+            
+            switch (cardinalPoint)
+            {
+                case 1: // Bottom Left
+                    return (Position.DepthEnum.BEHIND, Position.PlaneEnum.LEFT, Position.RotationEnum.BELOW);
+                case 2: // Bottom Center  
+                    return (Position.DepthEnum.BEHIND, Position.PlaneEnum.MIDDLE, Position.RotationEnum.BELOW);
+                case 3: // Bottom Right
+                    return (Position.DepthEnum.BEHIND, Position.PlaneEnum.RIGHT, Position.RotationEnum.BELOW);
+                case 4: // Middle Left
+                    return (Position.DepthEnum.MIDDLE, Position.PlaneEnum.LEFT, Position.RotationEnum.TOP);
+                case 5: // Middle Center (Most common)
+                    return (Position.DepthEnum.MIDDLE, Position.PlaneEnum.MIDDLE, Position.RotationEnum.TOP);
+                case 6: // Middle Right
+                    return (Position.DepthEnum.MIDDLE, Position.PlaneEnum.RIGHT, Position.RotationEnum.TOP);
+                case 7: // Top Left
+                    return (Position.DepthEnum.FRONT, Position.PlaneEnum.LEFT, Position.RotationEnum.TOP);
+                case 8: // Top Center
+                    return (Position.DepthEnum.FRONT, Position.PlaneEnum.MIDDLE, Position.RotationEnum.TOP);
+                case 9: // Top Right
+                    return (Position.DepthEnum.FRONT, Position.PlaneEnum.RIGHT, Position.RotationEnum.TOP);
+                case 10: // Centroid (use middle/middle)
+                    return (Position.DepthEnum.MIDDLE, Position.PlaneEnum.MIDDLE, Position.RotationEnum.TOP);
+                case 11: // Shear Center (use middle/middle)  
+                    return (Position.DepthEnum.MIDDLE, Position.PlaneEnum.MIDDLE, Position.RotationEnum.TOP);
+                default:
+                    LogMessage("CARDINAL_POINT_WARNING", $"Unknown cardinal point {cardinalPoint}, using default MIDDLE/MIDDLE/TOP");
+                    return (Position.DepthEnum.MIDDLE, Position.PlaneEnum.MIDDLE, Position.RotationEnum.TOP);
+            }
         }
 
         private static string ExecuteCodeWithCapture(string code)

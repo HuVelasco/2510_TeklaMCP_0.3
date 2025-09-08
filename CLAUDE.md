@@ -139,6 +139,19 @@ curl -X POST "http://localhost:8080/create-beam" -d '{...}'
 - **Architecture decisions** captured with rationale
 - **Change impact** clearly communicated
 
+## 10. 🌉 Bridge Coordination (If Used)
+
+### **Specialized Command File**
+For bridge operations with external systems:
+```
+.claude/bridge_coordination.command
+```
+
+### **General Rule**
+- When user mentions bridge/import/export operations → Read relevant .claude/command file
+- Keep general methodology in CLAUDE.md
+- Keep specific implementations in specialized command files
+
 ---
 *This methodology successfully delivered **5 major phases** with complete architectural transformation:*
 - **90% CRUD completeness** 

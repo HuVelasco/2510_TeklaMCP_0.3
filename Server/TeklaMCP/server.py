@@ -527,7 +527,7 @@ async def tekla_validate_ubim_file(
         if ubim_data.get("units", {}).get("length") != "mm":
             validation_report["issues"].append(f"Expected length units 'mm', got '{ubim_data.get('units', {}).get('length')}'")
         
-        # Sample frame validation
+        # Enhanced frame validation for ETABS MCP v3.0 features
         frames = ubim_data.get("frames", [])
         if frames:
             sample_frame = frames[0]
@@ -535,6 +535,42 @@ async def tekla_validate_ubim_file(
             for field in required_fields:
                 if field not in sample_frame:
                     validation_report["issues"].append(f"Sample frame missing required field: {field}")
+                    validation_report["valid"] = False
+            
+            # Check for new ETABS MCP v3.0 fields
+            enhanced_fields = {
+                "guid": "ETABS GUID for change tracking",
+                "properties.insertion_point": "Cardinal point and offset data",
+                "orientation.local_angle": "Local rotation angle from ETABS",
+                "orientation.design_orientation": "ETABS frame classification"
+            }
+            
+            enhanced_count = 0
+            for field_path, description in enhanced_fields.items():
+                field_parts = field_path.split(".")
+                current = sample_frame
+                field_exists = True
+                
+                try:
+                    for part in field_parts:
+                        current = current[part]
+                    enhanced_count += 1
+                    validation_report["issues"].append(f"INFO: Enhanced field present - {field_path}: {description}")
+                except (KeyError, TypeError):
+                    field_exists = False
+            
+            if enhanced_count > 0:
+                validation_report["issues"].append(f"INFO: ETABS MCP v3.0 enhanced format detected ({enhanced_count}/4 fields present)")
+            else:
+                validation_report["issues"].append(f"INFO: Legacy UBIM format detected (no enhanced fields)")
+            
+            # Validate insertion point data if present
+            properties = sample_frame.get("properties", {})
+            if "insertion_point" in properties:
+                insertion_point = properties["insertion_point"]
+                cardinal_point = insertion_point.get("cardinal_point", 0)
+                if cardinal_point < 1 or cardinal_point > 11:
+                    validation_report["issues"].append(f"WARNING: Invalid cardinal point {cardinal_point} (expected 1-11)")
                     validation_report["valid"] = False
         
         if validation_report["valid"]:
