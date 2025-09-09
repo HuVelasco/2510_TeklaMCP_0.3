@@ -1011,7 +1011,7 @@ namespace TeklaMCP
                             failedFrames.Add(new 
                             {
                                 etabs_id = frame.id,
-                                type = frame.type,
+                                type = frame.design_orientation ?? frame.type,
                                 reason = "Failed to insert beam into model"
                             });
                         }
@@ -1022,7 +1022,7 @@ namespace TeklaMCP
                         failedFrames.Add(new 
                         {
                             etabs_id = frame.id,
-                            type = frame.type,
+                            type = frame.design_orientation ?? frame.type,
                             reason = ex.Message
                         });
                     }
@@ -1254,59 +1254,43 @@ namespace TeklaMCP
             // Properties from UBIM frame
             beam.Profile.ProfileString = frame.properties.profile;  // "W36X182"
             
-            // NEW: Handle actual ETABS materials (GetMaterial)
+            // Handle actual ETABS materials (GetMaterial)
             beam.Material.MaterialString = ConvertETABSMaterial(frame.properties.material);  // "A992Fy50" -> "A992"
             
-            // NEW: Enhanced naming with GUID tracking
-            if (!string.IsNullOrEmpty(frame.guid))
-            {
-                beam.Name = $"ETABS_{frame.id}_{frame.guid.Substring(0, 8)}";  // Include GUID prefix for tracking
-            }
-            else
-            {
-                beam.Name = $"ETABS_{frame.id}";  // Fallback to frame ID only
-            }
-            beam.Class = "1";  // Default class
+            // Set beam name using design_orientation
+            beam.Name = GetFrameBaseName(frame.design_orientation);
             
-            // Apply cardinal point positioning with correct order
+            // Set beam class using simple numeric mapping
+            beam.Class = GetFrameClass(frame.design_orientation).ToString();
+            
+            // Apply cardinal point positioning with correct order (Plane, Rotation, Depth)
             if (frame.properties != null && frame.properties.cardinal_point > 0)
             {
                 var position = ConvertCardinalPointToTeklaPosition(frame.properties.cardinal_point, frame.design_orientation);
                 
-                beam.Position.Depth = position.Depth;
                 beam.Position.Plane = position.Plane;
                 beam.Position.Rotation = position.Rotation;
+                beam.Position.Depth = position.Depth;
                 
                 LogMessage("CARDINAL_POINT_APPLIED", 
-                    $"Frame {frame.id}: Cardinal point {insertionPoint.cardinal_point} -> {position.Depth}/{position.Plane}/{position.Rotation}");
+                    "Frame " + frame.id + ": Cardinal point " + frame.properties.cardinal_point.ToString() + " -> " + position.Plane.ToString() + "/" + position.Rotation.ToString() + "/" + position.Depth.ToString());
             }
             else
             {
                 // Fallback: MIDDLE/MIDDLE/TOP positioning for accuracy (per original spec)
-                beam.Position.Depth = Position.DepthEnum.MIDDLE;
-                beam.Position.Plane = Position.PlaneEnum.MIDDLE;  
+                beam.Position.Plane = Position.PlaneEnum.MIDDLE;
                 beam.Position.Rotation = Position.RotationEnum.TOP;
+                beam.Position.Depth = Position.DepthEnum.MIDDLE;
             }
             
-            // NEW: Handle local rotation angle from ETABS
-            if (frame.orientation != null && frame.orientation.local_angle != 0)
+            // Handle local rotation angle from ETABS
+            if (frame.local_angle != 0)
             {
                 LogMessage("LOCAL_ANGLE_DETECTED", 
-                    $"Frame {frame.id}: Local angle {frame.orientation.local_angle} degrees");
+                    "Frame " + frame.id + ": Local angle " + frame.local_angle.ToString() + " degrees");
                 
-                // Apply local rotation - convert degrees to radians if needed
-                // Note: Tekla rotation handling may need coordinate system conversion
-                // For now, log the value for verification
-            }
-            
-            // Legacy rotation handling (keep for compatibility)
-            if (frame.orientation != null)
-            {
-                if (frame.orientation.rotation_x != 0 || frame.orientation.rotation_y != 0 || frame.orientation.rotation_z != 0)
-                {
-                    LogMessage("LEGACY_ROTATION_DETECTED", 
-                        $"Frame {frame.id} has legacy rotation: X={frame.orientation.rotation_x}, Y={frame.orientation.rotation_y}, Z={frame.orientation.rotation_z}");
-                }
+                // Apply local rotation as RotationOffset
+                beam.Position.RotationOffset = frame.local_angle * Math.PI / 180.0;  // Convert degrees to radians
             }
             
             return beam;
@@ -1337,17 +1321,68 @@ namespace TeklaMCP
         }
         
         /// <summary>
+        /// Get beam base name from ETABS design orientation
+        /// </summary>
+        private static string GetFrameBaseName(string designOrientation)
+        {
+            if (string.IsNullOrEmpty(designOrientation))
+                return "BEAM";
+                
+            switch (designOrientation.ToLower())
+            {
+                case "column":
+                    return "COLUMN";
+                case "beam":
+                    return "BEAM";
+                case "brace":
+                    return "BRACE";
+                case "other":
+                    return "OTHER";
+                default:
+                    return "BEAM";  // Default fallback
+            }
+        }
+        
+        /// <summary>
+        /// Get frame class number from ETABS design orientation
+        /// 1=BEAM, 2=COLUMN, 3=BRACE, 4=OTHER
+        /// </summary>
+        private static int GetFrameClass(string designOrientation)
+        {
+            if (string.IsNullOrEmpty(designOrientation))
+                return 1;
+                
+            switch (designOrientation.ToLower())
+            {
+                case "beam":
+                    return 1;
+                case "column":
+                    return 2;
+                case "brace":
+                    return 3;
+                case "other":
+                    return 4;
+                default:
+                    return 1;  // Default fallback
+            }
+        }
+        
+        /// <summary>
         /// Convert ETABS cardinal points (1-11) to Tekla Position enums
-        /// Based on ETABS cardinal point specification
+        /// Based on ETABS cardinal point specification with design orientation context
         /// </summary>
         private static (Position.DepthEnum Depth, Position.PlaneEnum Plane, Position.RotationEnum Rotation) 
-            ConvertCardinalPointToTeklaPosition(int cardinalPoint)
+            ConvertCardinalPointToTeklaPosition(int cardinalPoint, string designOrientation)
         {
-            // ETABS cardinal points (1-11):
+            // ETABS cardinal points (1-11) with correct Tekla mapping:
             // 1=bottom left, 2=bottom center, 3=bottom right
             // 4=middle left, 5=middle center, 6=middle right  
             // 7=top left, 8=top center, 9=top right
             // 10=centroid, 11=shear center
+            
+            // Log the design orientation for context
+            LogMessage("CARDINAL_POINT_CONVERT", 
+                "Converting cardinal point " + cardinalPoint.ToString() + " for " + (designOrientation ?? "unknown") + " orientation");
             
             switch (cardinalPoint)
             {
@@ -1374,7 +1409,8 @@ namespace TeklaMCP
                 case 11: // Shear Center (use middle/middle)  
                     return (Position.DepthEnum.MIDDLE, Position.PlaneEnum.MIDDLE, Position.RotationEnum.TOP);
                 default:
-                    LogMessage("CARDINAL_POINT_WARNING", $"Unknown cardinal point {cardinalPoint}, using default MIDDLE/MIDDLE/TOP");
+                    LogMessage("CARDINAL_POINT_WARNING", 
+                        "Unknown cardinal point " + cardinalPoint.ToString() + ", using default MIDDLE/MIDDLE/TOP");
                     return (Position.DepthEnum.MIDDLE, Position.PlaneEnum.MIDDLE, Position.RotationEnum.TOP);
             }
         }
