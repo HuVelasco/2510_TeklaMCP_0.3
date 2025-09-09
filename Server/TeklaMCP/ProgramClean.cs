@@ -117,12 +117,12 @@ namespace TeklaMCP
     public class UBIMFrame
     {
         public string id { get; set; }
-        public string guid { get; set; }  // NEW: ETABS GUID for change tracking
-        public string type { get; set; }
+        public string guid { get; set; }  // ETABS GUID for change tracking
+        public string type { get; set; }  // column|beam|brace|other
+        public string design_orientation { get; set; }  // ETABS classification
+        public double local_angle { get; set; }  // Local rotation angle in degrees
         public UBIMGeometry geometry { get; set; }
         public UBIMProperties properties { get; set; }
-        public UBIMOrientation orientation { get; set; }
-        public UBIMOffsets offsets { get; set; }
     }
 
     public class UBIMGeometry
@@ -145,35 +145,10 @@ namespace TeklaMCP
         public string profile { get; set; }
         public string material { get; set; }
         public string story { get; set; }
-        public UBIMInsertionPoint insertion_point { get; set; }  // NEW: Cardinal point and offsets
-    }
-
-    public class UBIMOrientation
-    {
-        public double rotation_x { get; set; }
-        public double rotation_y { get; set; }
-        public double rotation_z { get; set; }
-        public int cardinal_point { get; set; }
-        public double local_angle { get; set; }  // NEW: Local rotation angle from ETABS
-        public string design_orientation { get; set; }  // NEW: ETABS GetDesignOrientation (column/beam/brace)
-    }
-
-    public class UBIMOffsets
-    {
-        public double start { get; set; }
-        public double end { get; set; }
-    }
-
-    /// <summary>
-    /// NEW: ETABS Insertion Point Data (GetInsertionPoint method)
-    /// </summary>
-    public class UBIMInsertionPoint
-    {
         public int cardinal_point { get; set; }  // 1-11 from ETABS
-        public bool mirror_2 { get; set; }  // Mirror about local 2-axis
-        public double[] offset_i { get; set; }  // Offset at I-end [x,y,z] in mm
-        public double[] offset_j { get; set; }  // Offset at J-end [x,y,z] in mm
+        public string frame_class { get; set; }  // Optional user-defined subtype (e.g., "MAIN", "SECONDARY")
     }
+
 
     public class ConnectTeklaRequest
     {
@@ -1293,11 +1268,10 @@ namespace TeklaMCP
             }
             beam.Class = "1";  // Default class
             
-            // NEW: Enhanced positioning using ETABS insertion point data
-            if (frame.properties?.insertion_point != null)
+            // Apply cardinal point positioning with correct order
+            if (frame.properties != null && frame.properties.cardinal_point > 0)
             {
-                var insertionPoint = frame.properties.insertion_point;
-                var position = ConvertCardinalPointToTeklaPosition(insertionPoint.cardinal_point);
+                var position = ConvertCardinalPointToTeklaPosition(frame.properties.cardinal_point, frame.design_orientation);
                 
                 beam.Position.Depth = position.Depth;
                 beam.Position.Plane = position.Plane;
