@@ -1,0 +1,30 @@
+{
+  "version": "1.0.0",
+  "source": "ETABS",
+  "units": {
+    "length": "mm",
+    "force": "N",
+    "angle": "degrees"
+  },
+  "frames": [
+    {
+      "id": "TEST_8",
+      "guid": "test-cardinal-8",
+      "type": "beam",
+      "design_orientation": "beam",
+      "local_angle": 0.0,
+      "geometry": {
+        "start": {"x": 0.0, "y": 0.0, "z": 4000.0, "point_id": "1"},
+        "end": {"x": 5000.0, "y": 0.0, "z": 4000.0, "point_id": "2"},
+        "length": 5000.0
+      },
+      "properties": {
+        "profile": "W21X50",
+        "material": "A992",
+        "story": "Test",
+        "cardinal_point": 8,
+        "frame_class": "TEST_TOP_CENTER"
+      }
+    }
+  ]
+}

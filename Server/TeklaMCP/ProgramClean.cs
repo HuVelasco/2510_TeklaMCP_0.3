@@ -39,6 +39,10 @@ namespace TeklaMCP
         public string PositionDepth { get; set; } = "BEHIND";
         public string PositionPlane { get; set; } = "MIDDLE";
         public string PositionRotation { get; set; } = "TOP";
+        
+        // Rotation parameters (UBIM enhancement)
+        public string RotationEnum { get; set; } = "TOP";
+        public double RotationOffset { get; set; } = 0.0;
     }
 
     /// <summary>
@@ -1240,6 +1244,16 @@ namespace TeklaMCP
             beam.Position.Plane = (Position.PlaneEnum)Enum.Parse(typeof(Position.PlaneEnum), beamRequest.PositionPlane.ToUpper());
             beam.Position.Rotation = (Position.RotationEnum)Enum.Parse(typeof(Position.RotationEnum), beamRequest.PositionRotation.ToUpper());
             
+            // Rotation parameters - UBIM enhancement for ETABS local angle support
+            if (!string.IsNullOrEmpty(beamRequest.RotationEnum))
+            {
+                beam.Position.Rotation = (Position.RotationEnum)Enum.Parse(typeof(Position.RotationEnum), beamRequest.RotationEnum.ToUpper());
+            }
+            if (beamRequest.RotationOffset != 0.0)
+            {
+                beam.Position.RotationOffset = beamRequest.RotationOffset; // Tekla accepts degrees directly
+            }
+            
             return beam;
         }
 
@@ -1264,33 +1278,47 @@ namespace TeklaMCP
             beam.Class = GetFrameClass(frame.design_orientation).ToString();
             
             // Apply cardinal point positioning with correct order (Plane, Rotation, Depth)
-            if (frame.properties != null && frame.properties.cardinal_point > 0)
+            if (frame.properties != null && frame.properties.cardinal_point >= 1 && frame.properties.cardinal_point <= 11)
             {
                 var position = ConvertCardinalPointToTeklaPosition(frame.properties.cardinal_point, frame.design_orientation);
                 
                 beam.Position.Plane = position.Plane;
+                beam.Position.PlaneOffset = 0;
                 beam.Position.Rotation = position.Rotation;
+                beam.Position.RotationOffset = frame.local_angle;
                 beam.Position.Depth = position.Depth;
+                beam.Position.DepthOffset = 0;
                 
                 LogMessage("CARDINAL_POINT_APPLIED", 
                     "Frame " + frame.id + ": Cardinal point " + frame.properties.cardinal_point.ToString() + " -> " + position.Plane.ToString() + "/" + position.Rotation.ToString() + "/" + position.Depth.ToString());
             }
             else
             {
-                // Fallback: MIDDLE/MIDDLE/TOP positioning for accuracy (per original spec)
+                // Default positioning based on design orientation
                 beam.Position.Plane = Position.PlaneEnum.MIDDLE;
+                beam.Position.PlaneOffset = 0;
                 beam.Position.Rotation = Position.RotationEnum.TOP;
-                beam.Position.Depth = Position.DepthEnum.MIDDLE;
+                beam.Position.RotationOffset = frame.local_angle;  // Apply local angle
+                
+                // CRITICAL: Different defaults for different frame types
+                if ((frame.design_orientation ?? "").ToUpper() == "BEAM")
+                {
+                    // Beams: MIDDLE/TOP/BEHIND (top flange aligned)
+                    beam.Position.Depth = Position.DepthEnum.BEHIND;
+                }
+                else
+                {
+                    // Columns/Braces: MIDDLE/TOP/MIDDLE (centered)
+                    beam.Position.Depth = Position.DepthEnum.MIDDLE;
+                }
+                beam.Position.DepthOffset = 0;
             }
             
-            // Handle local rotation angle from ETABS
+            // Log local angle if non-zero
             if (frame.local_angle != 0)
             {
                 LogMessage("LOCAL_ANGLE_DETECTED", 
                     "Frame " + frame.id + ": Local angle " + frame.local_angle.ToString() + " degrees");
-                
-                // Apply local rotation as RotationOffset
-                beam.Position.RotationOffset = frame.local_angle * Math.PI / 180.0;  // Convert degrees to radians
             }
             
             return beam;
@@ -1387,11 +1415,11 @@ namespace TeklaMCP
             switch (cardinalPoint)
             {
                 case 1: // Bottom Left
-                    return (Position.DepthEnum.BEHIND, Position.PlaneEnum.LEFT, Position.RotationEnum.BELOW);
+                    return (Position.DepthEnum.FRONT, Position.PlaneEnum.LEFT, Position.RotationEnum.BELOW);
                 case 2: // Bottom Center  
-                    return (Position.DepthEnum.BEHIND, Position.PlaneEnum.MIDDLE, Position.RotationEnum.BELOW);
+                    return (Position.DepthEnum.FRONT, Position.PlaneEnum.MIDDLE, Position.RotationEnum.BELOW);
                 case 3: // Bottom Right
-                    return (Position.DepthEnum.BEHIND, Position.PlaneEnum.RIGHT, Position.RotationEnum.BELOW);
+                    return (Position.DepthEnum.FRONT, Position.PlaneEnum.RIGHT, Position.RotationEnum.BELOW);
                 case 4: // Middle Left
                     return (Position.DepthEnum.MIDDLE, Position.PlaneEnum.LEFT, Position.RotationEnum.TOP);
                 case 5: // Middle Center (Most common)
@@ -1399,11 +1427,11 @@ namespace TeklaMCP
                 case 6: // Middle Right
                     return (Position.DepthEnum.MIDDLE, Position.PlaneEnum.RIGHT, Position.RotationEnum.TOP);
                 case 7: // Top Left
-                    return (Position.DepthEnum.FRONT, Position.PlaneEnum.LEFT, Position.RotationEnum.TOP);
+                    return (Position.DepthEnum.BEHIND, Position.PlaneEnum.LEFT, Position.RotationEnum.TOP);
                 case 8: // Top Center
-                    return (Position.DepthEnum.FRONT, Position.PlaneEnum.MIDDLE, Position.RotationEnum.TOP);
+                    return (Position.DepthEnum.BEHIND, Position.PlaneEnum.MIDDLE, Position.RotationEnum.TOP);
                 case 9: // Top Right
-                    return (Position.DepthEnum.FRONT, Position.PlaneEnum.RIGHT, Position.RotationEnum.TOP);
+                    return (Position.DepthEnum.BEHIND, Position.PlaneEnum.RIGHT, Position.RotationEnum.TOP);
                 case 10: // Centroid (use middle/middle)
                     return (Position.DepthEnum.MIDDLE, Position.PlaneEnum.MIDDLE, Position.RotationEnum.TOP);
                 case 11: // Shear Center (use middle/middle)  

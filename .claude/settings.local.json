@@ -28,13 +28,17 @@
       "Bash(dotnet clean:*)",
       "mcp__tekla__tekla_get_model_info",
       "Read(//c/Users/hugov/ClaudeProjects/2509_EtabsMCP_0.3/.claude/**)",
-      "Bash(sed:*)"
+      "Bash(sed:*)",
+      "mcp__tekla__tekla_import_frames_from_ubim",
+      "Read(//c/Users/hugov/ClaudeProjects/2509_EtabsMCP_0.3/**)",
+      "Read(//c/Users/hugov/ClaudeProjects/2511_UBIM_DataBridge/**)"
     ],
     "deny": [],
     "ask": []
   },
   "enableAllProjectMcpServers": true,
   "enabledMcpjsonServers": [
-    "tekla"
+    "tekla",
+    "etabs-clean"
   ]
 }

@@ -1,0 +1,19 @@
+{
+  "mcpServers": {
+    "etabs-clean": {
+      "command": "python",
+      "args": [
+        "server.py"
+      ],
+      "cwd": "C:/Users/hugov/ClaudeProjects/2509_EtabsMCP_0.3/etabs-mcp-clean",
+      "description": "ETABS MCP Server - Many Simple Tools Architecture with API Intelligence"
+    },
+    "tekla": {
+      "command": "python",
+      "args": [
+        "C:/Users/hugov/ClaudeProjects/2510_TeklaMCP_0.3/Server/TeklaMCP/server.py"
+      ],
+      "description": "TeklaMCP Server - FastMCP-based bridge to Tekla Structures"
+    }
+  }
+}

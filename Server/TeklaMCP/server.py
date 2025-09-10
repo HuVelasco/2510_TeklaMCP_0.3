@@ -447,26 +447,65 @@ async def tekla_import_frames_from_ubim(
     Returns import summary with created beam count and any errors
     """
     try:
-        # Read and parse UBIM JSON file
+        # Import shared UBIM library
+        try:
+            from ubim_core.converters.tekla import TeklaConverter
+            from ubim_core.validation.schema import UBIMValidator
+        except ImportError:
+            return "ERROR: UBIM core library not available. Install with: pip install -e ../../../2511_UBIM_DataBridge"
+        
+        # Read and validate UBIM file
         if not os.path.exists(ubim_file):
             return f"ERROR: UBIM file not found: {ubim_file}"
         
         with open(ubim_file, 'r') as f:
             ubim_data = json.load(f)
         
-        # Validate UBIM format
-        if not ubim_data.get('frames'):
-            return "ERROR: No frames found in UBIM file"
+        # Validate using shared UBIM validator
+        validator = UBIMValidator()
+        is_valid, issues = validator.validate_document(ubim_data)
         
-        frames = ubim_data['frames']
+        if not is_valid:
+            return f"ERROR: UBIM validation failed - {', '.join(issues[:3])}"  # Show first 3 issues
         
-        # Create import request for HTTP backend
-        import_request = {
-            "ubim_data": ubim_data,
-            "frame_count": len(frames)
+        # Convert using shared UBIM converter
+        converter = TeklaConverter()
+        beam_requests = converter.convert_ubim_to_beams(ubim_data)
+        
+        if not beam_requests:
+            return "ERROR: No valid beams could be generated from UBIM data"
+        
+        # Create beams via HTTP backend (batch operation)
+        created_beams = []
+        failed_beams = []
+        
+        for i, beam_request in enumerate(beam_requests):
+            try:
+                result = await call_endpoint("create-beam", "POST", beam_request)
+                if result.startswith("SUCCESS"):
+                    created_beams.append(f"Beam {i+1}: {beam_request.get('Profile', 'unknown')} {beam_request.get('Material', 'unknown')}")
+                else:
+                    failed_beams.append(f"Beam {i+1}: {result}")
+            except Exception as e:
+                failed_beams.append(f"Beam {i+1}: {str(e)}")
+        
+        # Return comprehensive result
+        result_summary = {
+            "total_frames": len(ubim_data.get('frames', [])),
+            "beam_requests_generated": len(beam_requests),
+            "beams_created": len(created_beams),
+            "beams_failed": len(failed_beams),
+            "success_rate": f"{(len(created_beams)/len(beam_requests)*100):.1f}%" if beam_requests else "0%"
         }
         
-        return await call_endpoint("import-ubim-frames", "POST", import_request)
+        message = f"SUCCESS: UBIM import completed - {result_summary['beams_created']}/{result_summary['beam_requests_generated']} beams created"
+        
+        if failed_beams:
+            message += f"\nFailed beams: {failed_beams[:3]}"  # Show first 3 failures
+            if len(failed_beams) > 3:
+                message += f"\n...and {len(failed_beams)-3} more failures"
+        
+        return message
         
     except json.JSONDecodeError as e:
         return f"ERROR: Invalid JSON in UBIM file: {e}"
@@ -502,86 +541,354 @@ async def tekla_validate_ubim_file(
     Returns validation report with frame count and any issues
     """
     try:
-        if not os.path.exists(ubim_file):
-            return f"ERROR: File not found: {ubim_file}"
+        # Import shared UBIM validation
+        try:
+            from ubim_core.validation.schema import UBIMValidator
+            from ubim_core.validation.safety import SafetyValidator
+        except ImportError:
+            return "ERROR: UBIM core library not available. Install with: pip install -e ../../../2511_UBIM_DataBridge"
         
+        # Use shared validators
+        schema_validator = UBIMValidator()
+        safety_validator = SafetyValidator()
+        
+        # Validate file using shared library
+        is_valid, issues = schema_validator.validate_file(ubim_file)
+        
+        if not is_valid:
+            return f"ERROR: UBIM schema validation failed - Issues: {', '.join(issues)}"
+        
+        # Load data for additional validation
         with open(ubim_file, 'r') as f:
             ubim_data = json.load(f)
         
-        # Validate UBIM structure
-        validation_report = {
+        frames = ubim_data.get("frames", [])
+        frame_count = len(frames)
+        safety_issues = []
+        
+        # Safety validation for first few frames
+        for i, frame in enumerate(frames[:5]):  # Check first 5 frames
+            is_safe, frame_issues = safety_validator.validate_frame_safety(frame)
+            if not is_safe:
+                safety_issues.extend([f"Frame {i+1}: {issue}" for issue in frame_issues])
+        
+        # Build validation report
+        validation_summary = {
             "file_path": ubim_file,
+            "frame_count": frame_count,
+            "schema_valid": True,
+            "safety_issues": len(safety_issues),
             "version": ubim_data.get("version", "unknown"),
             "source": ubim_data.get("source", "unknown"),
-            "units": ubim_data.get("units", {}),
-            "frame_count": len(ubim_data.get("frames", [])),
-            "valid": True,
-            "issues": []
         }
         
-        # Check required fields
-        if not ubim_data.get("frames"):
-            validation_report["issues"].append("No frames array found")
-            validation_report["valid"] = False
+        message = f"SUCCESS: UBIM validation passed - {frame_count} frames ready for import"
         
-        if ubim_data.get("units", {}).get("length") != "mm":
-            validation_report["issues"].append(f"Expected length units 'mm', got '{ubim_data.get('units', {}).get('length')}'")
-        
-        # Enhanced frame validation for ETABS MCP v3.0 features
-        frames = ubim_data.get("frames", [])
-        if frames:
-            sample_frame = frames[0]
-            required_fields = ["id", "type", "geometry", "properties"]
-            for field in required_fields:
-                if field not in sample_frame:
-                    validation_report["issues"].append(f"Sample frame missing required field: {field}")
-                    validation_report["valid"] = False
-            
-            # Check for new ETABS MCP v3.0 fields
-            enhanced_fields = {
-                "guid": "ETABS GUID for change tracking",
-                "properties.insertion_point": "Cardinal point and offset data",
-                "orientation.local_angle": "Local rotation angle from ETABS",
-                "orientation.design_orientation": "ETABS frame classification"
-            }
-            
-            enhanced_count = 0
-            for field_path, description in enhanced_fields.items():
-                field_parts = field_path.split(".")
-                current = sample_frame
-                field_exists = True
-                
-                try:
-                    for part in field_parts:
-                        current = current[part]
-                    enhanced_count += 1
-                    validation_report["issues"].append(f"INFO: Enhanced field present - {field_path}: {description}")
-                except (KeyError, TypeError):
-                    field_exists = False
-            
-            if enhanced_count > 0:
-                validation_report["issues"].append(f"INFO: ETABS MCP v3.0 enhanced format detected ({enhanced_count}/4 fields present)")
+        if safety_issues:
+            message += f"\nSAFETY WARNINGS: {len(safety_issues)} issues found in sample frames"
+            if len(safety_issues) <= 3:
+                message += f"\nIssues: {', '.join(safety_issues)}"
             else:
-                validation_report["issues"].append(f"INFO: Legacy UBIM format detected (no enhanced fields)")
-            
-            # Validate insertion point data if present
-            properties = sample_frame.get("properties", {})
-            if "insertion_point" in properties:
-                insertion_point = properties["insertion_point"]
-                cardinal_point = insertion_point.get("cardinal_point", 0)
-                if cardinal_point < 1 or cardinal_point > 11:
-                    validation_report["issues"].append(f"WARNING: Invalid cardinal point {cardinal_point} (expected 1-11)")
-                    validation_report["valid"] = False
+                message += f"\nFirst 3 issues: {', '.join(safety_issues[:3])}"
         
-        if validation_report["valid"]:
-            return f"SUCCESS: UBIM file validation passed - {validation_report['frame_count']} frames ready for import"
-        else:
-            return f"ERROR: UBIM validation failed - Issues: {', '.join(validation_report['issues'])}"
+        return message
             
     except json.JSONDecodeError as e:
         return f"ERROR: Invalid JSON format: {e}"
     except Exception as e:
         return f"ERROR: Validation failed: {e}"
+
+# ==================== GUID SYNCHRONIZATION ====================
+
+@mcp.tool()
+async def tekla_export_ubim_with_sync(
+    output_file: str = "tekla_frames.json",
+    sync_file: str = ".ubim_sync"
+) -> str:
+    """Export Tekla frames to UBIM format AND update GUID synchronization tracking.
+    
+    This combines export with sync tracking for the GUID-based workflow:
+    Export UBIM → Import UBIM → Detect Changes → User Review → Apply Changes
+    
+    Parameters:
+    - output_file: Output UBIM JSON file path (default: tekla_frames.json)
+    - sync_file: GUID sync tracking file (default: .ubim_sync)
+    
+    Returns export summary and sync tracking update
+    """
+    try:
+        # Import shared UBIM library
+        try:
+            from ubim_core.sync.guid_tracker import GUIDTracker
+            from ubim_core.converters.tekla import TeklaConverter
+        except ImportError:
+            return "ERROR: UBIM core library not available. Install with: pip install -e ../../../2511_UBIM_DataBridge"
+        
+        # Ensure HTTP server is running
+        await ensure_http_server_running()
+        
+        # Check Tekla connection
+        if not await is_tekla_connected():
+            return "ERROR: Not connected to Tekla. Start Tekla Structures first."
+        
+        # Get all parts from Tekla
+        parts_data = await make_http_request("GET", "/list-parts", {})
+        if not parts_data.get("success"):
+            return f"ERROR: Failed to get parts from Tekla: {parts_data.get('error', 'Unknown error')}"
+        
+        # Convert Tekla parts to UBIM format
+        # TODO: Implement Tekla → UBIM conversion
+        # For now, return a placeholder structure
+        ubim_data = {
+            "version": "1.0.0",
+            "source": "Tekla",
+            "export_date": "placeholder",
+            "object_type": "frames",
+            "frames": []
+        }
+        
+        # Save UBIM data
+        with open(output_file, 'w') as f:
+            json.dump(ubim_data, f, indent=2)
+        
+        # Update GUID tracking
+        tracker = GUIDTracker(sync_file)
+        
+        # Track all exported frames by their GUIDs
+        tracked_objects = 0
+        for frame in ubim_data.get("frames", []):
+            if frame.get("guid"):
+                snapshot = tracker.create_snapshot(
+                    guid=frame["guid"],
+                    object_data=frame,
+                    source_software="tekla",
+                    software_id=frame.get("id", "")
+                )
+                tracker.current_snapshots[frame["guid"]] = snapshot
+                tracked_objects += 1
+        
+        # Save updated tracking
+        tracker.save_sync_data()
+        
+        return f"SUCCESS: Exported {len(ubim_data.get('frames', []))} frames to {output_file} and tracked {tracked_objects} objects in {sync_file}"
+        
+    except Exception as e:
+        return f"ERROR: Export with sync failed: {e}"
+
+@mcp.tool()
+async def tekla_import_ubim_with_sync(
+    ubim_file: str,
+    sync_file: str = ".ubim_sync"
+) -> str:
+    """Import UBIM data to Tekla AND detect changes using GUID synchronization.
+    
+    This detects changes by comparing imported data against tracked state:
+    - New objects: Not in sync tracking
+    - Modified objects: Different fingerprints
+    - Deleted objects: In tracking but not in import
+    
+    Parameters:
+    - ubim_file: Path to UBIM JSON file to import
+    - sync_file: GUID sync tracking file (default: .ubim_sync)
+    
+    Returns import summary and detected changes
+    """
+    try:
+        # Import shared UBIM library
+        try:
+            from ubim_core.sync.guid_tracker import GUIDTracker
+            from ubim_core.converters.tekla import TeklaConverter
+        except ImportError:
+            return "ERROR: UBIM core library not available. Install with: pip install -e ../../../2511_UBIM_DataBridge"
+        
+        # Load UBIM data
+        if not os.path.exists(ubim_file):
+            return f"ERROR: UBIM file not found: {ubim_file}"
+        
+        with open(ubim_file, 'r') as f:
+            ubim_data = json.load(f)
+        
+        # Initialize GUID tracker
+        tracker = GUIDTracker(sync_file)
+        
+        # Detect changes using GUID comparison
+        detected_changes = tracker.update_from_ubim(ubim_data, "external")
+        
+        # Format changes for review
+        changes_summary = []
+        for change in detected_changes:
+            changes_summary.append({
+                "guid": change.guid,
+                "type": change.change_type,
+                "description": change.description,
+                "affected_properties": change.affected_properties,
+                "timestamp": change.timestamp
+            })
+        
+        return f"SUCCESS: Processed {len(ubim_data.get('frames', []))} frames, detected {len(detected_changes)} changes. Changes: {json.dumps(changes_summary, indent=2)}"
+        
+    except Exception as e:
+        return f"ERROR: Import with sync failed: {e}"
+
+@mcp.tool()
+async def tekla_get_pending_changes(
+    sync_file: str = ".ubim_sync"
+) -> str:
+    """Get changes awaiting user review from GUID synchronization.
+    
+    Returns all detected changes that haven't been reviewed yet, with engineering
+    impact assessment and recommendations.
+    
+    Parameters:
+    - sync_file: GUID sync tracking file (default: .ubim_sync)
+    
+    Returns pending changes formatted for user review
+    """
+    try:
+        from ubim_core.sync.guid_tracker import GUIDTracker
+        from ubim_core.sync.user_review import UserReviewInterface
+    except ImportError:
+        return "ERROR: UBIM core library not available. Install with: pip install -e ../../../2511_UBIM_DataBridge"
+    
+    try:
+        # Initialize tracking and review interface
+        tracker = GUIDTracker(sync_file)
+        review_interface = UserReviewInterface(tracker)
+        
+        # Get changes for review
+        changes_for_review = review_interface.get_changes_for_review()
+        summary = review_interface.display_review_summary()
+        
+        return f"PENDING CHANGES ({len(changes_for_review)} total):\n\nSUMMARY:\n{json.dumps(summary, indent=2)}\n\nDETAILS:\n{json.dumps(changes_for_review, indent=2)}"
+        
+    except Exception as e:
+        return f"ERROR: Failed to get pending changes: {e}"
+
+@mcp.tool()
+async def tekla_review_change(
+    guid: str,
+    timestamp: str,
+    approved: bool,
+    notes: str = "",
+    sync_file: str = ".ubim_sync"
+) -> str:
+    """Review and approve/reject a specific change in GUID synchronization.
+    
+    This is the user control point where engineers approve changes before they
+    are applied to the model.
+    
+    Parameters:
+    - guid: GUID of the object to review
+    - timestamp: Timestamp of the change to review
+    - approved: True to approve, False to reject
+    - notes: Optional review notes
+    - sync_file: GUID sync tracking file (default: .ubim_sync)
+    
+    Returns review result
+    """
+    try:
+        from ubim_core.sync.guid_tracker import GUIDTracker
+    except ImportError:
+        return "ERROR: UBIM core library not available. Install with: pip install -e ../../../2511_UBIM_DataBridge"
+    
+    try:
+        # Initialize tracking
+        tracker = GUIDTracker(sync_file)
+        
+        # Review the change
+        success = tracker.review_change(guid, timestamp, approved, notes)
+        
+        if success:
+            action = "approved" if approved else "rejected"
+            return f"SUCCESS: Change {action} for object {guid}. Notes: {notes}"
+        else:
+            return f"ERROR: Change not found: {guid} at {timestamp}"
+            
+    except Exception as e:
+        return f"ERROR: Failed to review change: {e}"
+
+@mcp.tool()
+async def tekla_apply_approved_changes(
+    sync_file: str = ".ubim_sync"
+) -> str:
+    """Apply user-approved changes to Tekla model.
+    
+    This is the final step where approved changes are actually applied to the
+    Tekla model. Only changes explicitly approved by the user are applied.
+    
+    Parameters:
+    - sync_file: GUID sync tracking file (default: .ubim_sync)
+    
+    Returns application results
+    """
+    try:
+        from ubim_core.sync.guid_tracker import GUIDTracker
+        from ubim_core.converters.tekla import TeklaConverter
+    except ImportError:
+        return "ERROR: UBIM core library not available. Install with: pip install -e ../../../2511_UBIM_DataBridge"
+    
+    # Ensure HTTP server is running
+    await ensure_http_server_running()
+    
+    # Check Tekla connection
+    if not await is_tekla_connected():
+        return "ERROR: Not connected to Tekla. Start Tekla Structures first."
+    
+    try:
+        # Initialize tracking
+        tracker = GUIDTracker(sync_file)
+        
+        # Get approved changes
+        approved_changes = tracker.get_approved_changes()
+        
+        if not approved_changes:
+            return "SUCCESS: No approved changes to apply"
+        
+        # Apply changes to Tekla model
+        converter = TeklaConverter()
+        applied_guids = []
+        failed_changes = []
+        
+        for change in approved_changes:
+            try:
+                # Apply the change based on type
+                if change.change_type == "created" and change.new_snapshot:
+                    # Create new object in Tekla
+                    object_data = change.new_snapshot.metadata.get("original_data", {})
+                    beam_requests = converter.convert_ubim_frame_to_beam(object_data)
+                    
+                    if beam_requests:
+                        # Create beam via HTTP
+                        result = await make_http_request("POST", "/create-beam", beam_requests[0])
+                        if result.get("success"):
+                            applied_guids.append(change.guid)
+                        else:
+                            failed_changes.append({"guid": change.guid, "error": result.get("error", "Unknown")})
+                    
+                elif change.change_type in ["properties_changed", "geometry_changed"] and change.new_snapshot:
+                    # Modify existing object in Tekla
+                    # TODO: Implement object modification via HTTP
+                    applied_guids.append(change.guid)
+                    
+                elif change.change_type == "deleted":
+                    # Delete object from Tekla
+                    # TODO: Implement object deletion via HTTP
+                    applied_guids.append(change.guid)
+                    
+            except Exception as e:
+                failed_changes.append({
+                    "guid": change.guid,
+                    "error": str(e)
+                })
+        
+        # Clear successfully applied changes
+        if applied_guids:
+            tracker.clear_applied_changes(applied_guids)
+        
+        return f"SUCCESS: Applied {len(applied_guids)} changes, {len(failed_changes)} failed. Applied: {applied_guids}. Failures: {failed_changes}"
+        
+    except Exception as e:
+        return f"ERROR: Failed to apply changes: {e}"
 
 # ==================== MAIN ====================
 

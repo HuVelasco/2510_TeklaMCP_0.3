@@ -1,0 +1,30 @@
+{
+  "version": "1.0.0",
+  "source": "ETABS",
+  "units": {
+    "length": "mm",
+    "force": "N",
+    "angle": "degrees"
+  },
+  "frames": [
+    {
+      "id": "ROT_COL_90",
+      "guid": "test-rotated-column-90",
+      "type": "column",
+      "design_orientation": "column",
+      "local_angle": 90.0,
+      "geometry": {
+        "start": {"x": 7000.0, "y": 0.0, "z": 0.0, "point_id": "1"},
+        "end": {"x": 7000.0, "y": 0.0, "z": 4000.0, "point_id": "2"},
+        "length": 4000.0
+      },
+      "properties": {
+        "profile": "W14X90",
+        "material": "A992",
+        "story": "Test",
+        "cardinal_point": 5,
+        "frame_class": "ROTATED_90"
+      }
+    }
+  ]
+}
