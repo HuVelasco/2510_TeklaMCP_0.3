@@ -497,21 +497,31 @@ async def tekla_import_frames_from_ubim(
         # Detect changes using Git-inspired GUID tracking
         detected_changes = guid_tracker.update_from_ubim(ubim_data, "etabs")
         
-        # REAL FIX: Use GUID-based twin model tracking instead of broken coordinate matching
-        # Check if this is a duplicate import (if we already have these exact frames)
-        if detected_changes:
-            # This is a real change - let the UBIM coordinator handle it
-            return f"TWIN MODEL SYNC DETECTED: {len(detected_changes)} changes found. Use review workflow:\n1. mcp__tekla__tekla_get_pending_changes()\n2. mcp__tekla__tekla_review_change(guid, timestamp, approved)\n3. mcp__tekla__tekla_apply_approved_changes()"
+        # MANDATORY DUPLICATE PREVENTION: Check existing beams FIRST
+        parts_data = await make_http_request("GET", "/list-parts")
+        if not parts_data.get("success"):
+            return f"ERROR: Cannot check existing beams. Refusing import to prevent duplicates. HTTP error: {parts_data}"
         
-        # If no changes detected, check if we're importing to empty model or duplicate import
-        try:
-            parts_data = await make_http_request("GET", "/list-parts", {})
-            existing_count = len(parts_data.get("parts", [])) if parts_data.get("success") else 0
-            
-            if existing_count > 10:  # Model already has content
-                return f"DUPLICATE IMPORT PREVENTED: Model already has {existing_count} beams. Use GUID-based sync instead of bulk import."
-        except:
-            pass
+        existing_count = len(parts_data.get("parts", []))
+        
+        # CRITICAL: If model has beams, this is likely a duplicate import
+        if existing_count > 0:
+            return f"""
+DUPLICATE IMPORT PREVENTED
+=========================
+Tekla model already contains {existing_count} beams.
+Importing {len(ubim_data.get('frames', []))} more frames would create duplicates.
+
+SOLUTION: Use proper twin model sync workflow:
+1. Export current Tekla: mcp__tekla__tekla_export_ubim_with_sync()
+2. Compare changes: mcp__tekla__tekla_get_pending_changes()
+3. Review changes: mcp__tekla__tekla_review_change()
+4. Apply approved: mcp__tekla__tekla_apply_approved_changes()
+
+BYPASS (DANGEROUS): To force import anyway, clear model first.
+"""
+        
+        # Only proceed if model is truly empty (0 beams)
         
         # Create or update beams via HTTP backend
         created_beams = []
