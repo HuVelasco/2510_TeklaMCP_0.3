@@ -498,7 +498,14 @@ async def tekla_import_frames_from_ubim(
         detected_changes = guid_tracker.update_from_ubim(ubim_data, "etabs")
         
         # MANDATORY DUPLICATE PREVENTION: Check existing beams FIRST
-        parts_data = await make_http_request("GET", "/list-parts")
+        parts_result = await call_endpoint("list-parts", "GET")
+        
+        # Parse the result to get proper data structure
+        try:
+            import json
+            parts_data = json.loads(parts_result.replace("SUCCESS: ", ""))
+        except:
+            parts_data = {"success": False, "error": f"Could not parse parts response: {parts_result}"}
         if not parts_data.get("success"):
             return f"ERROR: Cannot check existing beams. Refusing import to prevent duplicates. HTTP error: {parts_data}"
         
