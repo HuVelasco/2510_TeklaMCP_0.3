@@ -646,6 +646,179 @@ async def tekla_validate_ubim_file(
 # ==================== GUID SYNCHRONIZATION ====================
 
 @mcp.tool()
+async def tekla_get_pending_changes(
+    sync_file: str = ".ubim_sync"
+) -> str:
+    """Get changes awaiting user review from GUID synchronization.
+    
+    Returns all detected changes that haven't been reviewed yet, with engineering
+    impact assessment and recommendations.
+    
+    Parameters:
+    - sync_file: GUID sync tracking file (default: .ubim_sync)
+    
+    Returns pending changes formatted for user review
+    """
+    try:
+        from ubim_core.sync.guid_tracker import GUIDTracker
+        
+        tracker = GUIDTracker(sync_file)
+        pending = tracker.get_pending_changes()
+        
+        if not pending:
+            return "No pending changes found. All models are synchronized."
+        
+        review_report = f"""
+PENDING CHANGES REVIEW REQUIRED
+==============================
+Total pending changes: {len(pending)}
+Awaiting review: {len([c for c in pending if not c.user_reviewed])}
+Already approved: {len([c for c in pending if c.user_reviewed and c.user_approved])}
+Already rejected: {len([c for c in pending if c.user_reviewed and not c.user_approved])}
+
+CHANGES REQUIRING REVIEW:
+"""
+        
+        for i, change in enumerate([c for c in pending if not c.user_reviewed][:10]):  # Show first 10
+            review_report += f"""
+{i+1}. GUID: {change.guid}
+   Type: {change.change_type}
+   Description: {change.description}
+   Timestamp: {change.timestamp}
+   
+   TO APPROVE: mcp__tekla__tekla_review_change(guid="{change.guid}", timestamp="{change.timestamp}", approved=True)
+   TO REJECT:  mcp__tekla__tekla_review_change(guid="{change.guid}", timestamp="{change.timestamp}", approved=False)
+"""
+        
+        if len([c for c in pending if not c.user_reviewed]) > 10:
+            review_report += f"\n... and {len([c for c in pending if not c.user_reviewed]) - 10} more changes\n"
+        
+        return review_report
+        
+    except ImportError:
+        return "ERROR: UBIM core library not available. Install with: pip install -e ../../../2511_UBIM_DataBridge"
+    except Exception as e:
+        return f"ERROR: Could not get pending changes: {e}"
+
+@mcp.tool()
+async def tekla_review_change(
+    guid: str,
+    timestamp: str,
+    approved: bool,
+    notes: str = ""
+) -> str:
+    """Review and approve/reject a specific change in GUID synchronization.
+    
+    This is the user control point where engineers approve changes before they
+    are applied to the model.
+    
+    Parameters:
+    - guid: GUID of the object to review
+    - timestamp: Timestamp of the change to review
+    - approved: True to approve, False to reject
+    - notes: Optional review notes
+    
+    Returns review result
+    """
+    try:
+        from ubim_core.sync.guid_tracker import GUIDTracker
+        
+        tracker = GUIDTracker(".ubim_sync")
+        success = tracker.review_change(guid, timestamp, approved, notes)
+        
+        if success:
+            status = "APPROVED" if approved else "REJECTED"
+            return f"SUCCESS: Change {status} for GUID {guid}\nNotes: {notes}\n\nNext steps: Use mcp__tekla__tekla_apply_approved_changes() to apply approved changes."
+        else:
+            return f"ERROR: Change not found for GUID {guid} at timestamp {timestamp}"
+            
+    except ImportError:
+        return "ERROR: UBIM core library not available. Install with: pip install -e ../../../2511_UBIM_DataBridge"
+    except Exception as e:
+        return f"ERROR: Could not review change: {e}"
+
+@mcp.tool()
+async def tekla_apply_approved_changes() -> str:
+    """Apply user-approved changes to Tekla model.
+    
+    This is the final step where approved changes are actually applied to the
+    Tekla model. Only changes explicitly approved by the user are applied.
+    
+    Returns application results
+    """
+    try:
+        from ubim_core.sync.guid_tracker import GUIDTracker
+        
+        tracker = GUIDTracker(".ubim_sync")
+        approved_changes = tracker.get_approved_changes()
+        
+        if not approved_changes:
+            return "No approved changes to apply. All changes have been processed or are awaiting review."
+        
+        # Apply changes to Tekla via HTTP backend
+        applied_count = 0
+        failed_count = 0
+        results = []
+        
+        for change in approved_changes:
+            try:
+                if change.change_type == "created":
+                    # Create new beam from UBIM data
+                    frame_data = change.new_snapshot.metadata.get("original_data", {})
+                    # Convert UBIM frame to Tekla beam request
+                    from ubim_core.converters.tekla import TeklaConverter
+                    converter = TeklaConverter()
+                    beam_requests = converter.convert_ubim_to_beams({"frames": [frame_data]})
+                    
+                    if beam_requests:
+                        result = await call_endpoint("create-beam", "POST", beam_requests[0])
+                        if result.startswith("SUCCESS"):
+                            applied_count += 1
+                            results.append(f"✅ Created beam for GUID {change.guid}")
+                        else:
+                            failed_count += 1
+                            results.append(f"❌ Failed to create beam for GUID {change.guid}: {result}")
+                
+                elif change.change_type in ["modified", "properties_changed", "geometry_changed"]:
+                    # Update existing beam
+                    # This would require mapping GUID to Tekla ID and updating properties
+                    results.append(f"⚠️  Update for GUID {change.guid} - Manual implementation needed")
+                    
+                elif change.change_type == "deleted":
+                    # Delete beam
+                    results.append(f"⚠️  Delete for GUID {change.guid} - Manual implementation needed")
+                    
+            except Exception as e:
+                failed_count += 1
+                results.append(f"❌ Error applying change for GUID {change.guid}: {e}")
+        
+        # Clear successfully applied changes
+        if applied_count > 0:
+            applied_guids = [c.guid for c in approved_changes if "✅" in str(results)]
+            tracker.clear_applied_changes(applied_guids)
+        
+        summary = f"""
+TWIN MODEL CHANGES APPLIED
+=========================
+Total approved changes: {len(approved_changes)}
+Successfully applied: {applied_count}
+Failed applications: {failed_count}
+
+RESULTS:
+{chr(10).join(results[:10])}
+"""
+        
+        if len(results) > 10:
+            summary += f"\n... and {len(results) - 10} more results"
+        
+        return summary
+        
+    except ImportError:
+        return "ERROR: UBIM core library not available. Install with: pip install -e ../../../2511_UBIM_DataBridge"
+    except Exception as e:
+        return f"ERROR: Could not apply changes: {e}"
+
+@mcp.tool()
 async def tekla_export_ubim_with_sync(
     output_file: str = "tekla_frames.json",
     sync_file: str = ".ubim_sync"
