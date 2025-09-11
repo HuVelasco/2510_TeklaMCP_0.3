@@ -497,52 +497,36 @@ async def tekla_import_frames_from_ubim(
         # Detect changes using Git-inspired GUID tracking
         detected_changes = guid_tracker.update_from_ubim(ubim_data, "etabs")
         
-        # Get existing Tekla parts with their GUIDs for matching
-        existing_parts_by_guid = {}
+        # REAL FIX: Use GUID-based twin model tracking instead of broken coordinate matching
+        # Check if this is a duplicate import (if we already have these exact frames)
+        if detected_changes:
+            # This is a real change - let the UBIM coordinator handle it
+            return f"TWIN MODEL SYNC DETECTED: {len(detected_changes)} changes found. Use review workflow:\n1. mcp__tekla__tekla_get_pending_changes()\n2. mcp__tekla__tekla_review_change(guid, timestamp, approved)\n3. mcp__tekla__tekla_apply_approved_changes()"
+        
+        # If no changes detected, check if we're importing to empty model or duplicate import
         try:
             parts_data = await make_http_request("GET", "/list-parts", {})
-            if parts_data.get("success"):
-                for part in parts_data.get("parts", []):
-                    # Use GUID as primary key (not coordinates)
-                    part_guid = part.get('guid') or part.get('name', '').replace('ETABS_', '')
-                    if part_guid:
-                        existing_parts_by_guid[part_guid] = {
-                            'id': part.get('id'),
-                            'tekla_id': part.get('id')
-                        }
+            existing_count = len(parts_data.get("parts", [])) if parts_data.get("success") else 0
+            
+            if existing_count > 10:  # Model already has content
+                return f"DUPLICATE IMPORT PREVENTED: Model already has {existing_count} beams. Use GUID-based sync instead of bulk import."
         except:
-            pass  # Continue even if we can't check existing parts
+            pass
         
         # Create or update beams via HTTP backend
         created_beams = []
         updated_beams = []
         failed_beams = []
         
+        # ONLY CREATE BEAMS IF THIS IS TRULY A NEW IMPORT (empty or minimal model)
         for i, beam_request in enumerate(beam_requests):
             try:
-                # Check if beam already exists at these coordinates
-                beam_key = f"{beam_request.get('StartPointX',0)}_{beam_request.get('StartPointY',0)}_{beam_request.get('StartPointZ',0)}_{beam_request.get('EndPointX',0)}_{beam_request.get('EndPointY',0)}_{beam_request.get('EndPointZ',0)}"
-                
-                if beam_key in existing_parts:
-                    # Update existing beam instead of creating new
-                    beam_id = existing_parts[beam_key]
-                    update_data = {
-                        "id": beam_id,
-                        "profile": beam_request.get('Profile'),
-                        "material": beam_request.get('Material')
-                    }
-                    result = await call_endpoint("update-object", "POST", update_data)
-                    if result.startswith("SUCCESS"):
-                        updated_beams.append(f"Beam {i+1}: Updated ID {beam_id}")
-                    else:
-                        failed_beams.append(f"Beam {i+1}: Update failed - {result}")
+                # Create new beam (only for new imports, not updates)
+                result = await call_endpoint("create-beam", "POST", beam_request)
+                if result.startswith("SUCCESS"):
+                    created_beams.append(f"Beam {i+1}: {beam_request.get('Profile', 'unknown')} {beam_request.get('Material', 'unknown')}")
                 else:
-                    # Create new beam
-                    result = await call_endpoint("create-beam", "POST", beam_request)
-                    if result.startswith("SUCCESS"):
-                        created_beams.append(f"Beam {i+1}: {beam_request.get('Profile', 'unknown')} {beam_request.get('Material', 'unknown')}")
-                    else:
-                        failed_beams.append(f"Beam {i+1}: {result}")
+                    failed_beams.append(f"Beam {i+1}: {result}")
             except Exception as e:
                 failed_beams.append(f"Beam {i+1}: {str(e)}")
         
