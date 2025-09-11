@@ -184,7 +184,7 @@ namespace TeklaMCP
         
         public class TeklaConfig
         {
-            public string ServerUrl { get; set; } = "http://localhost:8080/";
+            public string ServerUrl { get; set; } = "http://localhost:5050/";
             public string LogDirectory { get; set; } = @"C:\temp";
             public string LogFile { get; set; } = @"C:\temp\tekla_mcp_phase3.log";
             public int RequestTimeout { get; set; } = 30000;

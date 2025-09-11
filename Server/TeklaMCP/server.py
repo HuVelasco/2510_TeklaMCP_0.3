@@ -37,7 +37,7 @@ from typing import Optional, Dict, List
 mcp = FastMCP("TeklaMCP Server")
 
 # HTTP backend configuration
-TEKLA_SERVER_URL = "http://localhost:8080"
+TEKLA_SERVER_URL = "http://localhost:5050"
 
 # ==================== HTTP SERVER AUTOMATION ====================
 
@@ -167,6 +167,16 @@ async def call_endpoint(endpoint: str, method: str = "GET", params=None):
 @mcp.tool()
 async def tekla_get_model_info() -> str:
     """Get information about the current Tekla Structures model"""
+    # First check if HTTP server is running
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(f"{TEKLA_SERVER_URL}/test", timeout=aiohttp.ClientTimeout(total=2)) as response:
+                if response.status != 200:
+                    return "WARNING: Tekla HTTP server not responding. Please ensure:\n1. Tekla Structures is running\n2. HTTP server is started (run TeklaMCPClean.exe or 'dotnet run' in Server/TeklaMCP)\n3. No other process is using port 5050"
+    except Exception as e:
+        return f"ERROR: Cannot connect to Tekla HTTP server on {TEKLA_SERVER_URL}.\n\nPlease ensure:\n1. Tekla Structures is running\n2. Start HTTP server: cd Server/TeklaMCP && dotnet run\n3. Check that port 5050 is available\n\nDetailed error: {str(e)}"
+    
+    # If server is running, get model info
     return await call_endpoint("tekla-info", "GET")
 
 
@@ -475,17 +485,64 @@ async def tekla_import_frames_from_ubim(
         if not beam_requests:
             return "ERROR: No valid beams could be generated from UBIM data"
         
-        # Create beams via HTTP backend (batch operation)
+        # GUID-BASED TWIN MODEL: Use GUIDs as primary identity (Git-inspired approach)
+        try:
+            from ubim_core.sync.guid_tracker import GUIDTracker
+        except ImportError:
+            return "ERROR: UBIM GUID tracker not available. Install with: pip install -e ../../../2511_UBIM_DataBridge"
+        
+        # Initialize GUID tracker for twin model synchronization
+        guid_tracker = GUIDTracker(".ubim_sync")
+        
+        # Detect changes using Git-inspired GUID tracking
+        detected_changes = guid_tracker.update_from_ubim(ubim_data, "etabs")
+        
+        # Get existing Tekla parts with their GUIDs for matching
+        existing_parts_by_guid = {}
+        try:
+            parts_data = await make_http_request("GET", "/list-parts", {})
+            if parts_data.get("success"):
+                for part in parts_data.get("parts", []):
+                    # Use GUID as primary key (not coordinates)
+                    part_guid = part.get('guid') or part.get('name', '').replace('ETABS_', '')
+                    if part_guid:
+                        existing_parts_by_guid[part_guid] = {
+                            'id': part.get('id'),
+                            'tekla_id': part.get('id')
+                        }
+        except:
+            pass  # Continue even if we can't check existing parts
+        
+        # Create or update beams via HTTP backend
         created_beams = []
+        updated_beams = []
         failed_beams = []
         
         for i, beam_request in enumerate(beam_requests):
             try:
-                result = await call_endpoint("create-beam", "POST", beam_request)
-                if result.startswith("SUCCESS"):
-                    created_beams.append(f"Beam {i+1}: {beam_request.get('Profile', 'unknown')} {beam_request.get('Material', 'unknown')}")
+                # Check if beam already exists at these coordinates
+                beam_key = f"{beam_request.get('StartPointX',0)}_{beam_request.get('StartPointY',0)}_{beam_request.get('StartPointZ',0)}_{beam_request.get('EndPointX',0)}_{beam_request.get('EndPointY',0)}_{beam_request.get('EndPointZ',0)}"
+                
+                if beam_key in existing_parts:
+                    # Update existing beam instead of creating new
+                    beam_id = existing_parts[beam_key]
+                    update_data = {
+                        "id": beam_id,
+                        "profile": beam_request.get('Profile'),
+                        "material": beam_request.get('Material')
+                    }
+                    result = await call_endpoint("update-object", "POST", update_data)
+                    if result.startswith("SUCCESS"):
+                        updated_beams.append(f"Beam {i+1}: Updated ID {beam_id}")
+                    else:
+                        failed_beams.append(f"Beam {i+1}: Update failed - {result}")
                 else:
-                    failed_beams.append(f"Beam {i+1}: {result}")
+                    # Create new beam
+                    result = await call_endpoint("create-beam", "POST", beam_request)
+                    if result.startswith("SUCCESS"):
+                        created_beams.append(f"Beam {i+1}: {beam_request.get('Profile', 'unknown')} {beam_request.get('Material', 'unknown')}")
+                    else:
+                        failed_beams.append(f"Beam {i+1}: {result}")
             except Exception as e:
                 failed_beams.append(f"Beam {i+1}: {str(e)}")
         
@@ -494,11 +551,15 @@ async def tekla_import_frames_from_ubim(
             "total_frames": len(ubim_data.get('frames', [])),
             "beam_requests_generated": len(beam_requests),
             "beams_created": len(created_beams),
+            "beams_updated": len(updated_beams),
             "beams_failed": len(failed_beams),
-            "success_rate": f"{(len(created_beams)/len(beam_requests)*100):.1f}%" if beam_requests else "0%"
+            "success_rate": f"{((len(created_beams)+len(updated_beams))/len(beam_requests)*100):.1f}%" if beam_requests else "0%"
         }
         
-        message = f"SUCCESS: UBIM import completed - {result_summary['beams_created']}/{result_summary['beam_requests_generated']} beams created"
+        message = f"SUCCESS: UBIM import completed - {result_summary['beams_created']} created, {result_summary['beams_updated']} updated, {result_summary['beams_failed']} failed"
+        
+        if updated_beams:
+            message += f"\nUpdated {len(updated_beams)} existing beams (prevented duplicates)"
         
         if failed_beams:
             message += f"\nFailed beams: {failed_beams[:3]}"  # Show first 3 failures
@@ -627,8 +688,12 @@ async def tekla_export_ubim_with_sync(
         # Ensure HTTP server is running
         await ensure_http_server_running()
         
-        # Check Tekla connection
-        if not await is_tekla_connected():
+        # Check Tekla connection by attempting to get model info
+        try:
+            model_info = await make_http_request("GET", "/model-info", {})
+            if not model_info.get("success"):
+                return "ERROR: Not connected to Tekla. Start Tekla Structures first."
+        except Exception:
             return "ERROR: Not connected to Tekla. Start Tekla Structures first."
         
         # Get all parts from Tekla
@@ -637,14 +702,50 @@ async def tekla_export_ubim_with_sync(
             return f"ERROR: Failed to get parts from Tekla: {parts_data.get('error', 'Unknown error')}"
         
         # Convert Tekla parts to UBIM format
-        # TODO: Implement Tekla → UBIM conversion
-        # For now, return a placeholder structure
+        from datetime import datetime
+        
+        frames = []
+        parts = parts_data.get("parts", [])
+        
+        for part in parts:
+            # Convert Tekla beam to UBIM frame format
+            if part.get("type") == "Beam":
+                frame = {
+                    "id": part.get("id", ""),
+                    "guid": part.get("guid", f"tekla_{part.get('id', '')}"),
+                    "label": part.get("name", "BEAM"),
+                    "geometry": {
+                        "start_point": {
+                            "x": part.get("startX", 0),
+                            "y": part.get("startY", 0),
+                            "z": part.get("startZ", 0)
+                        },
+                        "end_point": {
+                            "x": part.get("endX", 0),
+                            "y": part.get("endY", 0),
+                            "z": part.get("endZ", 0)
+                        }
+                    },
+                    "properties": {
+                        "profile": part.get("profile", ""),
+                        "material": part.get("material", ""),
+                        "class": part.get("class", "1"),
+                        "frame_type": "beam" if part.get("name") == "BEAM" else "column"
+                    },
+                    "positioning": {
+                        "position_depth": part.get("positionDepth", "MIDDLE"),
+                        "position_plane": part.get("positionPlane", "MIDDLE"),
+                        "position_rotation": part.get("positionRotation", "TOP")
+                    }
+                }
+                frames.append(frame)
+        
         ubim_data = {
             "version": "1.0.0",
             "source": "Tekla",
-            "export_date": "placeholder",
+            "export_date": datetime.now().isoformat(),
             "object_type": "frames",
-            "frames": []
+            "frames": frames
         }
         
         # Save UBIM data
