@@ -864,14 +864,19 @@ async def tekla_export_ubim_with_sync(
         
         # Check Tekla connection by attempting to get model info
         try:
-            model_info = await make_http_request("GET", "/model-info", {})
-            if not model_info.get("success"):
+            model_info_result = await call_endpoint("model-info", "GET")
+            if "SUCCESS" not in model_info_result:
                 return "ERROR: Not connected to Tekla. Start Tekla Structures first."
         except Exception:
             return "ERROR: Not connected to Tekla. Start Tekla Structures first."
         
         # Get all parts from Tekla
-        parts_data = await make_http_request("GET", "/list-parts", {})
+        parts_result = await call_endpoint("list-parts", "GET")
+        try:
+            import json
+            parts_data = json.loads(parts_result.replace("SUCCESS: ", ""))
+        except:
+            return f"ERROR: Failed to get parts from Tekla: Could not parse response"
         if not parts_data.get("success"):
             return f"ERROR: Failed to get parts from Tekla: {parts_data.get('error', 'Unknown error')}"
         
@@ -1134,7 +1139,7 @@ async def tekla_apply_approved_changes(
                     
                     if beam_requests:
                         # Create beam via HTTP
-                        result = await make_http_request("POST", "/create-beam", beam_requests[0])
+                        result = await call_endpoint("create-beam", "POST", beam_requests[0])
                         if result.get("success"):
                             applied_guids.append(change.guid)
                         else:
