@@ -1241,8 +1241,18 @@ result = report.ToString();
         {
             return @"
 // ENHANCED ML EXTRACTION: Drawing types, relationships, geometric context, coordinate systems
+// WSL COMPATIBILITY: Save to project directory instead of Windows temp (inaccessible from WSL)
 var timestamp = System.DateTime.Now.ToString(""yyyyMMdd_HHmmss"");
-var outputPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), ""tekla_extraction_"" + timestamp + "".jsonl"");
+
+// Create extractions directory in current working directory (WSL-accessible)
+var currentDir = System.IO.Directory.GetCurrentDirectory();
+var extractionsDir = System.IO.Path.Combine(currentDir, ""extractions"");
+if (!System.IO.Directory.Exists(extractionsDir))
+{
+    System.IO.Directory.CreateDirectory(extractionsDir);
+}
+
+var outputPath = System.IO.Path.Combine(extractionsDir, ""tekla_extraction_"" + timestamp + "".jsonl"");
 System.Console.WriteLine(""📁 Enhanced ML extraction to: "" + outputPath);
 
 var startTime = System.DateTime.Now;
@@ -1706,9 +1716,27 @@ using (var writer = new System.IO.StreamWriter(outputPath, false, System.Text.En
 var duration = (System.DateTime.Now - startTime).TotalSeconds;
 var fileSizeMB = bytesWritten / (1024.0 * 1024.0);
 
+// WSL PATH CONVERSION: Convert Windows path to WSL-accessible format
+// Windows: C:\Users\hugov\ClaudeProjects\...\extractions\file.jsonl
+// WSL:     /mnt/c/Users/hugov/ClaudeProjects/.../extractions/file.jsonl
+string wslPath = outputPath;
+if (outputPath.Length >= 2 && outputPath[1] == ':')
+{
+    // Extract drive letter and convert to lowercase
+    char driveLetter = System.Char.ToLower(outputPath[0]);
+    string pathWithoutDrive = outputPath.Substring(2); // Remove ""C:""
+
+    // Replace backslashes with forward slashes
+    pathWithoutDrive = pathWithoutDrive.Replace(@""""\\"""", """"""/"""""");
+
+    // Construct WSL path: /mnt/c/...
+    wslPath = """"""/mnt/"""""" + driveLetter + pathWithoutDrive;
+}
+
 // Return ONLY metadata - not the actual data
 var metadata = new System.Collections.Generic.Dictionary<string, object>();
 metadata[""file_path""] = outputPath;
+metadata[""file_path_wsl""] = wslPath;
 metadata[""total_drawings""] = drawingsProcessed;
 metadata[""total_objects""] = totalObjects;
 metadata[""file_size_mb""] = System.Math.Round(fileSizeMB, 2);
@@ -1720,6 +1748,8 @@ metadata[""extraction_version""] = ""enhanced_v2_geometric"";
 System.Console.WriteLine(""✅ Enhanced extraction complete: "" + totalObjects + "" objects from "" + drawingsProcessed + "" drawings"");
 System.Console.WriteLine(""📦 File size: "" + fileSizeMB.ToString(""F2"") + "" MB"");
 System.Console.WriteLine(""⏱️ Duration: "" + duration.ToString(""F1"") + "" seconds"");
+System.Console.WriteLine(""🪟 Windows path: "" + outputPath);
+System.Console.WriteLine(""🐧 WSL path: "" + wslPath);
 
 result = Newtonsoft.Json.JsonConvert.SerializeObject(metadata, jsonSettings);
 ";

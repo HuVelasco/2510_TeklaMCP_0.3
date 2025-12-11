@@ -78,3 +78,7 @@ coverage/
 *.db1.$*
 *.db1-*
 *.db.lock
+
+# ML extraction outputs (large JSONL files)
+extractions/
+*.jsonl
