@@ -1375,7 +1375,8 @@ using (var writer = new System.IO.StreamWriter(outputPath, false, System.Text.En
                 var drawingObj = obj as Tekla.Structures.Drawing.DrawingObject;
                 if (drawingObj != null)
                 {
-                    var getRelatedMethod = drawingObj.GetType().GetMethod(""GetRelatedObjects"");
+                    // FIX: Specify Type.EmptyTypes to avoid ambiguous match with GetRelatedObjects(Type) overload
+                    var getRelatedMethod = drawingObj.GetType().GetMethod(""GetRelatedObjects"", System.Type.EmptyTypes);
                     if (getRelatedMethod != null)
                     {
                         var related = getRelatedMethod.Invoke(drawingObj, new object[] { });
@@ -1414,16 +1415,68 @@ using (var writer = new System.IO.StreamWriter(outputPath, false, System.Text.En
             {
                 try
                 {
-                    var dimension = obj as Tekla.Structures.Drawing.StraightDimension;
-                    if (dimension != null)
-                    {
-                        var dimPoints = new System.Collections.Generic.List<object>();
+                    var dimPoints = new System.Collections.Generic.List<object>();
 
-                        // Get dimension points
-                        var getPoints = dimension.GetType().GetMethod(""GetPoints"");
+                    // FIX: Handle DimensionSets separately - they contain child dimensions
+                    if (obj.GetType().Name.Contains(""DimensionSet""))
+                    {
+                        // DimensionSet has GetObjects() method that returns child dimensions
+                        var getObjects = obj.GetType().GetMethod(""GetObjects"", System.Type.EmptyTypes);
+                        if (getObjects != null)
+                        {
+                            var children = getObjects.Invoke(obj, new object[] { });
+                            if (children != null)
+                            {
+                                var childEnum = children as System.Collections.IEnumerator;
+                                if (childEnum != null)
+                                {
+                                    while (childEnum.MoveNext())
+                                    {
+                                        var childDim = childEnum.Current;
+                                        if (childDim != null)
+                                        {
+                                            // Extract points from each child dimension
+                                            var getPoints = childDim.GetType().GetMethod(""GetPoints"");
+                                            if (getPoints != null)
+                                            {
+                                                var points = getPoints.Invoke(childDim, new object[] { });
+                                                if (points != null)
+                                                {
+                                                    var pointList = points as System.Collections.ArrayList;
+                                                    if (pointList != null)
+                                                    {
+                                                        foreach (var pt in pointList)
+                                                        {
+                                                            var pointType = pt.GetType();
+                                                            var xProp = pointType.GetProperty(""X"");
+                                                            var yProp = pointType.GetProperty(""Y"");
+                                                            var zProp = pointType.GetProperty(""Z"");
+                                                            if (xProp != null && yProp != null && zProp != null)
+                                                            {
+                                                                dimPoints.Add(new {
+                                                                    x = xProp.GetValue(pt, null),
+                                                                    y = yProp.GetValue(pt, null),
+                                                                    z = zProp.GetValue(pt, null),
+                                                                    type = ""dimension_point""
+                                                                });
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        // Individual dimension - extract points directly
+                        var getPoints = obj.GetType().GetMethod(""GetPoints"");
                         if (getPoints != null)
                         {
-                            var points = getPoints.Invoke(dimension, new object[] { });
+                            var points = getPoints.Invoke(obj, new object[] { });
                             if (points != null)
                             {
                                 var pointList = points as System.Collections.ArrayList;
@@ -1431,13 +1484,16 @@ using (var writer = new System.IO.StreamWriter(outputPath, false, System.Text.En
                                 {
                                     foreach (var pt in pointList)
                                     {
-                                        var point = pt as Tekla.Structures.Geometry3d.Point;
-                                        if (point != null)
+                                        var pointType = pt.GetType();
+                                        var xProp = pointType.GetProperty(""X"");
+                                        var yProp = pointType.GetProperty(""Y"");
+                                        var zProp = pointType.GetProperty(""Z"");
+                                        if (xProp != null && yProp != null && zProp != null)
                                         {
                                             dimPoints.Add(new {
-                                                x = point.X,
-                                                y = point.Y,
-                                                z = point.Z,
+                                                x = xProp.GetValue(pt, null),
+                                                y = yProp.GetValue(pt, null),
+                                                z = zProp.GetValue(pt, null),
                                                 type = ""dimension_point""
                                             });
                                         }
@@ -1445,13 +1501,17 @@ using (var writer = new System.IO.StreamWriter(outputPath, false, System.Text.En
                                 }
                             }
                         }
+                    }
 
-                        geometricData[""dimension_points""] = dimPoints;
+                    geometricData[""dimension_points""] = dimPoints;
 
-                        // FIX: Use reflection for dimension attributes (don't hardcode properties)
-                        try
+                    // FIX: Use reflection for dimension attributes (don't hardcode properties)
+                    try
+                    {
+                        var attrsProp = obj.GetType().GetProperty(""Attributes"");
+                        if (attrsProp != null)
                         {
-                            var attributes = dimension.Attributes;
+                            var attributes = attrsProp.GetValue(obj, null);
                             if (attributes != null)
                             {
                                 var attrData = new System.Collections.Generic.Dictionary<string, string>();
@@ -1476,8 +1536,8 @@ using (var writer = new System.IO.StreamWriter(outputPath, false, System.Text.En
                                 }
                             }
                         }
-                        catch { }
                     }
+                    catch { }
                 }
                 catch (Exception ex)
                 {
@@ -1485,141 +1545,195 @@ using (var writer = new System.IO.StreamWriter(outputPath, false, System.Text.En
                 }
             }
 
-            // For PART objects: Extract vertices, edges, individual holes
+            // For PART objects: Extract vertices, edges, individual holes using SOLIDS API
             if (obj.GetType().Name.Contains(""Part""))
             {
                 try
                 {
-                    var part = obj as Tekla.Structures.Drawing.Part;
-                    if (part != null)
+                    var partGeometry = new System.Collections.Generic.Dictionary<string, object>();
+                    var vertices = new System.Collections.Generic.List<object>();
+
+                    // FIX: Use GetSolid() method to extract part geometry
+                    var getSolid = obj.GetType().GetMethod(""GetSolid"", System.Type.EmptyTypes);
+                    if (getSolid != null)
                     {
-                        var partGeometry = new System.Collections.Generic.Dictionary<string, object>();
-
-                        // Get part contour (vertices/edges)
-                        var getContour = part.GetType().GetMethod(""GetContour"");
-                        if (getContour != null)
+                        var solid = getSolid.Invoke(obj, new object[] { });
+                        if (solid != null)
                         {
-                            var contour = getContour.Invoke(part, new object[] { });
-                            if (contour != null)
+                            // Get faces from solid
+                            var getFaceList = solid.GetType().GetMethod(""GetFaceList"");
+                            if (getFaceList != null)
                             {
-                                var contourPoints = new System.Collections.Generic.List<object>();
-                                var contourType = contour.GetType();
-                                var contourList = contour as System.Collections.IEnumerable;
-                                if (contourList != null)
+                                var faceList = getFaceList.Invoke(solid, new object[] { });
+                                if (faceList != null)
                                 {
-                                    foreach (var pt in contourList)
+                                    var faceEnum = faceList as System.Collections.IEnumerator;
+                                    if (faceEnum != null)
                                     {
-                                        var point = pt as Tekla.Structures.Geometry3d.Point;
-                                        if (point != null)
+                                        while (faceEnum.MoveNext())
                                         {
-                                            contourPoints.Add(new { x = point.X, y = point.Y, z = point.Z });
-                                        }
-                                    }
-                                }
-                                partGeometry[""vertices""] = contourPoints;
-                            }
-                        }
-
-                        // FIX: Get bolt/hole positions using reflection (BoltGroup type doesn't exist)
-                        var holes = new System.Collections.Generic.List<object>();
-                        var getChildren = part.GetType().GetMethod(""GetChildren"");
-                        if (getChildren != null)
-                        {
-                            var children = getChildren.Invoke(part, new object[] { });
-                            if (children != null)
-                            {
-                                var childEnum = children as System.Collections.IEnumerator;
-                                if (childEnum != null)
-                                {
-                                    while (childEnum.MoveNext())
-                                    {
-                                        var child = childEnum.Current;
-                                        if (child != null)
-                                        {
-                                            var childType = child.GetType().Name;
-
-                                            // Try Bolt objects (check for bolt-related types)
-                                            if (childType.Contains(""Bolt"") || childType.Contains(""bolt""))
+                                            var face = faceEnum.Current;
+                                            if (face != null)
                                             {
-                                                try
+                                                // Get contour from face
+                                                var getContour = face.GetType().GetMethod(""GetContour"");
+                                                if (getContour != null)
                                                 {
-                                                    // Try to get bolt positions via reflection
-                                                    var getBoltPositions = child.GetType().GetMethod(""GetBoltPositions"");
-                                                    if (getBoltPositions != null)
+                                                    var contour = getContour.Invoke(face, new object[] { });
+                                                    if (contour != null)
                                                     {
-                                                        var positions = getBoltPositions.Invoke(child, new object[] { });
-                                                        if (positions != null)
+                                                        var contourPoints = contour as System.Collections.IEnumerable;
+                                                        if (contourPoints != null)
                                                         {
-                                                            var posEnum = positions as System.Collections.IEnumerable;
-                                                            if (posEnum != null)
+                                                            foreach (var pt in contourPoints)
                                                             {
-                                                                foreach (var pos in posEnum)
+                                                                if (pt != null)
                                                                 {
-                                                                    if (pos != null)
+                                                                    var xProp = pt.GetType().GetProperty(""X"");
+                                                                    var yProp = pt.GetType().GetProperty(""Y"");
+                                                                    var zProp = pt.GetType().GetProperty(""Z"");
+                                                                    if (xProp != null && yProp != null && zProp != null)
                                                                     {
-                                                                        var xProp = pos.GetType().GetProperty(""X"");
-                                                                        var yProp = pos.GetType().GetProperty(""Y"");
-                                                                        var zProp = pos.GetType().GetProperty(""Z"");
-
-                                                                        if (xProp != null && yProp != null && zProp != null)
-                                                                        {
-                                                                            holes.Add(new {
-                                                                                x = xProp.GetValue(pos, null),
-                                                                                y = yProp.GetValue(pos, null),
-                                                                                z = zProp.GetValue(pos, null),
-                                                                                type = ""bolt_hole"",
-                                                                                source = childType
-                                                                            });
-                                                                        }
+                                                                        vertices.Add(new {
+                                                                            x = xProp.GetValue(pt, null),
+                                                                            y = yProp.GetValue(pt, null),
+                                                                            z = zProp.GetValue(pt, null)
+                                                                        });
                                                                     }
                                                                 }
                                                             }
                                                         }
                                                     }
-
-                                                    // Try to get single position property
-                                                    var positionProp = child.GetType().GetProperty(""Position"");
-                                                    if (positionProp != null)
-                                                    {
-                                                        var position = positionProp.GetValue(child, null);
-                                                        if (position != null)
-                                                        {
-                                                            var xProp = position.GetType().GetProperty(""X"");
-                                                            var yProp = position.GetType().GetProperty(""Y"");
-                                                            var zProp = position.GetType().GetProperty(""Z"");
-
-                                                            if (xProp != null && yProp != null && zProp != null)
-                                                            {
-                                                                holes.Add(new {
-                                                                    x = xProp.GetValue(position, null),
-                                                                    y = yProp.GetValue(position, null),
-                                                                    z = zProp.GetValue(position, null),
-                                                                    type = ""bolt_single"",
-                                                                    source = childType
-                                                                });
-                                                            }
-                                                        }
-                                                    }
                                                 }
-                                                catch { /* Skip if bolt extraction fails */ }
                                             }
                                         }
                                     }
                                 }
                             }
                         }
-
-                        if (holes.Count > 0)
-                        {
-                            partGeometry[""holes""] = holes;
-                        }
-
-                        geometricData[""part_geometry""] = partGeometry;
                     }
+
+                    partGeometry[""vertices""] = vertices;
+
+                    // FIX: Get bolt/hole positions from Part children using Solids API
+                    var holes = new System.Collections.Generic.List<object>();
+                    var getChildren = obj.GetType().GetMethod(""GetChildren"");
+                    if (getChildren != null)
+                    {
+                        var children = getChildren.Invoke(obj, new object[] { });
+                        if (children != null)
+                        {
+                            var childEnum = children as System.Collections.IEnumerator;
+                            if (childEnum != null)
+                            {
+                                while (childEnum.MoveNext())
+                                {
+                                    var child = childEnum.Current;
+                                    if (child != null)
+                                    {
+                                        var childType = child.GetType().Name;
+
+                                        // Try Bolt objects using GetSolid()
+                                        if (childType.Contains(""Bolt""))
+                                        {
+                                            try
+                                            {
+                                                var getBoltSolid = child.GetType().GetMethod(""GetSolid"", System.Type.EmptyTypes);
+                                                if (getBoltSolid != null)
+                                                {
+                                                    var boltSolid = getBoltSolid.Invoke(child, new object[] { });
+                                                    if (boltSolid != null)
+                                                    {
+                                                        // Get center/origin from bolt solid
+                                                        var getOrigin = boltSolid.GetType().GetMethod(""GetOrigin"");
+                                                        if (getOrigin != null)
+                                                        {
+                                                            var origin = getOrigin.Invoke(boltSolid, new object[] { });
+                                                            if (origin != null)
+                                                            {
+                                                                var xProp = origin.GetType().GetProperty(""X"");
+                                                                var yProp = origin.GetType().GetProperty(""Y"");
+                                                                var zProp = origin.GetType().GetProperty(""Z"");
+                                                                if (xProp != null && yProp != null && zProp != null)
+                                                                {
+                                                                    holes.Add(new {
+                                                                        x = xProp.GetValue(origin, null),
+                                                                        y = yProp.GetValue(origin, null),
+                                                                        z = zProp.GetValue(origin, null),
+                                                                        type = ""bolt_hole"",
+                                                                        source = childType
+                                                                    });
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                            catch { /* Skip if bolt extraction fails */ }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    if (holes.Count > 0)
+                    {
+                        partGeometry[""holes""] = holes;
+                    }
+
+                    geometricData[""part_geometry""] = partGeometry;
                 }
                 catch (Exception ex)
                 {
                     geometricData[""part_extraction_error""] = ex.Message;
+                }
+            }
+
+            // For BOLT objects: Extract bolt geometry using Solids API
+            if (obj.GetType().Name.Contains(""Bolt""))
+            {
+                try
+                {
+                    var boltGeometry = new System.Collections.Generic.Dictionary<string, object>();
+                    var boltPositions = new System.Collections.Generic.List<object>();
+
+                    var getBoltSolid = obj.GetType().GetMethod(""GetSolid"", System.Type.EmptyTypes);
+                    if (getBoltSolid != null)
+                    {
+                        var boltSolid = getBoltSolid.Invoke(obj, new object[] { });
+                        if (boltSolid != null)
+                        {
+                            // Get center/origin from bolt solid
+                            var getOrigin = boltSolid.GetType().GetMethod(""GetOrigin"");
+                            if (getOrigin != null)
+                            {
+                                var origin = getOrigin.Invoke(boltSolid, new object[] { });
+                                if (origin != null)
+                                {
+                                    var xProp = origin.GetType().GetProperty(""X"");
+                                    var yProp = origin.GetType().GetProperty(""Y"");
+                                    var zProp = origin.GetType().GetProperty(""Z"");
+                                    if (xProp != null && yProp != null && zProp != null)
+                                    {
+                                        boltPositions.Add(new {
+                                            x = xProp.GetValue(origin, null),
+                                            y = yProp.GetValue(origin, null),
+                                            z = zProp.GetValue(origin, null),
+                                            type = ""bolt_position""
+                                        });
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    boltGeometry[""positions""] = boltPositions;
+                    geometricData[""bolt_geometry""] = boltGeometry;
+                }
+                catch (Exception ex)
+                {
+                    geometricData[""bolt_extraction_error""] = ex.Message;
                 }
             }
 
