@@ -21,6 +21,9 @@
     <Reference Include="Tekla.Structures.Geometry3d">
       <HintPath>C:\TeklaStructures\2024.0\bin\Tekla.Structures.Geometry3d.dll</HintPath>
     </Reference>
+    <Reference Include="Tekla.Structures.Drawing">
+      <HintPath>C:\TeklaStructures\2024.0\bin\Tekla.Structures.Drawing.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
   <ItemGroup>

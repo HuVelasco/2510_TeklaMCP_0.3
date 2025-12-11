@@ -1169,55 +1169,46 @@ while (drawingEnumerator.MoveNext() && drawingsProcessed < " + request.MaxDrawin
 
     drawingsProcessed++;
 
-    var sheets = drawing.GetSheets();
-    while (sheets.MoveNext())
+    // GetSheet() returns the ContainerView (sheet)
+    var sheet = drawing.GetSheet();
+    if (sheet == null) continue;
+
+    // Get all objects from the sheet
+    var objects = sheet.GetAllObjects();
+    while (objects.MoveNext())
     {
-        var sheet = sheets.Current as Tekla.Structures.Drawing.Sheet;
-        if (sheet == null) continue;
+        totalObjects++;
+        var obj = objects.Current;
+        if (obj == null) continue;
 
-        var views = sheet.GetAllViews();
-        while (views.MoveNext())
+        string typeName = obj.GetType().FullName;
+
+        // Count occurrences
+        if (!typeCount.ContainsKey(typeName))
         {
-            var view = views.Current as Tekla.Structures.Drawing.ViewBase;
-            if (view == null) continue;
+            typeCount[typeName] = 0;
 
-            var objects = view.GetAllObjects();
-            while (objects.MoveNext())
+            // Store sample object properties using reflection
+            var props = obj.GetType().GetProperties();
+            var sampleProps = new System.Collections.Generic.List<string>();
+
+            foreach (var prop in props)
             {
-                totalObjects++;
-                var obj = objects.Current;
-                if (obj == null) continue;
-
-                string typeName = obj.GetType().FullName;
-
-                // Count occurrences
-                if (!typeCount.ContainsKey(typeName))
+                try
                 {
-                    typeCount[typeName] = 0;
-
-                    // Store sample object properties using reflection
-                    var props = obj.GetType().GetProperties();
-                    var sampleProps = new System.Collections.Generic.List<string>();
-
-                    foreach (var prop in props)
-                    {
-                        try
-                        {
-                            var value = prop.GetValue(obj, null);
-                            sampleProps.Add(prop.Name + "": "" + prop.PropertyType.Name + "" = "" + (value != null ? value.ToString() : ""null""));
-                        }
-                        catch
-                        {
-                            sampleProps.Add(prop.Name + "": "" + prop.PropertyType.Name + "" (error reading)"");
-                        }
-                    }
-
-                    typeSamples[typeName] = string.Join("", "", sampleProps.ToArray());
+                    var value = prop.GetValue(obj, null);
+                    sampleProps.Add(prop.Name + "": "" + prop.PropertyType.Name + "" = "" + (value != null ? value.ToString() : ""null""));
                 }
-
-                typeCount[typeName]++;
+                catch
+                {
+                    sampleProps.Add(prop.Name + "": "" + prop.PropertyType.Name + "" (error reading)"");
+                }
             }
+
+            typeSamples[typeName] = string.Join("", "", sampleProps.ToArray());
         }
+
+        typeCount[typeName]++;
     }
 }
 
@@ -1268,48 +1259,39 @@ while (drawingEnumerator.MoveNext() && drawingsProcessed < " + request.MaxDrawin
 
     var allObjects = new System.Collections.Generic.List<object>();
 
-    var sheets = drawing.GetSheets();
-    while (sheets.MoveNext())
+    // GetSheet() returns the ContainerView (sheet)
+    var sheet = drawing.GetSheet();
+    if (sheet == null) continue;
+
+    // Get all objects from the sheet
+    var objects = sheet.GetAllObjects();
+    while (objects.MoveNext())
     {
-        var sheet = sheets.Current as Tekla.Structures.Drawing.Sheet;
-        if (sheet == null) continue;
+        var obj = objects.Current;
+        if (obj == null) continue;
 
-        var views = sheet.GetAllViews();
-        while (views.MoveNext())
+        var objData = new System.Collections.Generic.Dictionary<string, object>();
+        objData[""type""] = obj.GetType().FullName;
+
+        // Extract ALL properties via reflection
+        var props = obj.GetType().GetProperties();
+        var propData = new System.Collections.Generic.Dictionary<string, string>();
+
+        foreach (var prop in props)
         {
-            var view = views.Current as Tekla.Structures.Drawing.ViewBase;
-            if (view == null) continue;
-
-            var objects = view.GetAllObjects();
-            while (objects.MoveNext())
+            try
             {
-                var obj = objects.Current;
-                if (obj == null) continue;
-
-                var objData = new System.Collections.Generic.Dictionary<string, object>();
-                objData[""type""] = obj.GetType().FullName;
-
-                // Extract ALL properties via reflection
-                var props = obj.GetType().GetProperties();
-                var propData = new System.Collections.Generic.Dictionary<string, string>();
-
-                foreach (var prop in props)
-                {
-                    try
-                    {
-                        var value = prop.GetValue(obj, null);
-                        propData[prop.Name] = value != null ? value.ToString() : ""null"";
-                    }
-                    catch (Exception ex)
-                    {
-                        propData[prop.Name] = ""ERROR: "" + ex.Message;
-                    }
-                }
-
-                objData[""properties""] = propData;
-                allObjects.Add(objData);
+                var value = prop.GetValue(obj, null);
+                propData[prop.Name] = value != null ? value.ToString() : ""null"";
+            }
+            catch (Exception ex)
+            {
+                propData[prop.Name] = ""ERROR: "" + ex.Message;
             }
         }
+
+        objData[""properties""] = propData;
+        allObjects.Add(objData);
     }
 
     drawingData[""objects""] = allObjects;
@@ -1771,10 +1753,8 @@ public class DynamicTeklaScript
                     parameters.ReferencedAssemblies.Add("System.dll");
                     parameters.ReferencedAssemblies.Add("System.Core.dll");
 
-                    // Add Tekla Drawing API support for ML dataset extraction
-                    parameters.ReferencedAssemblies.Add("Tekla.Structures.Drawing.dll");
-
                     // Auto-discover Tekla assemblies
+                    bool drawingDllAdded = false;
                     foreach (var loadedAssembly in AppDomain.CurrentDomain.GetAssemblies())
                     {
                         try
@@ -1785,11 +1765,57 @@ public class DynamicTeklaScript
                                 if (name.StartsWith("Tekla.Structures") || name.Equals("Newtonsoft.Json"))
                                 {
                                     parameters.ReferencedAssemblies.Add(loadedAssembly.Location);
-                                    Console.WriteLine($"📚 Added reference: {name}");
+
+                                    // Check if Drawing DLL was found
+                                    if (name.Equals("Tekla.Structures.Drawing"))
+                                    {
+                                        drawingDllAdded = true;
+                                        LogMessage("ASSEMBLY_DISCOVERY", "Tekla.Structures.Drawing found via auto-discovery");
+                                    }
                                 }
                             }
                         }
                         catch { /* Skip problematic assemblies */ }
+                    }
+
+                    // If Drawing DLL wasn't found via auto-discovery, add it manually
+                    // It should be in the same directory as Tekla.Structures.Model.dll
+                    if (!drawingDllAdded)
+                    {
+                        try
+                        {
+                            LogMessage("ASSEMBLY_MANUAL_ADD", "Drawing DLL not auto-discovered, attempting manual add");
+
+                            // Find Tekla install directory from loaded Model assembly
+                            var modelAssembly = AppDomain.CurrentDomain.GetAssemblies()
+                                .FirstOrDefault(a => a.GetName().Name == "Tekla.Structures.Model");
+
+                            if (modelAssembly != null && !string.IsNullOrEmpty(modelAssembly.Location))
+                            {
+                                var teklaDir = System.IO.Path.GetDirectoryName(modelAssembly.Location);
+                                var drawingDllPath = System.IO.Path.Combine(teklaDir, "Tekla.Structures.Drawing.dll");
+
+                                LogMessage("ASSEMBLY_SEARCH", $"Looking for Drawing DLL at: {drawingDllPath}");
+
+                                if (System.IO.File.Exists(drawingDllPath))
+                                {
+                                    parameters.ReferencedAssemblies.Add(drawingDllPath);
+                                    LogMessage("ASSEMBLY_ADDED", $"Successfully added Tekla.Structures.Drawing from {drawingDllPath}");
+                                }
+                                else
+                                {
+                                    LogMessage("ASSEMBLY_ERROR", $"Tekla.Structures.Drawing.dll not found at {drawingDllPath}");
+                                }
+                            }
+                            else
+                            {
+                                LogMessage("ASSEMBLY_ERROR", "Could not locate Tekla.Structures.Model assembly");
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            LogMessage("ASSEMBLY_ERROR", $"Exception adding Drawing DLL: {ex.Message}");
+                        }
                     }
 
                     parameters.GenerateInMemory = true;
