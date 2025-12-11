@@ -1240,82 +1240,17 @@ result = report.ToString();
         private static string GenerateFullExtractionCode(DrawingExtractionRequest request)
         {
             return @"
+// File-based extraction - write directly to disk to avoid Claude context saturation
+var timestamp = System.DateTime.Now.ToString(""yyyyMMdd_HHmmss"");
+var outputPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), ""tekla_extraction_"" + timestamp + "".jsonl"");
+System.Console.WriteLine(""📁 Writing extraction to: "" + outputPath);
+
+var startTime = System.DateTime.Now;
 var dh = new Tekla.Structures.Drawing.DrawingHandler();
-var extractedData = new System.Collections.Generic.List<object>();
 int drawingsProcessed = 0;
-
-var drawingEnumerator = dh.GetDrawings();
-while (drawingEnumerator.MoveNext() && drawingsProcessed < " + request.MaxDrawings + @")
-{
-    var drawing = drawingEnumerator.Current as Tekla.Structures.Drawing.Drawing;
-    if (drawing == null) continue;
-
-    drawingsProcessed++;
-
-    var drawingData = new System.Collections.Generic.Dictionary<string, object>();
-    drawingData[""mark""] = drawing.Mark;
-    drawingData[""type""] = drawing.GetType().Name;
-
-    var allObjects = new System.Collections.Generic.List<object>();
-
-    // GetSheet() returns the ContainerView (sheet)
-    var sheet = drawing.GetSheet();
-    if (sheet == null) continue;
-
-    // Get all objects from the sheet
-    var objects = sheet.GetAllObjects();
-    while (objects.MoveNext())
-    {
-        var obj = objects.Current;
-        if (obj == null) continue;
-
-        var objData = new System.Collections.Generic.Dictionary<string, object>();
-        objData[""type""] = obj.GetType().FullName;
-
-        // Extract ALL properties via reflection
-        var props = obj.GetType().GetProperties();
-        var propData = new System.Collections.Generic.Dictionary<string, string>();
-
-        foreach (var prop in props)
-        {
-            try
-            {
-                var value = prop.GetValue(obj, null);
-                propData[prop.Name] = value != null ? value.ToString() : ""null"";
-            }
-            catch (Exception ex)
-            {
-                propData[prop.Name] = ""ERROR: "" + ex.Message;
-            }
-        }
-
-        objData[""properties""] = propData;
-        allObjects.Add(objData);
-    }
-
-    drawingData[""objects""] = allObjects;
-    drawingData[""object_count""] = allObjects.Count;
-    extractedData.Add(drawingData);
-}
-
-// Calculate approximate size for warning
 int totalObjects = 0;
-foreach (var item in extractedData)
-{
-    var dict = item as System.Collections.Generic.Dictionary<string, object>;
-    if (dict != null && dict.ContainsKey(""object_count""))
-    {
-        totalObjects += (int)dict[""object_count""];
-    }
-}
+long bytesWritten = 0;
 
-// Log size warning if large dataset
-if (totalObjects > 10000)
-{
-    System.Console.WriteLine(""⚠️ Large dataset: "" + totalObjects.ToString() + "" objects. JSON will be large."");
-}
-
-// Serialize to compact JSON
 var jsonSettings = new Newtonsoft.Json.JsonSerializerSettings
 {
     ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore,
@@ -1323,7 +1258,92 @@ var jsonSettings = new Newtonsoft.Json.JsonSerializerSettings
     NullValueHandling = Newtonsoft.Json.NullValueHandling.Include
 };
 
-result = Newtonsoft.Json.JsonConvert.SerializeObject(extractedData, jsonSettings);
+using (var writer = new System.IO.StreamWriter(outputPath, false, System.Text.Encoding.UTF8))
+{
+    var drawingEnumerator = dh.GetDrawings();
+    while (drawingEnumerator.MoveNext() && drawingsProcessed < " + request.MaxDrawings + @")
+    {
+        var drawing = drawingEnumerator.Current as Tekla.Structures.Drawing.Drawing;
+        if (drawing == null) continue;
+
+        drawingsProcessed++;
+
+        var drawingData = new System.Collections.Generic.Dictionary<string, object>();
+        drawingData[""mark""] = drawing.Mark;
+        drawingData[""type""] = drawing.GetType().Name;
+
+        var allObjects = new System.Collections.Generic.List<object>();
+
+        // GetSheet() returns the ContainerView (sheet)
+        var sheet = drawing.GetSheet();
+        if (sheet == null) continue;
+
+        // Get all objects from the sheet
+        var objects = sheet.GetAllObjects();
+        while (objects.MoveNext())
+        {
+            var obj = objects.Current;
+            if (obj == null) continue;
+
+            var objData = new System.Collections.Generic.Dictionary<string, object>();
+            objData[""type""] = obj.GetType().FullName;
+
+            // Extract ALL properties via reflection
+            var props = obj.GetType().GetProperties();
+            var propData = new System.Collections.Generic.Dictionary<string, string>();
+
+            foreach (var prop in props)
+            {
+                try
+                {
+                    var value = prop.GetValue(obj, null);
+                    propData[prop.Name] = value != null ? value.ToString() : ""null"";
+                }
+                catch (Exception ex)
+                {
+                    propData[prop.Name] = ""ERROR: "" + ex.Message;
+                }
+            }
+
+            objData[""properties""] = propData;
+            allObjects.Add(objData);
+        }
+
+        drawingData[""objects""] = allObjects;
+        drawingData[""object_count""] = allObjects.Count;
+        totalObjects += allObjects.Count;
+
+        // Write this drawing as a single JSON line
+        var jsonLine = Newtonsoft.Json.JsonConvert.SerializeObject(drawingData, jsonSettings);
+        writer.WriteLine(jsonLine);
+        bytesWritten += System.Text.Encoding.UTF8.GetByteCount(jsonLine) + 2; // +2 for newline
+
+        // Progress indicator
+        if (drawingsProcessed % 10 == 0)
+        {
+            System.Console.WriteLine(""📊 Progress: "" + drawingsProcessed + "" drawings, "" + totalObjects + "" objects"");
+        }
+    }
+}
+
+var duration = (System.DateTime.Now - startTime).TotalSeconds;
+var fileSizeMB = bytesWritten / (1024.0 * 1024.0);
+
+// Return ONLY metadata - not the actual data
+var metadata = new System.Collections.Generic.Dictionary<string, object>();
+metadata[""file_path""] = outputPath;
+metadata[""total_drawings""] = drawingsProcessed;
+metadata[""total_objects""] = totalObjects;
+metadata[""file_size_mb""] = System.Math.Round(fileSizeMB, 2);
+metadata[""duration_seconds""] = System.Math.Round(duration, 1);
+metadata[""format""] = ""jsonl"";
+metadata[""timestamp""] = timestamp;
+
+System.Console.WriteLine(""✅ Extraction complete: "" + totalObjects + "" objects from "" + drawingsProcessed + "" drawings"");
+System.Console.WriteLine(""📦 File size: "" + fileSizeMB.ToString(""F2"") + "" MB"");
+System.Console.WriteLine(""⏱️ Duration: "" + duration.ToString(""F1"") + "" seconds"");
+
+result = Newtonsoft.Json.JsonConvert.SerializeObject(metadata, jsonSettings);
 ";
         }
 
