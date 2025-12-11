@@ -1240,10 +1240,10 @@ result = report.ToString();
         private static string GenerateFullExtractionCode(DrawingExtractionRequest request)
         {
             return @"
-// File-based extraction - write directly to disk to avoid Claude context saturation
+// ENHANCED ML EXTRACTION: Drawing types, relationships, geometric context, coordinate systems
 var timestamp = System.DateTime.Now.ToString(""yyyyMMdd_HHmmss"");
 var outputPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), ""tekla_extraction_"" + timestamp + "".jsonl"");
-System.Console.WriteLine(""📁 Writing extraction to: "" + outputPath);
+System.Console.WriteLine(""📁 Enhanced ML extraction to: "" + outputPath);
 
 var startTime = System.DateTime.Now;
 var dh = new Tekla.Structures.Drawing.DrawingHandler();
@@ -1270,13 +1270,39 @@ using (var writer = new System.IO.StreamWriter(outputPath, false, System.Text.En
 
         var drawingData = new System.Collections.Generic.Dictionary<string, object>();
         drawingData[""mark""] = drawing.Mark;
-        drawingData[""type""] = drawing.GetType().Name;
+
+        // ENHANCEMENT 1: Drawing type classification (actual Tekla class)
+        drawingData[""drawing_type""] = drawing.GetType().Name;
+        drawingData[""drawing_type_full""] = drawing.GetType().FullName;
 
         var allObjects = new System.Collections.Generic.List<object>();
 
         // GetSheet() returns the ContainerView (sheet)
         var sheet = drawing.GetSheet();
         if (sheet == null) continue;
+
+        // Extract sheet/view transformation matrix for coordinate conversion
+        var sheetTransform = new System.Collections.Generic.Dictionary<string, object>();
+        try
+        {
+            var viewCS = sheet as Tekla.Structures.Drawing.View;
+            if (viewCS != null)
+            {
+                // Try to get transformation plane
+                var transform = viewCS.DisplayCoordinateSystem;
+                if (transform != null)
+                {
+                    sheetTransform[""origin""] = new { x = transform.Origin.X, y = transform.Origin.Y, z = transform.Origin.Z };
+                    sheetTransform[""axis_x""] = new { x = transform.AxisX.X, y = transform.AxisX.Y, z = transform.AxisX.Z };
+                    sheetTransform[""axis_y""] = new { x = transform.AxisY.X, y = transform.AxisY.Y, z = transform.AxisY.Z };
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            sheetTransform[""error""] = ex.Message;
+        }
+        drawingData[""sheet_coordinate_system""] = sheetTransform;
 
         // Get all objects from the sheet
         var objects = sheet.GetAllObjects();
@@ -1287,8 +1313,282 @@ using (var writer = new System.IO.StreamWriter(outputPath, false, System.Text.En
 
             var objData = new System.Collections.Generic.Dictionary<string, object>();
             objData[""type""] = obj.GetType().FullName;
+            objData[""type_name""] = obj.GetType().Name;
 
-            // Extract ALL properties via reflection
+            // Try to get object ID/identifier
+            try
+            {
+                var drawingObj = obj as Tekla.Structures.Drawing.DrawingObject;
+                if (drawingObj != null)
+                {
+                    var identifier = drawingObj.GetType().GetProperty(""Identifier"");
+                    if (identifier != null)
+                    {
+                        var id = identifier.GetValue(drawingObj, null);
+                        if (id != null)
+                        {
+                            objData[""object_id""] = id.ToString();
+                        }
+                    }
+                }
+            }
+            catch { }
+
+            // ENHANCEMENT 2 - LAYER 1: Explicit relationships via GetRelatedObjects
+            var relatedObjects = new System.Collections.Generic.List<string>();
+            try
+            {
+                var drawingObj = obj as Tekla.Structures.Drawing.DrawingObject;
+                if (drawingObj != null)
+                {
+                    var getRelatedMethod = drawingObj.GetType().GetMethod(""GetRelatedObjects"");
+                    if (getRelatedMethod != null)
+                    {
+                        var related = getRelatedMethod.Invoke(drawingObj, new object[] { });
+                        if (related != null)
+                        {
+                            var enumerator = related as System.Collections.IEnumerator;
+                            if (enumerator != null)
+                            {
+                                while (enumerator.MoveNext())
+                                {
+                                    var relObj = enumerator.Current;
+                                    if (relObj != null)
+                                    {
+                                        relatedObjects.Add(relObj.GetType().Name + "": "" + relObj.ToString());
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                objData[""relationship_error""] = ex.Message;
+            }
+            if (relatedObjects.Count > 0)
+            {
+                objData[""related_objects""] = relatedObjects;
+            }
+
+            // ENHANCEMENT 3 - LAYER 2: Geometric inference data
+            var geometricData = new System.Collections.Generic.Dictionary<string, object>();
+
+            // For DIMENSION objects: Extract dimension points and geometry
+            if (obj.GetType().Name.Contains(""Dimension""))
+            {
+                try
+                {
+                    var dimension = obj as Tekla.Structures.Drawing.StraightDimension;
+                    if (dimension != null)
+                    {
+                        var dimPoints = new System.Collections.Generic.List<object>();
+
+                        // Get dimension points
+                        var getPoints = dimension.GetType().GetMethod(""GetPoints"");
+                        if (getPoints != null)
+                        {
+                            var points = getPoints.Invoke(dimension, new object[] { });
+                            if (points != null)
+                            {
+                                var pointList = points as System.Collections.ArrayList;
+                                if (pointList != null)
+                                {
+                                    foreach (var pt in pointList)
+                                    {
+                                        var point = pt as Tekla.Structures.Geometry3d.Point;
+                                        if (point != null)
+                                        {
+                                            dimPoints.Add(new {
+                                                x = point.X,
+                                                y = point.Y,
+                                                z = point.Z,
+                                                type = ""dimension_point""
+                                            });
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        geometricData[""dimension_points""] = dimPoints;
+
+                        // Try to get dimension attributes
+                        try
+                        {
+                            var attributes = dimension.Attributes;
+                            if (attributes != null)
+                            {
+                                geometricData[""dimension_attributes""] = new {
+                                    arrowhead = attributes.Arrowhead != null ? attributes.Arrowhead.ToString() : ""null"",
+                                    font = attributes.Font != null ? attributes.Font.ToString() : ""null""
+                                };
+                            }
+                        }
+                        catch { }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    geometricData[""dimension_extraction_error""] = ex.Message;
+                }
+            }
+
+            // For PART objects: Extract vertices, edges, individual holes
+            if (obj.GetType().Name.Contains(""Part""))
+            {
+                try
+                {
+                    var part = obj as Tekla.Structures.Drawing.Part;
+                    if (part != null)
+                    {
+                        var partGeometry = new System.Collections.Generic.Dictionary<string, object>();
+
+                        // Get part contour (vertices/edges)
+                        var getContour = part.GetType().GetMethod(""GetContour"");
+                        if (getContour != null)
+                        {
+                            var contour = getContour.Invoke(part, new object[] { });
+                            if (contour != null)
+                            {
+                                var contourPoints = new System.Collections.Generic.List<object>();
+                                var contourType = contour.GetType();
+                                var contourList = contour as System.Collections.IEnumerable;
+                                if (contourList != null)
+                                {
+                                    foreach (var pt in contourList)
+                                    {
+                                        var point = pt as Tekla.Structures.Geometry3d.Point;
+                                        if (point != null)
+                                        {
+                                            contourPoints.Add(new { x = point.X, y = point.Y, z = point.Z });
+                                        }
+                                    }
+                                }
+                                partGeometry[""vertices""] = contourPoints;
+                            }
+                        }
+
+                        // Get bolt/hole groups and extract INDIVIDUAL hole positions
+                        var holes = new System.Collections.Generic.List<object>();
+                        var getChildren = part.GetType().GetMethod(""GetChildren"");
+                        if (getChildren != null)
+                        {
+                            var children = getChildren.Invoke(part, new object[] { });
+                            if (children != null)
+                            {
+                                var childEnum = children as System.Collections.IEnumerator;
+                                if (childEnum != null)
+                                {
+                                    while (childEnum.MoveNext())
+                                    {
+                                        var child = childEnum.Current;
+                                        if (child != null && child.GetType().Name.Contains(""BoltGroup""))
+                                        {
+                                            // This is a bolt group - extract individual bolt positions
+                                            var boltGroup = child as Tekla.Structures.Drawing.BoltGroup;
+                                            if (boltGroup != null)
+                                            {
+                                                var getBoltPositions = boltGroup.GetType().GetMethod(""GetBoltPositions"");
+                                                if (getBoltPositions != null)
+                                                {
+                                                    var positions = getBoltPositions.Invoke(boltGroup, new object[] { });
+                                                    if (positions != null)
+                                                    {
+                                                        var posList = positions as System.Collections.ArrayList;
+                                                        if (posList != null)
+                                                        {
+                                                            foreach (var pos in posList)
+                                                            {
+                                                                var point = pos as Tekla.Structures.Geometry3d.Point;
+                                                                if (point != null)
+                                                                {
+                                                                    holes.Add(new {
+                                                                        x = point.X,
+                                                                        y = point.Y,
+                                                                        z = point.Z,
+                                                                        type = ""bolt_hole""
+                                                                    });
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        if (holes.Count > 0)
+                        {
+                            partGeometry[""holes""] = holes;
+                        }
+
+                        geometricData[""part_geometry""] = partGeometry;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    geometricData[""part_extraction_error""] = ex.Message;
+                }
+            }
+
+            // For VIEW objects: Extract transformation matrix
+            if (obj.GetType().Name.Contains(""View""))
+            {
+                try
+                {
+                    var view = obj as Tekla.Structures.Drawing.View;
+                    if (view != null)
+                    {
+                        var viewTransform = new System.Collections.Generic.Dictionary<string, object>();
+
+                        // Get view coordinate system (transformation matrix)
+                        var viewCS = view.DisplayCoordinateSystem;
+                        if (viewCS != null)
+                        {
+                            viewTransform[""origin""] = new { x = viewCS.Origin.X, y = viewCS.Origin.Y, z = viewCS.Origin.Z };
+                            viewTransform[""axis_x""] = new { x = viewCS.AxisX.X, y = viewCS.AxisX.Y, z = viewCS.AxisX.Z };
+                            viewTransform[""axis_y""] = new { x = viewCS.AxisY.X, y = viewCS.AxisY.Y, z = viewCS.AxisY.Z };
+                        }
+
+                        geometricData[""view_coordinate_system""] = viewTransform;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    geometricData[""view_extraction_error""] = ex.Message;
+                }
+            }
+
+            if (geometricData.Count > 0)
+            {
+                objData[""geometric_data""] = geometricData;
+            }
+
+            // ENHANCEMENT 4: View context (parent view ID)
+            try
+            {
+                var drawingObj = obj as Tekla.Structures.Drawing.DrawingObject;
+                if (drawingObj != null)
+                {
+                    var getView = drawingObj.GetType().GetProperty(""Parent"");
+                    if (getView != null)
+                    {
+                        var parentView = getView.GetValue(drawingObj, null);
+                        if (parentView != null)
+                        {
+                            objData[""parent_view_type""] = parentView.GetType().Name;
+                        }
+                    }
+                }
+            }
+            catch { }
+
+            // Extract ALL properties via reflection (keep existing functionality)
             var props = obj.GetType().GetProperties();
             var propData = new System.Collections.Generic.Dictionary<string, string>();
 
@@ -1316,7 +1616,7 @@ using (var writer = new System.IO.StreamWriter(outputPath, false, System.Text.En
         // Write this drawing as a single JSON line
         var jsonLine = Newtonsoft.Json.JsonConvert.SerializeObject(drawingData, jsonSettings);
         writer.WriteLine(jsonLine);
-        bytesWritten += System.Text.Encoding.UTF8.GetByteCount(jsonLine) + 2; // +2 for newline
+        bytesWritten += System.Text.Encoding.UTF8.GetByteCount(jsonLine) + 2;
 
         // Progress indicator
         if (drawingsProcessed % 10 == 0)
@@ -1338,8 +1638,9 @@ metadata[""file_size_mb""] = System.Math.Round(fileSizeMB, 2);
 metadata[""duration_seconds""] = System.Math.Round(duration, 1);
 metadata[""format""] = ""jsonl"";
 metadata[""timestamp""] = timestamp;
+metadata[""extraction_version""] = ""enhanced_v2_geometric"";
 
-System.Console.WriteLine(""✅ Extraction complete: "" + totalObjects + "" objects from "" + drawingsProcessed + "" drawings"");
+System.Console.WriteLine(""✅ Enhanced extraction complete: "" + totalObjects + "" objects from "" + drawingsProcessed + "" drawings"");
 System.Console.WriteLine(""📦 File size: "" + fileSizeMB.ToString(""F2"") + "" MB"");
 System.Console.WriteLine(""⏱️ Duration: "" + duration.ToString(""F1"") + "" seconds"");
 
