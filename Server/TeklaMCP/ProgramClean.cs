@@ -160,6 +160,16 @@ namespace TeklaMCP
     }
 
     /// <summary>
+    /// Drawing extraction request for ML dataset generation
+    /// </summary>
+    public class DrawingExtractionRequest
+    {
+        public string DrawingMark { get; set; }  // Null = process all drawings
+        public int MaxDrawings { get; set; } = 10;
+        public bool DiscoveryMode { get; set; } = true;
+    }
+
+    /// <summary>
     /// TeklaMCP 0.3 PHASE 4 - Part-Based CRUD Operations
     /// 
     /// PHASE 4 IMPROVEMENTS:
@@ -223,7 +233,10 @@ namespace TeklaMCP
                 
                 // ETABS-TEKLA BRIDGE operations
                 { "POST /import-ubim-frames", HandleImportUBIMFrames },
-                { "POST /connect-tekla", HandleConnectTekla }
+                { "POST /connect-tekla", HandleConnectTekla },
+
+                // ML DATASET EXTRACTION operations
+                { "POST /extract-drawing-objects", HandleExtractDrawingObjects }
             };
         }
 
@@ -1059,13 +1072,13 @@ namespace TeklaMCP
             {
                 var model = new Model();
                 var connectionStatus = model.GetConnectionStatus();
-                
+
                 if (connectionStatus)
                 {
                     var modelInfo = model.GetInfo();
                     LogMessage("TEKLA_CONNECT_SUCCESS", $"Connected to model: {modelInfo.ModelName}");
-                    
-                    return BuildSuccessResponse(new 
+
+                    return BuildSuccessResponse(new
                     {
                         tekla_connected = true,
                         model_name = modelInfo.ModelName,
@@ -1085,7 +1098,229 @@ namespace TeklaMCP
                 return BuildErrorResponse($"Connection error: {ex.Message}", "connect-tekla");
             }
         }
-        
+
+        // ==================== ML DATASET EXTRACTION ====================
+
+        static string HandleExtractDrawingObjects(HttpListenerRequest request)
+        {
+            try
+            {
+                var model = new Model();
+                if (!model.GetConnectionStatus())
+                {
+                    return BuildErrorResponse("Tekla not connected", "extract-drawing-objects");
+                }
+
+                string requestBody = ReadRequestBody(request);
+                var extractRequest = string.IsNullOrEmpty(requestBody)
+                    ? new DrawingExtractionRequest()
+                    : JsonConvert.DeserializeObject<DrawingExtractionRequest>(requestBody);
+
+                LogMessage("DRAWING_EXTRACTION_START",
+                    $"Starting extraction - Discovery: {extractRequest.DiscoveryMode}, Max: {extractRequest.MaxDrawings}");
+
+                // Generate C# code for drawing extraction
+                string extractionCode = GenerateDrawingExtractionCode(extractRequest);
+
+                // Execute the extraction code
+                string result = ExecuteCodeWithCapture(extractionCode);
+
+                LogMessage("DRAWING_EXTRACTION_COMPLETE", "Extraction completed successfully");
+
+                return BuildSuccessResponse(new {
+                    extraction_mode = extractRequest.DiscoveryMode ? "discovery" : "full",
+                    max_drawings = extractRequest.MaxDrawings,
+                    result = result
+                }, "Drawing extraction completed");
+            }
+            catch (Exception ex)
+            {
+                LogMessage("DRAWING_EXTRACTION_ERROR", $"Error: {ex.Message}");
+                return BuildErrorResponse($"Drawing extraction error: {ex.Message}", "extract-drawing-objects");
+            }
+        }
+
+        private static string GenerateDrawingExtractionCode(DrawingExtractionRequest request)
+        {
+            if (request.DiscoveryMode)
+            {
+                return GenerateDiscoveryModeCode(request);
+            }
+            else
+            {
+                return GenerateFullExtractionCode(request);
+            }
+        }
+
+        private static string GenerateDiscoveryModeCode(DrawingExtractionRequest request)
+        {
+            return @"
+var dh = new Tekla.Structures.Drawing.DrawingHandler();
+var typeCount = new System.Collections.Generic.Dictionary<string, int>();
+var typeSamples = new System.Collections.Generic.Dictionary<string, object>();
+int drawingsProcessed = 0;
+int totalObjects = 0;
+
+var drawingEnumerator = dh.GetDrawings();
+while (drawingEnumerator.MoveNext() && drawingsProcessed < " + request.MaxDrawings + @")
+{
+    var drawing = drawingEnumerator.Current as Tekla.Structures.Drawing.Drawing;
+    if (drawing == null) continue;
+
+    drawingsProcessed++;
+
+    var sheets = drawing.GetSheets();
+    while (sheets.MoveNext())
+    {
+        var sheet = sheets.Current as Tekla.Structures.Drawing.Sheet;
+        if (sheet == null) continue;
+
+        var views = sheet.GetAllViews();
+        while (views.MoveNext())
+        {
+            var view = views.Current as Tekla.Structures.Drawing.ViewBase;
+            if (view == null) continue;
+
+            var objects = view.GetAllObjects();
+            while (objects.MoveNext())
+            {
+                totalObjects++;
+                var obj = objects.Current;
+                if (obj == null) continue;
+
+                string typeName = obj.GetType().FullName;
+
+                // Count occurrences
+                if (!typeCount.ContainsKey(typeName))
+                {
+                    typeCount[typeName] = 0;
+
+                    // Store sample object properties using reflection
+                    var props = obj.GetType().GetProperties();
+                    var sampleProps = new System.Collections.Generic.List<string>();
+
+                    foreach (var prop in props)
+                    {
+                        try
+                        {
+                            var value = prop.GetValue(obj, null);
+                            sampleProps.Add(prop.Name + "": "" + prop.PropertyType.Name + "" = "" + (value != null ? value.ToString() : ""null""));
+                        }
+                        catch
+                        {
+                            sampleProps.Add(prop.Name + "": "" + prop.PropertyType.Name + "" (error reading)"");
+                        }
+                    }
+
+                    typeSamples[typeName] = string.Join("", "", sampleProps.ToArray());
+                }
+
+                typeCount[typeName]++;
+            }
+        }
+    }
+}
+
+// Build discovery report
+var report = new System.Text.StringBuilder();
+report.AppendLine(""DRAWING OBJECT DISCOVERY REPORT"");
+report.AppendLine(""=============================="");
+report.AppendLine(""Drawings Scanned: "" + drawingsProcessed.ToString());
+report.AppendLine(""Total Objects: "" + totalObjects.ToString());
+report.AppendLine(""Unique Types Found: "" + typeCount.Count.ToString());
+report.AppendLine("""");
+report.AppendLine(""OBJECT TYPES:"");
+
+foreach (var entry in typeCount)
+{
+    report.AppendLine("""");
+    report.AppendLine(""Type: "" + entry.Key);
+    report.AppendLine(""Count: "" + entry.Value.ToString());
+    if (typeSamples.ContainsKey(entry.Key))
+    {
+        report.AppendLine(""Sample Properties: "" + typeSamples[entry.Key].ToString());
+    }
+}
+
+result = report.ToString();
+";
+        }
+
+        private static string GenerateFullExtractionCode(DrawingExtractionRequest request)
+        {
+            return @"
+var dh = new Tekla.Structures.Drawing.DrawingHandler();
+var extractedData = new System.Collections.Generic.List<object>();
+int drawingsProcessed = 0;
+
+var drawingEnumerator = dh.GetDrawings();
+while (drawingEnumerator.MoveNext() && drawingsProcessed < " + request.MaxDrawings + @")
+{
+    var drawing = drawingEnumerator.Current as Tekla.Structures.Drawing.Drawing;
+    if (drawing == null) continue;
+
+    drawingsProcessed++;
+
+    var drawingData = new System.Collections.Generic.Dictionary<string, object>();
+    drawingData[""mark""] = drawing.Mark;
+    drawingData[""title""] = drawing.Title;
+    drawingData[""type""] = drawing.GetType().Name;
+
+    var allObjects = new System.Collections.Generic.List<object>();
+
+    var sheets = drawing.GetSheets();
+    while (sheets.MoveNext())
+    {
+        var sheet = sheets.Current as Tekla.Structures.Drawing.Sheet;
+        if (sheet == null) continue;
+
+        var views = sheet.GetAllViews();
+        while (views.MoveNext())
+        {
+            var view = views.Current as Tekla.Structures.Drawing.ViewBase;
+            if (view == null) continue;
+
+            var objects = view.GetAllObjects();
+            while (objects.MoveNext())
+            {
+                var obj = objects.Current;
+                if (obj == null) continue;
+
+                var objData = new System.Collections.Generic.Dictionary<string, object>();
+                objData[""type""] = obj.GetType().FullName;
+
+                // Extract ALL properties via reflection
+                var props = obj.GetType().GetProperties();
+                var propData = new System.Collections.Generic.Dictionary<string, string>();
+
+                foreach (var prop in props)
+                {
+                    try
+                    {
+                        var value = prop.GetValue(obj, null);
+                        propData[prop.Name] = value != null ? value.ToString() : ""null"";
+                    }
+                    catch (Exception ex)
+                    {
+                        propData[prop.Name] = ""ERROR: "" + ex.Message;
+                    }
+                }
+
+                objData[""properties""] = propData;
+                allObjects.Add(objData);
+            }
+        }
+    }
+
+    drawingData[""objects""] = allObjects;
+    drawingData[""object_count""] = allObjects.Count;
+    extractedData.Add(drawingData);
+}
+
+result = ""Extracted "" + drawingsProcessed.ToString() + "" drawings with complete object data. Use JSON serialization for full output."";
+";
+        }
+
         // ==================== HELPER METHODS ====================
         
         private static string ReadRequestBody(HttpListenerRequest request)
@@ -1535,6 +1770,9 @@ public class DynamicTeklaScript
                     var parameters = new CompilerParameters();
                     parameters.ReferencedAssemblies.Add("System.dll");
                     parameters.ReferencedAssemblies.Add("System.Core.dll");
+
+                    // Add Tekla Drawing API support for ML dataset extraction
+                    parameters.ReferencedAssemblies.Add("Tekla.Structures.Drawing.dll");
 
                     // Auto-discover Tekla assemblies
                     foreach (var loadedAssembly in AppDomain.CurrentDomain.GetAssemblies())

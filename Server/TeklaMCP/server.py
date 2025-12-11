@@ -1048,13 +1048,13 @@ async def tekla_apply_approved_changes(
     sync_file: str = ".ubim_sync"
 ) -> str:
     """Apply user-approved changes to Tekla model.
-    
+
     This is the final step where approved changes are actually applied to the
     Tekla model. Only changes explicitly approved by the user are applied.
-    
+
     Parameters:
     - sync_file: GUID sync tracking file (default: .ubim_sync)
-    
+
     Returns application results
     """
     try:
@@ -1062,29 +1062,29 @@ async def tekla_apply_approved_changes(
         from ubim_core.converters.tekla import TeklaConverter
     except ImportError:
         return "ERROR: UBIM core library not available. Install with: pip install -e ../../../2511_UBIM_DataBridge"
-    
+
     # Ensure HTTP server is running
     await ensure_http_server_running()
-    
+
     # Check Tekla connection
     if not await is_tekla_connected():
         return "ERROR: Not connected to Tekla. Start Tekla Structures first."
-    
+
     try:
         # Initialize tracking
         tracker = GUIDTracker(sync_file)
-        
+
         # Get approved changes
         approved_changes = tracker.get_approved_changes()
-        
+
         if not approved_changes:
             return "SUCCESS: No approved changes to apply"
-        
+
         # Apply changes to Tekla model
         converter = TeklaConverter()
         applied_guids = []
         failed_changes = []
-        
+
         for change in approved_changes:
             try:
                 # Apply the change based on type
@@ -1092,7 +1092,7 @@ async def tekla_apply_approved_changes(
                     # Create new object in Tekla
                     object_data = change.new_snapshot.metadata.get("original_data", {})
                     beam_requests = converter.convert_ubim_frame_to_beam(object_data)
-                    
+
                     if beam_requests:
                         # Create beam via HTTP
                         result = await call_endpoint("create-beam", "POST", beam_requests[0])
@@ -1100,31 +1100,89 @@ async def tekla_apply_approved_changes(
                             applied_guids.append(change.guid)
                         else:
                             failed_changes.append({"guid": change.guid, "error": result.get("error", "Unknown")})
-                    
+
                 elif change.change_type in ["properties_changed", "geometry_changed"] and change.new_snapshot:
                     # Modify existing object in Tekla
                     # TODO: Implement object modification via HTTP
                     applied_guids.append(change.guid)
-                    
+
                 elif change.change_type == "deleted":
                     # Delete object from Tekla
                     # TODO: Implement object deletion via HTTP
                     applied_guids.append(change.guid)
-                    
+
             except Exception as e:
                 failed_changes.append({
                     "guid": change.guid,
                     "error": str(e)
                 })
-        
+
         # Clear successfully applied changes
         if applied_guids:
             tracker.clear_applied_changes(applied_guids)
-        
+
         return f"SUCCESS: Applied {len(applied_guids)} changes, {len(failed_changes)} failed. Applied: {applied_guids}. Failures: {failed_changes}"
-        
+
     except Exception as e:
         return f"ERROR: Failed to apply changes: {e}"
+
+# ==================== ML DATASET EXTRACTION ====================
+
+@mcp.tool()
+async def tekla_extract_drawing_objects(
+    drawing_mark: str = None,
+    max_drawings: int = 10,
+    discovery_mode: bool = True
+) -> str:
+    """Extract drawing objects from Tekla drawings for ML dataset generation
+
+    ML DATASET EXTRACTION: Comprehensive drawing object extraction tool
+
+    This tool extracts ALL objects from Tekla shop drawings to build a machine
+    learning training dataset for automated dimension placement.
+
+    **TWO MODES:**
+
+    1. **Discovery Mode** (discovery_mode=True):
+       - Scans drawings and catalogs what object types exist
+       - Uses .NET reflection to discover ALL classes
+       - Counts occurrences of each type
+       - Extracts sample properties for each type
+       - Returns summary report of findings
+
+    2. **Full Extraction Mode** (discovery_mode=False):
+       - Extracts ALL properties from ALL objects
+       - Uses reflection to get complete property data
+       - Links drawing objects to model objects where possible
+       - Returns comprehensive JSON dataset
+
+    Parameters:
+    - drawing_mark: Optional specific drawing mark (default: None = process all)
+    - max_drawings: Maximum number of drawings to process (default: 10)
+    - discovery_mode: True for discovery, False for full extraction (default: True)
+
+    **WORKFLOW:**
+    1. Start with discovery_mode=True to see what object types exist
+    2. Analyze the discovery results
+    3. Run with discovery_mode=False to get full dataset
+    4. Use the dataset for ML training analysis
+
+    Returns extraction results with object type catalog or full dataset
+    """
+    try:
+        # Build extraction request
+        extraction_request = {
+            "DrawingMark": drawing_mark,
+            "MaxDrawings": max_drawings,
+            "DiscoveryMode": discovery_mode
+        }
+
+        result = await call_endpoint("extract-drawing-objects", "POST", extraction_request)
+
+        return result
+
+    except Exception as e:
+        return f"ERROR: Drawing extraction failed: {e}"
 
 # ==================== MAIN ====================
 
