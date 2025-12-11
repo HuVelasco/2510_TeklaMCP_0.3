@@ -1727,10 +1727,10 @@ if (outputPath.Length >= 2 && outputPath[1] == ':')
     string pathWithoutDrive = outputPath.Substring(2); // Remove ""C:""
 
     // Replace backslashes with forward slashes
-    pathWithoutDrive = pathWithoutDrive.Replace(@""""\\"""", """"""/"""""");
+    pathWithoutDrive = pathWithoutDrive.Replace(""\\\\"", ""/"""");
 
     // Construct WSL path: /mnt/c/...
-    wslPath = """"""/mnt/"""""" + driveLetter + pathWithoutDrive;
+    wslPath = ""/mnt/"" + driveLetter + pathWithoutDrive;
 }
 
 // Return ONLY metadata - not the actual data
