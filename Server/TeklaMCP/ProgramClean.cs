@@ -1254,7 +1254,6 @@ while (drawingEnumerator.MoveNext() && drawingsProcessed < " + request.MaxDrawin
 
     var drawingData = new System.Collections.Generic.Dictionary<string, object>();
     drawingData[""mark""] = drawing.Mark;
-    drawingData[""title""] = drawing.Title;
     drawingData[""type""] = drawing.GetType().Name;
 
     var allObjects = new System.Collections.Generic.List<object>();
