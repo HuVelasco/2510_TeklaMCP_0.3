@@ -1298,7 +1298,32 @@ while (drawingEnumerator.MoveNext() && drawingsProcessed < " + request.MaxDrawin
     extractedData.Add(drawingData);
 }
 
-result = ""Extracted "" + drawingsProcessed.ToString() + "" drawings with complete object data. Use JSON serialization for full output."";
+// Calculate approximate size for warning
+int totalObjects = 0;
+foreach (var item in extractedData)
+{
+    var dict = item as System.Collections.Generic.Dictionary<string, object>;
+    if (dict != null && dict.ContainsKey(""object_count""))
+    {
+        totalObjects += (int)dict[""object_count""];
+    }
+}
+
+// Log size warning if large dataset
+if (totalObjects > 10000)
+{
+    System.Console.WriteLine(""⚠️ Large dataset: "" + totalObjects.ToString() + "" objects. JSON will be large."");
+}
+
+// Serialize to compact JSON
+var jsonSettings = new Newtonsoft.Json.JsonSerializerSettings
+{
+    ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore,
+    Formatting = Newtonsoft.Json.Formatting.None,
+    NullValueHandling = Newtonsoft.Json.NullValueHandling.Include
+};
+
+result = Newtonsoft.Json.JsonConvert.SerializeObject(extractedData, jsonSettings);
 ";
         }
 
