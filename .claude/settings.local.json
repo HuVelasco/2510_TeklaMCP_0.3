@@ -31,7 +31,12 @@
       "Bash(sed:*)",
       "mcp__tekla__tekla_import_frames_from_ubim",
       "Read(//c/Users/hugov/ClaudeProjects/2509_EtabsMCP_0.3/**)",
-      "Read(//c/Users/hugov/ClaudeProjects/2511_UBIM_DataBridge/**)"
+      "Read(//c/Users/hugov/ClaudeProjects/2511_UBIM_DataBridge/**)",
+      "Bash(tee:*)",
+      "mcp__tekla__tekla_extract_drawing_objects",
+      "Bash(cat:*)",
+      "Bash(wc:*)",
+      "Bash(ls:*)"
     ],
     "deny": [],
     "ask": []
