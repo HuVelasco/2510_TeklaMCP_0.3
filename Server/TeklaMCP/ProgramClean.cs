@@ -1349,12 +1349,13 @@ using (var writer = new System.IO.StreamWriter(outputPath, false, System.Text.En
             objData[""type""] = obj.GetType().FullName;
             objData[""type_name""] = obj.GetType().Name;
 
-            // Try to get object ID/identifier
+            // ENHANCEMENT: Get object ID and model linkage (inspired by tekladrawingexamples.cs)
             try
             {
                 var drawingObj = obj as Tekla.Structures.Drawing.DrawingObject;
                 if (drawingObj != null)
                 {
+                    // Get drawing object identifier
                     var identifier = drawingObj.GetType().GetProperty(""Identifier"");
                     if (identifier != null)
                     {
@@ -1362,6 +1363,23 @@ using (var writer = new System.IO.StreamWriter(outputPath, false, System.Text.En
                         if (id != null)
                         {
                             objData[""object_id""] = id.ToString();
+                        }
+                    }
+
+                    // ENHANCEMENT: Track ModelIdentifier for drawing objects linked to model objects
+                    // This establishes the drawing→model relationship for ML training
+                    var modelIdentifierProp = drawingObj.GetType().GetProperty(""ModelIdentifier"");
+                    if (modelIdentifierProp != null)
+                    {
+                        var modelId = modelIdentifierProp.GetValue(drawingObj, null);
+                        if (modelId != null)
+                        {
+                            objData[""model_object_id""] = modelId.ToString();
+                            objData[""has_model_link""] = true;
+                        }
+                        else
+                        {
+                            objData[""has_model_link""] = false;
                         }
                     }
                 }
@@ -1505,6 +1523,33 @@ using (var writer = new System.IO.StreamWriter(outputPath, false, System.Text.En
 
                     geometricData[""dimension_points""] = dimPoints;
 
+                    // ENHANCEMENT: Extract InsertionPoint for dimension text placement (ML training feature)
+                    try
+                    {
+                        var insertionPointProp = obj.GetType().GetProperty(""InsertionPoint"");
+                        if (insertionPointProp != null)
+                        {
+                            var insertionPoint = insertionPointProp.GetValue(obj, null);
+                            if (insertionPoint != null)
+                            {
+                                var ipX = insertionPoint.GetType().GetProperty(""X"");
+                                var ipY = insertionPoint.GetType().GetProperty(""Y"");
+                                var ipZ = insertionPoint.GetType().GetProperty(""Z"");
+
+                                if (ipX != null && ipY != null && ipZ != null)
+                                {
+                                    geometricData[""dimension_text_position""] = new {
+                                        x = ipX.GetValue(insertionPoint, null),
+                                        y = ipY.GetValue(insertionPoint, null),
+                                        z = ipZ.GetValue(insertionPoint, null),
+                                        type = ""dimension_text_insertion_point""
+                                    };
+                                }
+                            }
+                        }
+                    }
+                    catch { /* Skip if InsertionPoint not available */ }
+
                     // FIX: Use reflection for dimension attributes (don't hardcode properties)
                     try
                     {
@@ -1614,6 +1659,48 @@ using (var writer = new System.IO.StreamWriter(outputPath, false, System.Text.En
                     }
 
                     partGeometry[""vertices""] = vertices;
+
+                    // ENHANCEMENT: Extract bounding box (AABB) data inspired by tekladrawingexamples.cs
+                    try
+                    {
+                        var minPointProp = solid.GetType().GetProperty(""MinimumPoint"");
+                        var maxPointProp = solid.GetType().GetProperty(""MaximumPoint"");
+
+                        if (minPointProp != null && maxPointProp != null)
+                        {
+                            var minPoint = minPointProp.GetValue(solid, null);
+                            var maxPoint = maxPointProp.GetValue(solid, null);
+
+                            if (minPoint != null && maxPoint != null)
+                            {
+                                var minX = minPoint.GetType().GetProperty(""X"");
+                                var minY = minPoint.GetType().GetProperty(""Y"");
+                                var minZ = minPoint.GetType().GetProperty(""Z"");
+                                var maxX = maxPoint.GetType().GetProperty(""X"");
+                                var maxY = maxPoint.GetType().GetProperty(""Y"");
+                                var maxZ = maxPoint.GetType().GetProperty(""Z"");
+
+                                if (minX != null && minY != null && minZ != null &&
+                                    maxX != null && maxY != null && maxZ != null)
+                                {
+                                    partGeometry[""bounding_box_aabb""] = new {
+                                        min = new {
+                                            x = minX.GetValue(minPoint, null),
+                                            y = minY.GetValue(minPoint, null),
+                                            z = minZ.GetValue(minPoint, null)
+                                        },
+                                        max = new {
+                                            x = maxX.GetValue(maxPoint, null),
+                                            y = maxY.GetValue(maxPoint, null),
+                                            z = maxZ.GetValue(maxPoint, null)
+                                        },
+                                        type = ""axis_aligned""
+                                    };
+                                }
+                            }
+                        }
+                    }
+                    catch { /* Skip bounding box if extraction fails */ }
 
                     // FIX: Get bolt/hole positions from Part children using Solids API
                     var holes = new System.Collections.Generic.List<object>();
