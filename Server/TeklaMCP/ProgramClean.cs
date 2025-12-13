@@ -1660,47 +1660,98 @@ using (var writer = new System.IO.StreamWriter(outputPath, false, System.Text.En
 
                     partGeometry[""vertices""] = vertices;
 
-                    // ENHANCEMENT: Extract bounding box (AABB) data inspired by tekladrawingexamples.cs
+                    // ENHANCEMENT: Extract bounding box from MODEL Part solid (tekladrawingexamples.cs:2059)
                     try
                     {
-                        var minPointProp = solid.GetType().GetProperty(""MinimumPoint"");
-                        var maxPointProp = solid.GetType().GetProperty(""MaximumPoint"");
-
-                        if (minPointProp != null && maxPointProp != null)
+                        var drawingPart = obj as Tekla.Structures.Drawing.Part;
+                        if (drawingPart != null && drawingPart.ModelIdentifier != null)
                         {
-                            var minPoint = minPointProp.GetValue(solid, null);
-                            var maxPoint = maxPointProp.GetValue(solid, null);
-
-                            if (minPoint != null && maxPoint != null)
+                            var teklaModel = new Tekla.Structures.Model.Model();
+                            var modelObj = teklaModel.SelectModelObject(drawingPart.ModelIdentifier);
+                            var modelPart = modelObj as Tekla.Structures.Model.Part;
+                            if (modelPart != null)
                             {
-                                var minX = minPoint.GetType().GetProperty(""X"");
-                                var minY = minPoint.GetType().GetProperty(""Y"");
-                                var minZ = minPoint.GetType().GetProperty(""Z"");
-                                var maxX = maxPoint.GetType().GetProperty(""X"");
-                                var maxY = maxPoint.GetType().GetProperty(""Y"");
-                                var maxZ = maxPoint.GetType().GetProperty(""Z"");
-
-                                if (minX != null && minY != null && minZ != null &&
-                                    maxX != null && maxY != null && maxZ != null)
+                                var modelSolid = modelPart.GetSolid();
+                                if (modelSolid != null)
                                 {
-                                    partGeometry[""bounding_box_aabb""] = new {
-                                        min = new {
-                                            x = minX.GetValue(minPoint, null),
-                                            y = minY.GetValue(minPoint, null),
-                                            z = minZ.GetValue(minPoint, null)
-                                        },
-                                        max = new {
-                                            x = maxX.GetValue(maxPoint, null),
-                                            y = maxY.GetValue(maxPoint, null),
-                                            z = maxZ.GetValue(maxPoint, null)
-                                        },
-                                        type = ""axis_aligned""
+                                    var minPt = modelSolid.MinimumPoint;
+                                    var maxPt = modelSolid.MaximumPoint;
+                                    partGeometry[""bounding_box_model""] = new {
+                                        min = new { x = minPt.X, y = minPt.Y, z = minPt.Z },
+                                        max = new { x = maxPt.X, y = maxPt.Y, z = maxPt.Z },
+                                        type = ""model_global_coordinates""
                                     };
+
+                                    // VERTICES from MODEL solid with duplicate removal
+                                    // Based on TeklaDrawingExamples.cs lines 814-903, 858-864
+                                    var modelVertices = new System.Collections.Generic.List<object>();
+                                    try
+                                    {
+                                        var uniqueVertices = new System.Collections.Generic.List<Tekla.Structures.Geometry3d.Point>();
+                                        int maxVertices = 500;  // Increased for complete geometry
+                                        double tolerance = 0.01;
+                                        int totalExtracted = 0;
+                                        int duplicatesRemoved = 0;
+
+                                        var faceList = modelSolid.GetFaceEnumerator();
+                                        while (faceList.MoveNext() && modelVertices.Count < maxVertices)
+                                        {
+                                            var face = faceList.Current as Tekla.Structures.Solid.Face;
+                                            if (face != null)
+                                            {
+                                                var loopList = face.GetLoopEnumerator();
+                                                while (loopList.MoveNext() && modelVertices.Count < maxVertices)
+                                                {
+                                                    var loop = loopList.Current as Tekla.Structures.Solid.Loop;
+                                                    if (loop != null)
+                                                    {
+                                                        var vertexList = loop.GetVertexEnumerator();
+                                                        while (vertexList.MoveNext() && modelVertices.Count < maxVertices)
+                                                        {
+                                                            totalExtracted++;
+                                                            var vertex = vertexList.Current as Tekla.Structures.Geometry3d.Point;
+                                                            if (vertex != null)
+                                                            {
+                                                                bool isDuplicate = false;
+                                                                foreach (var existing in uniqueVertices)
+                                                                {
+                                                                    if (System.Math.Abs(existing.X - vertex.X) < tolerance &&
+                                                                        System.Math.Abs(existing.Y - vertex.Y) < tolerance &&
+                                                                        System.Math.Abs(existing.Z - vertex.Z) < tolerance)
+                                                                    {
+                                                                        isDuplicate = true;
+                                                                        duplicatesRemoved++;
+                                                                        break;
+                                                                    }
+                                                                }
+                                                                if (!isDuplicate)
+                                                                {
+                                                                    uniqueVertices.Add(new Tekla.Structures.Geometry3d.Point(vertex.X, vertex.Y, vertex.Z));
+                                                                    modelVertices.Add(new {
+                                                                        x = System.Math.Round(vertex.X, 2),
+                                                                        y = System.Math.Round(vertex.Y, 2),
+                                                                        z = System.Math.Round(vertex.Z, 2)
+                                                                    });
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        partGeometry[""vertices_model""] = modelVertices;
+                                        partGeometry[""vertices_count""] = modelVertices.Count;
+                                        partGeometry[""vertices_duplicates_removed""] = duplicatesRemoved;
+                                    }
+                                    catch (Exception vertexEx)
+                                    {
+                                        partGeometry[""vertices_error""] = vertexEx.Message;
+                                    }
                                 }
                             }
                         }
                     }
-                    catch { /* Skip bounding box if extraction fails */ }
+                    catch (Exception ex) { partGeometry[""bbox_error""] = ex.Message; }
 
                     // FIX: Get bolt/hole positions from Part children using Solids API
                     var holes = new System.Collections.Generic.List<object>();
@@ -1965,7 +2016,7 @@ result = Newtonsoft.Json.JsonConvert.SerializeObject(metadata, jsonSettings);
                 return reader.ReadToEnd();
             }
         }
-        
+
         private static object GetPartInfo(Part part)
         {
             // Need to get report properties for Part data
