@@ -1241,12 +1241,12 @@ result = report.ToString();
         private static string GenerateFullExtractionCode(DrawingExtractionRequest request)
         {
             return @"
-// ENHANCED ML EXTRACTION: Drawing types, relationships, geometric context, coordinate systems
-// WSL COMPATIBILITY: Save to project directory instead of Windows temp (inaccessible from WSL)
+// PHASE 1 ML-OPTIMIZED EXTRACTION: View-centric with 2D/3D transformation matrices
+// WSL COMPATIBILITY: Save to project directory (WSL-accessible)
 var timestamp = System.DateTime.Now.ToString(""yyyyMMdd_HHmmss"");
-bool extractSolidVertices = " + request.ExtractSolidVertices.ToString().ToLower() + @";  // Control solid vertex extraction
+bool extractSolidVertices = " + request.ExtractSolidVertices.ToString().ToLower() + @";
 
-// Create extractions directory in current working directory (WSL-accessible)
+// Create extractions directory
 var currentDir = System.IO.Directory.GetCurrentDirectory();
 var extractionsDir = System.IO.Path.Combine(currentDir, ""extractions"");
 if (!System.IO.Directory.Exists(extractionsDir))
@@ -1254,8 +1254,8 @@ if (!System.IO.Directory.Exists(extractionsDir))
     System.IO.Directory.CreateDirectory(extractionsDir);
 }
 
-var outputPath = System.IO.Path.Combine(extractionsDir, ""tekla_extraction_"" + timestamp + "".jsonl"");
-System.Console.WriteLine(""📁 Enhanced ML extraction to: "" + outputPath);
+var outputPath = System.IO.Path.Combine(extractionsDir, ""tekla_extraction_ml_"" + timestamp + "".jsonl"");
+System.Console.WriteLine(""📁 ML-optimized extraction to: "" + outputPath);
 
 var startTime = System.DateTime.Now;
 var dh = new Tekla.Structures.Drawing.DrawingHandler();
@@ -1282,81 +1282,143 @@ using (var writer = new System.IO.StreamWriter(outputPath, false, System.Text.En
 
         var drawingData = new System.Collections.Generic.Dictionary<string, object>();
         drawingData[""mark""] = drawing.Mark;
-
-        // ENHANCEMENT 1: Drawing type classification (actual Tekla class)
         drawingData[""drawing_type""] = drawing.GetType().Name;
         drawingData[""drawing_type_full""] = drawing.GetType().FullName;
 
-        var allObjects = new System.Collections.Generic.List<object>();
+        // PHASE 1: Extract ALL views with transformation matrices
+        var viewsList = new System.Collections.Generic.List<object>();
+        var viewIdMap = new System.Collections.Generic.Dictionary<object, string>();  // View object → view_id
+        int viewIndex = 0;
 
-        // GetSheet() returns the ContainerView (sheet)
         var sheet = drawing.GetSheet();
         if (sheet == null) continue;
 
-        // Extract sheet/view transformation matrix for coordinate conversion
-        // FIX: ContainerView is NOT a View - use reflection to get coordinate system
-        var sheetTransform = new System.Collections.Generic.Dictionary<string, object>();
-        try
+        // Get all View objects from sheet
+        var allSheetObjects = sheet.GetAllObjects();
+        while (allSheetObjects.MoveNext())
         {
-            // Try to get DisplayCoordinateSystem property via reflection
-            var displayCSProp = sheet.GetType().GetProperty(""DisplayCoordinateSystem"");
-            if (displayCSProp != null)
+            var obj = allSheetObjects.Current;
+            if (obj == null) continue;
+
+            // Check if this is a View object
+            if (obj.GetType().Name == ""View"")
             {
-                var transform = displayCSProp.GetValue(sheet, null);
-                if (transform != null)
+                var view = obj as Tekla.Structures.Drawing.View;
+                if (view != null)
                 {
-                    var originProp = transform.GetType().GetProperty(""Origin"");
-                    var axisXProp = transform.GetType().GetProperty(""AxisX"");
-                    var axisYProp = transform.GetType().GetProperty(""AxisY"");
+                    var viewId = ""view_"" + viewIndex.ToString();
+                    viewIdMap[view] = viewId;
 
-                    if (originProp != null && axisXProp != null && axisYProp != null)
+                    var viewData = new System.Collections.Generic.Dictionary<string, object>();
+                    viewData[""view_id""] = viewId;
+                    viewData[""view_index""] = viewIndex;
+
+                    // Extract view properties
+                    try
                     {
-                        var origin = originProp.GetValue(transform, null);
-                        var axisX = axisXProp.GetValue(transform, null);
-                        var axisY = axisYProp.GetValue(transform, null);
+                        viewData[""name""] = view.Name != null ? view.Name : ""unnamed"";
+                        viewData[""view_type""] = view.ViewType.ToString();
 
-                        sheetTransform[""origin""] = new {
-                            x = origin.GetType().GetProperty(""X"").GetValue(origin, null),
-                            y = origin.GetType().GetProperty(""Y"").GetValue(origin, null),
-                            z = origin.GetType().GetProperty(""Z"").GetValue(origin, null)
+                        // CRITICAL: Extract ViewCoordinateSystem (3D transformation)
+                        var viewCS = view.ViewCoordinateSystem;
+                        if (viewCS != null)
+                        {
+                            var viewCSData = new System.Collections.Generic.Dictionary<string, object>();
+                            viewCSData[""origin""] = new {
+                                x = System.Math.Round(viewCS.Origin.X, 3),
+                                y = System.Math.Round(viewCS.Origin.Y, 3),
+                                z = System.Math.Round(viewCS.Origin.Z, 3)
+                            };
+                            viewCSData[""axis_x""] = new {
+                                x = System.Math.Round(viewCS.AxisX.X, 6),
+                                y = System.Math.Round(viewCS.AxisX.Y, 6),
+                                z = System.Math.Round(viewCS.AxisX.Z, 6)
+                            };
+                            viewCSData[""axis_y""] = new {
+                                x = System.Math.Round(viewCS.AxisY.X, 6),
+                                y = System.Math.Round(viewCS.AxisY.Y, 6),
+                                z = System.Math.Round(viewCS.AxisY.Z, 6)
+                            };
+
+                            // Compute normal vector (axis_z = axis_x × axis_y)
+                            var normalX = viewCS.AxisX.Y * viewCS.AxisY.Z - viewCS.AxisX.Z * viewCS.AxisY.Y;
+                            var normalY = viewCS.AxisX.Z * viewCS.AxisY.X - viewCS.AxisX.X * viewCS.AxisY.Z;
+                            var normalZ = viewCS.AxisX.X * viewCS.AxisY.Y - viewCS.AxisX.Y * viewCS.AxisY.X;
+                            viewCSData[""normal""] = new {
+                                x = System.Math.Round(normalX, 6),
+                                y = System.Math.Round(normalY, 6),
+                                z = System.Math.Round(normalZ, 6)
+                            };
+
+                            viewData[""coordinate_system_3d""] = viewCSData;
+                        }
+
+                        // CRITICAL: Extract DisplayCoordinateSystem (2D transformation)
+                        var displayCS = view.DisplayCoordinateSystem;
+                        if (displayCS != null)
+                        {
+                            viewData[""coordinate_system_2d""] = new {
+                                origin_x = System.Math.Round(displayCS.Origin.X, 3),
+                                origin_y = System.Math.Round(displayCS.Origin.Y, 3),
+                                origin_z = System.Math.Round(displayCS.Origin.Z, 3)
+                            };
+                        }
+
+                        // Extract view bounds
+                        viewData[""width""] = view.Width;
+                        viewData[""height""] = view.Height;
+                        viewData[""frame_origin""] = new {
+                            x = view.FrameOrigin.X,
+                            y = view.FrameOrigin.Y
                         };
-                        sheetTransform[""axis_x""] = new {
-                            x = axisX.GetType().GetProperty(""X"").GetValue(axisX, null),
-                            y = axisX.GetType().GetProperty(""Y"").GetValue(axisX, null),
-                            z = axisX.GetType().GetProperty(""Z"").GetValue(axisX, null)
-                        };
-                        sheetTransform[""axis_y""] = new {
-                            x = axisY.GetType().GetProperty(""X"").GetValue(axisY, null),
-                            y = axisY.GetType().GetProperty(""Y"").GetValue(axisY, null),
-                            z = axisY.GetType().GetProperty(""Z"").GetValue(axisY, null)
-                        };
+
                     }
+                    catch (Exception ex)
+                    {
+                        viewData[""extraction_error""] = ex.Message;
+                    }
+
+                    viewsList.Add(viewData);
+                    viewIndex++;
                 }
             }
         }
-        catch (Exception ex)
-        {
-            sheetTransform[""error""] = ex.Message;
-        }
-        drawingData[""sheet_coordinate_system""] = sheetTransform;
 
-        // Get all objects from the sheet
-        var objects = sheet.GetAllObjects();
-        while (objects.MoveNext())
+        drawingData[""views""] = viewsList;
+        drawingData[""view_count""] = viewsList.Count;
+
+        // Now extract all objects with parent view tracking
+        var allObjects = new System.Collections.Generic.List<object>();
+        var objectsEnum = sheet.GetAllObjects();
+        while (objectsEnum.MoveNext())
         {
-            var obj = objects.Current;
+            var obj = objectsEnum.Current;
             if (obj == null) continue;
+
+            // Skip View objects (already extracted)
+            if (obj.GetType().Name == ""View"") continue;
 
             var objData = new System.Collections.Generic.Dictionary<string, object>();
             objData[""type""] = obj.GetType().FullName;
             objData[""type_name""] = obj.GetType().Name;
 
-            // ENHANCEMENT: Get object ID and model linkage (inspired by tekladrawingexamples.cs)
+            // PHASE 1: Track parent view for this object
             try
             {
                 var drawingObj = obj as Tekla.Structures.Drawing.DrawingObject;
                 if (drawingObj != null)
                 {
+                    // Get parent view using GetView() method
+                    var getViewMethod = drawingObj.GetType().GetMethod(""GetView"");
+                    if (getViewMethod != null)
+                    {
+                        var parentView = getViewMethod.Invoke(drawingObj, new object[] { });
+                        if (parentView != null && viewIdMap.ContainsKey(parentView))
+                        {
+                            objData[""parent_view_id""] = viewIdMap[parentView];
+                        }
+                    }
+
                     // Get drawing object identifier
                     var identifier = drawingObj.GetType().GetProperty(""Identifier"");
                     if (identifier != null)
@@ -1368,8 +1430,7 @@ using (var writer = new System.IO.StreamWriter(outputPath, false, System.Text.En
                         }
                     }
 
-                    // ENHANCEMENT: Track ModelIdentifier for drawing objects linked to model objects
-                    // This establishes the drawing→model relationship for ML training
+                    // CRITICAL: Track ModelIdentifier for Parts (3D model linkage)
                     var modelIdentifierProp = drawingObj.GetType().GetProperty(""ModelIdentifier"");
                     if (modelIdentifierProp != null)
                     {
