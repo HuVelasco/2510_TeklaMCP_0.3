@@ -167,6 +167,7 @@ namespace TeklaMCP
         public string DrawingMark { get; set; }  // Null = process all drawings
         public int MaxDrawings { get; set; } = 10;
         public bool DiscoveryMode { get; set; } = true;
+        public bool ExtractSolidVertices { get; set; } = false;  // False = only extract part points (StartPoint, EndPoint, ContourPoints)
     }
 
     /// <summary>
@@ -1243,6 +1244,7 @@ result = report.ToString();
 // ENHANCED ML EXTRACTION: Drawing types, relationships, geometric context, coordinate systems
 // WSL COMPATIBILITY: Save to project directory instead of Windows temp (inaccessible from WSL)
 var timestamp = System.DateTime.Now.ToString(""yyyyMMdd_HHmmss"");
+bool extractSolidVertices = " + request.ExtractSolidVertices.ToString().ToLower() + @";  // Control solid vertex extraction
 
 // Create extractions directory in current working directory (WSL-accessible)
 var currentDir = System.IO.Directory.GetCurrentDirectory();
@@ -1671,6 +1673,73 @@ using (var writer = new System.IO.StreamWriter(outputPath, false, System.Text.En
                             var modelPart = modelObj as Tekla.Structures.Model.Part;
                             if (modelPart != null)
                             {
+                                // ENHANCEMENT: Extract part-specific points (StartPoint/EndPoint, ContourPoints)
+                                var partTypeName = modelPart.GetType().Name;
+                                partGeometry[""part_type_model""] = partTypeName;
+
+                                // For Beam: StartPoint and EndPoint
+                                var beam = modelPart as Tekla.Structures.Model.Beam;
+                                if (beam != null)
+                                {
+                                    partGeometry[""start_point""] = new {
+                                        x = System.Math.Round(beam.StartPoint.X, 2),
+                                        y = System.Math.Round(beam.StartPoint.Y, 2),
+                                        z = System.Math.Round(beam.StartPoint.Z, 2)
+                                    };
+                                    partGeometry[""end_point""] = new {
+                                        x = System.Math.Round(beam.EndPoint.X, 2),
+                                        y = System.Math.Round(beam.EndPoint.Y, 2),
+                                        z = System.Math.Round(beam.EndPoint.Z, 2)
+                                    };
+                                }
+
+                                // For ContourPlate and PolyBeam: Contour points
+                                var contourProp = modelPart.GetType().GetProperty(""Contour"");
+                                if (contourProp != null)
+                                {
+                                    var contour = contourProp.GetValue(modelPart, null);
+                                    if (contour != null)
+                                    {
+                                        var contourPointsProp = contour.GetType().GetProperty(""ContourPoints"");
+                                        if (contourPointsProp != null)
+                                        {
+                                            var contourPts = contourPointsProp.GetValue(contour, null) as System.Collections.IEnumerable;
+                                            if (contourPts != null)
+                                            {
+                                                var contourPointsList = new System.Collections.Generic.List<object>();
+                                                foreach (var pt in contourPts)
+                                                {
+                                                    if (pt != null)
+                                                    {
+                                                        var xProp = pt.GetType().GetProperty(""X"");
+                                                        var yProp = pt.GetType().GetProperty(""Y"");
+                                                        var zProp = pt.GetType().GetProperty(""Z"");
+                                                        if (xProp != null && yProp != null && zProp != null)
+                                                        {
+                                                            var x = xProp.GetValue(pt, null);
+                                                            var y = yProp.GetValue(pt, null);
+                                                            var z = zProp.GetValue(pt, null);
+                                                            if (x != null && y != null && z != null)
+                                                            {
+                                                                contourPointsList.Add(new {
+                                                                    x = System.Math.Round(System.Convert.ToDouble(x), 2),
+                                                                    y = System.Math.Round(System.Convert.ToDouble(y), 2),
+                                                                    z = System.Math.Round(System.Convert.ToDouble(z), 2)
+                                                                });
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                                if (contourPointsList.Count > 0)
+                                                {
+                                                    partGeometry[""contour_points""] = contourPointsList;
+                                                    partGeometry[""contour_points_count""] = contourPointsList.Count;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+
                                 var modelSolid = modelPart.GetSolid();
                                 if (modelSolid != null)
                                 {
@@ -1682,70 +1751,100 @@ using (var writer = new System.IO.StreamWriter(outputPath, false, System.Text.En
                                         type = ""model_global_coordinates""
                                     };
 
-                                    // VERTICES from MODEL solid with duplicate removal
+                                    // VERTICES from MODEL solid (INTELLIGENT EXTRACTION)
                                     // Based on TeklaDrawingExamples.cs lines 814-903, 858-864
-                                    var modelVertices = new System.Collections.Generic.List<object>();
-                                    try
-                                    {
-                                        var uniqueVertices = new System.Collections.Generic.List<Tekla.Structures.Geometry3d.Point>();
-                                        int maxVertices = 500;  // Increased for complete geometry
-                                        double tolerance = 0.01;
-                                        int totalExtracted = 0;
-                                        int duplicatesRemoved = 0;
+                                    //
+                                    // PART TYPE OPTIMIZATION:
+                                    // - Beam: ALWAYS skip (StartPoint/EndPoint + BBox sufficient)
+                                    // - BentPlate, SpiralBeam, PolyBeam: Complex curves, need vertices
+                                    // - ContourPlate, LoftedPlate: Complex surfaces, need vertices
+                                    // - Brep: Arbitrary solid, need vertices
 
-                                        var faceList = modelSolid.GetFaceEnumerator();
-                                        while (faceList.MoveNext() && modelVertices.Count < maxVertices)
+                                    bool shouldExtractVertices = extractSolidVertices;
+
+                                    // OPTIMIZATION: Skip vertex extraction for simple Beams
+                                    if (partTypeName == ""Beam"")
+                                    {
+                                        shouldExtractVertices = false;  // Always skip - StartPoint/EndPoint is sufficient
+                                    }
+
+                                    if (shouldExtractVertices)
+                                    {
+                                        var modelVertices = new System.Collections.Generic.List<object>();
+                                        try
                                         {
-                                            var face = faceList.Current as Tekla.Structures.Solid.Face;
-                                            if (face != null)
+                                            var uniqueVertices = new System.Collections.Generic.List<Tekla.Structures.Geometry3d.Point>();
+                                            int maxVertices = 500;  // Configurable limit
+                                            double tolerance = 0.01;
+                                            int totalExtracted = 0;
+                                            int duplicatesRemoved = 0;
+
+                                            var faceList = modelSolid.GetFaceEnumerator();
+                                            while (faceList.MoveNext() && modelVertices.Count < maxVertices)
                                             {
-                                                var loopList = face.GetLoopEnumerator();
-                                                while (loopList.MoveNext() && modelVertices.Count < maxVertices)
+                                                var face = faceList.Current as Tekla.Structures.Solid.Face;
+                                                if (face != null)
                                                 {
-                                                    var loop = loopList.Current as Tekla.Structures.Solid.Loop;
-                                                    if (loop != null)
+                                                    var loopList = face.GetLoopEnumerator();
+                                                    while (loopList.MoveNext() && modelVertices.Count < maxVertices)
                                                     {
-                                                        var vertexList = loop.GetVertexEnumerator();
-                                                        while (vertexList.MoveNext() && modelVertices.Count < maxVertices)
+                                                        var loop = loopList.Current as Tekla.Structures.Solid.Loop;
+                                                        if (loop != null)
                                                         {
-                                                            totalExtracted++;
-                                                            var vertex = vertexList.Current as Tekla.Structures.Geometry3d.Point;
-                                                            if (vertex != null)
+                                                            var vertexList = loop.GetVertexEnumerator();
+                                                            while (vertexList.MoveNext() && modelVertices.Count < maxVertices)
                                                             {
-                                                                bool isDuplicate = false;
-                                                                foreach (var existing in uniqueVertices)
+                                                                totalExtracted++;
+                                                                var vertex = vertexList.Current as Tekla.Structures.Geometry3d.Point;
+                                                                if (vertex != null)
                                                                 {
-                                                                    if (System.Math.Abs(existing.X - vertex.X) < tolerance &&
-                                                                        System.Math.Abs(existing.Y - vertex.Y) < tolerance &&
-                                                                        System.Math.Abs(existing.Z - vertex.Z) < tolerance)
+                                                                    bool isDuplicate = false;
+                                                                    foreach (var existing in uniqueVertices)
                                                                     {
-                                                                        isDuplicate = true;
-                                                                        duplicatesRemoved++;
-                                                                        break;
+                                                                        if (System.Math.Abs(existing.X - vertex.X) < tolerance &&
+                                                                            System.Math.Abs(existing.Y - vertex.Y) < tolerance &&
+                                                                            System.Math.Abs(existing.Z - vertex.Z) < tolerance)
+                                                                        {
+                                                                            isDuplicate = true;
+                                                                            duplicatesRemoved++;
+                                                                            break;
+                                                                        }
                                                                     }
-                                                                }
-                                                                if (!isDuplicate)
-                                                                {
-                                                                    uniqueVertices.Add(new Tekla.Structures.Geometry3d.Point(vertex.X, vertex.Y, vertex.Z));
-                                                                    modelVertices.Add(new {
-                                                                        x = System.Math.Round(vertex.X, 2),
-                                                                        y = System.Math.Round(vertex.Y, 2),
-                                                                        z = System.Math.Round(vertex.Z, 2)
-                                                                    });
+                                                                    if (!isDuplicate)
+                                                                    {
+                                                                        uniqueVertices.Add(new Tekla.Structures.Geometry3d.Point(vertex.X, vertex.Y, vertex.Z));
+                                                                        modelVertices.Add(new {
+                                                                            x = System.Math.Round(vertex.X, 2),
+                                                                            y = System.Math.Round(vertex.Y, 2),
+                                                                            z = System.Math.Round(vertex.Z, 2)
+                                                                        });
+                                                                    }
                                                                 }
                                                             }
                                                         }
                                                     }
                                                 }
                                             }
+                                            partGeometry[""vertices_model""] = modelVertices;
+                                            partGeometry[""vertices_count""] = modelVertices.Count;
+                                            partGeometry[""vertices_duplicates_removed""] = duplicatesRemoved;
                                         }
-                                        partGeometry[""vertices_model""] = modelVertices;
-                                        partGeometry[""vertices_count""] = modelVertices.Count;
-                                        partGeometry[""vertices_duplicates_removed""] = duplicatesRemoved;
+                                        catch (Exception vertexEx)
+                                        {
+                                            partGeometry[""vertices_error""] = vertexEx.Message;
+                                        }
                                     }
-                                    catch (Exception vertexEx)
+                                    else
                                     {
-                                        partGeometry[""vertices_error""] = vertexEx.Message;
+                                        partGeometry[""vertices_model""] = ""disabled"";
+                                        if (partTypeName == ""Beam"")
+                                        {
+                                            partGeometry[""vertices_note""] = ""Skipped for Beam - use start_point and end_point instead (sufficient for simple beams)"";
+                                        }
+                                        else
+                                        {
+                                            partGeometry[""vertices_note""] = ""Disabled by parameter - use part_type_model, start_point, end_point, contour_points, or set extract_solid_vertices=true"";
+                                        }
                                     }
                                 }
                             }

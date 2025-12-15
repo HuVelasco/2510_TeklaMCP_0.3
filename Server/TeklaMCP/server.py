@@ -1132,7 +1132,8 @@ async def tekla_apply_approved_changes(
 async def tekla_extract_drawing_objects(
     drawing_mark: str = None,
     max_drawings: int = 10,
-    discovery_mode: bool = True
+    discovery_mode: bool = True,
+    extract_solid_vertices: bool = False
 ) -> str:
     """Extract drawing objects from Tekla drawings for ML dataset generation
 
@@ -1160,6 +1161,10 @@ async def tekla_extract_drawing_objects(
     - drawing_mark: Optional specific drawing mark (default: None = process all)
     - max_drawings: Maximum number of drawings to process (default: 10)
     - discovery_mode: True for discovery, False for full extraction (default: True)
+    - extract_solid_vertices: Extract full solid vertices (default: False)
+      * False: Extract only part points (Beam StartPoint/EndPoint, ContourPoints) + BBox
+      * True: Extract full solid vertices (up to 500 per part) with duplicate removal
+      * Recommendation: False for straight beams, True for complex parts with cuts
 
     **WORKFLOW:**
     1. Start with discovery_mode=True to see what object types exist
@@ -1174,7 +1179,8 @@ async def tekla_extract_drawing_objects(
         extraction_request = {
             "DrawingMark": drawing_mark,
             "MaxDrawings": max_drawings,
-            "DiscoveryMode": discovery_mode
+            "DiscoveryMode": discovery_mode,
+            "ExtractSolidVertices": extract_solid_vertices
         }
 
         result = await call_endpoint("extract-drawing-objects", "POST", extraction_request)
