@@ -1287,7 +1287,7 @@ using (var writer = new System.IO.StreamWriter(outputPath, false, System.Text.En
 
         // PHASE 1: Extract ALL views with transformation matrices
         var viewsList = new System.Collections.Generic.List<object>();
-        var viewIdMap = new System.Collections.Generic.Dictionary<object, string>();  // View object → view_id
+        var viewObjectMap = new System.Collections.Generic.List<object>();  // Store view objects for lookup
         int viewIndex = 0;
 
         var sheet = drawing.GetSheet();
@@ -1307,7 +1307,9 @@ using (var writer = new System.IO.StreamWriter(outputPath, false, System.Text.En
                 if (view != null)
                 {
                     var viewId = ""view_"" + viewIndex.ToString();
-                    viewIdMap[view] = viewId;
+
+                    // Store view object for later lookup
+                    viewObjectMap.Add(view);
 
                     var viewData = new System.Collections.Generic.Dictionary<string, object>();
                     viewData[""view_id""] = viewId;
@@ -1403,27 +1405,50 @@ using (var writer = new System.IO.StreamWriter(outputPath, false, System.Text.En
             objData[""type_name""] = obj.GetType().Name;
 
             // PHASE 1: Track parent view for this object
+            var debugInfo = new System.Collections.Generic.List<string>();
             try
             {
-                var drawingObj = obj as Tekla.Structures.Drawing.DrawingObject;
-                if (drawingObj != null)
+                var objDrawing = obj as Tekla.Structures.Drawing.DrawingObject;
+                if (objDrawing != null)
                 {
+                    debugInfo.Add(""is_drawing_obj"");
+
                     // Get parent view using GetView() method
-                    var getViewMethod = drawingObj.GetType().GetMethod(""GetView"");
+                    var getViewMethod = objDrawing.GetType().GetMethod(""GetView"");
                     if (getViewMethod != null)
                     {
-                        var parentView = getViewMethod.Invoke(drawingObj, new object[] { });
-                        if (parentView != null && viewIdMap.ContainsKey(parentView))
+                        debugInfo.Add(""has_getview_method"");
+                        var parentView = getViewMethod.Invoke(objDrawing, new object[] { });
+                        if (parentView != null)
                         {
-                            objData[""parent_view_id""] = viewIdMap[parentView];
+                            debugInfo.Add(""getview_returned_not_null"");
+
+                            // Try using ReferenceEquals for object comparison
+                            for (int i = 0; i < viewObjectMap.Count; i++)
+                            {
+                                if (System.Object.ReferenceEquals(viewObjectMap[i], parentView))
+                                {
+                                    objData[""parent_view_id""] = ""view_"" + i.ToString();
+                                    debugInfo.Add(""found_match_at_"" + i.ToString());
+                                    break;
+                                }
+                            }
                         }
+                        else
+                        {
+                            debugInfo.Add(""getview_returned_null"");
+                        }
+                    }
+                    else
+                    {
+                        debugInfo.Add(""no_getview_method"");
                     }
 
                     // Get drawing object identifier
-                    var identifier = drawingObj.GetType().GetProperty(""Identifier"");
+                    var identifier = objDrawing.GetType().GetProperty(""Identifier"");
                     if (identifier != null)
                     {
-                        var id = identifier.GetValue(drawingObj, null);
+                        var id = identifier.GetValue(objDrawing, null);
                         if (id != null)
                         {
                             objData[""object_id""] = id.ToString();
@@ -1431,10 +1456,10 @@ using (var writer = new System.IO.StreamWriter(outputPath, false, System.Text.En
                     }
 
                     // CRITICAL: Track ModelIdentifier for Parts (3D model linkage)
-                    var modelIdentifierProp = drawingObj.GetType().GetProperty(""ModelIdentifier"");
+                    var modelIdentifierProp = objDrawing.GetType().GetProperty(""ModelIdentifier"");
                     if (modelIdentifierProp != null)
                     {
-                        var modelId = modelIdentifierProp.GetValue(drawingObj, null);
+                        var modelId = modelIdentifierProp.GetValue(objDrawing, null);
                         if (modelId != null)
                         {
                             objData[""model_object_id""] = modelId.ToString();
@@ -1446,8 +1471,21 @@ using (var writer = new System.IO.StreamWriter(outputPath, false, System.Text.En
                         }
                     }
                 }
+                else
+                {
+                    debugInfo.Add(""not_drawing_obj"");
+                }
             }
-            catch { }
+            catch (Exception ex)
+            {
+                debugInfo.Add(""exception:"" + ex.Message);
+            }
+
+            // Add debug info for first few objects
+            if (totalObjects < 5)
+            {
+                objData[""debug_view_tracking""] = string.Join("","", debugInfo.ToArray());
+            }
 
             // ENHANCEMENT 2 - LAYER 1: Explicit relationships via GetRelatedObjects
             var relatedObjects = new System.Collections.Generic.List<string>();
