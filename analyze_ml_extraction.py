@@ -5,7 +5,7 @@ Analyze ML-Optimized Extraction with View Transformations
 import json
 
 # Read JSONL file with BOM handling
-extraction_file = "Server/TeklaMCP/extractions/tekla_extraction_ml_20251215_131107.jsonl"
+extraction_file = "Server/TeklaMCP/extractions/tekla_extraction_ml_20251215_134606.jsonl"
 
 with open(extraction_file, 'r', encoding='utf-8-sig') as f:
     line = f.readline()

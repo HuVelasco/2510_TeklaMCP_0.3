@@ -1,0 +1,22 @@
+{
+  "parsing": {
+    "parts_count": 0,
+    "dimensions_count": 147
+  },
+  "solving": {
+    "status": "Optimal",
+    "solved_parts": 0,
+    "total_parts": 0
+  },
+  "validation": {
+    "errors": [],
+    "avg_error_mm": 0.0,
+    "max_error_mm": 0.0,
+    "validated_parts": 0
+  },
+  "missing_dimensions": {
+    "required": -3,
+    "provided": 147,
+    "missing": 0
+  }
+}

@@ -36,7 +36,9 @@
       "mcp__tekla__tekla_extract_drawing_objects",
       "Bash(cat:*)",
       "Bash(wc:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(tasklist:*)",
+      "Bash(pip install:*)"
     ],
     "deny": [],
     "ask": []

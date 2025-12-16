@@ -1,0 +1,37 @@
+// CORRECT APPROACH: Get bounding box from MODEL Part (like line 2059 in examples)
+// Replace lines 1662-1704 with this:
+
+// ENHANCEMENT: Extract bounding box from MODEL object solid (tekladrawingexamples.cs:2059)
+try
+{
+    // Get the model object using ModelIdentifier
+    var drawingPart = obj as Tekla.Structures.Drawing.Part;
+    if (drawingPart != null && drawingPart.ModelIdentifier != null)
+    {
+        var model = new Tekla.Structures.Model.Model();
+        var modelObj = model.SelectModelObject(drawingPart.ModelIdentifier);
+        var modelPart = modelObj as Tekla.Structures.Model.Part;
+
+        if (modelPart != null)
+        {
+            var solid = modelPart.GetSolid();
+            if (solid != null)
+            {
+                // Get AABB from model solid (this is in GLOBAL model coordinates)
+                var minPt = solid.MinimumPoint;
+                var maxPt = solid.MaximumPoint;
+
+                partGeometry[""bounding_box_model""] = new {
+                    min = new { x = minPt.X, y = minPt.Y, z = minPt.Z },
+                    max = new { x = maxPt.X, y = maxPt.Y, z = maxPt.Z },
+                    type = ""model_global_coordinates"",
+                    note = ""Use view transformation matrix to convert to drawing local coordinates""
+                };
+            }
+        }
+    }
+}
+catch (Exception ex)
+{
+    partGeometry[""bbox_model_error""] = ex.Message;
+}
