@@ -721,7 +721,8 @@
         "ModelIdentifier": "773641573",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -763,7 +764,8 @@
         "ModelIdentifier": "773481986",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -805,7 +807,8 @@
         "ModelIdentifier": "773474024",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -847,7 +850,8 @@
         "ModelIdentifier": "773448963",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -889,7 +893,8 @@
         "ModelIdentifier": "773447707",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.LeaderLine",
@@ -1023,7 +1028,8 @@
         "ModelIdentifier": "773641573",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -1065,7 +1071,8 @@
         "ModelIdentifier": "773481986",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -1107,7 +1114,8 @@
         "ModelIdentifier": "773474024",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -1152,7 +1160,8 @@
         "ModelIdentifier": "773448963",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -1194,7 +1203,8 @@
         "ModelIdentifier": "773447707",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.LeaderLine",
@@ -1486,7 +1496,8 @@
         "ModelIdentifier": "773641573",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -1538,7 +1549,8 @@
         "ModelIdentifier": "773481986",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -1580,7 +1592,8 @@
         "ModelIdentifier": "773474024",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -1622,7 +1635,8 @@
         "ModelIdentifier": "773448963",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.LeaderLine",
@@ -2006,7 +2020,8 @@
         "ModelIdentifier": "773641573",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.LeaderLine",
@@ -2292,7 +2307,8 @@
         "ModelIdentifier": "773641573",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -2334,7 +2350,8 @@
         "ModelIdentifier": "773481986",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -2388,7 +2405,8 @@
         "ModelIdentifier": "773474024",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -2443,7 +2461,8 @@
         "ModelIdentifier": "773448963",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -2485,7 +2504,8 @@
         "ModelIdentifier": "773447707",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.LeaderLine",
@@ -2541,7 +2561,8 @@
         "ModelIdentifier": "773641573",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -2583,7 +2604,8 @@
         "ModelIdentifier": "773481986",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -2625,7 +2647,8 @@
         "ModelIdentifier": "773474024",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -2667,7 +2690,8 @@
         "ModelIdentifier": "773448963",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.LeaderLine",
@@ -2863,7 +2887,8 @@
         "ModelIdentifier": "773641573",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -2905,7 +2930,8 @@
         "ModelIdentifier": "773481986",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -2950,7 +2976,8 @@
         "ModelIdentifier": "773474024",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -2992,7 +3019,8 @@
         "ModelIdentifier": "773448963",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -3034,7 +3062,8 @@
         "ModelIdentifier": "773447707",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.LeaderLine",
@@ -3093,7 +3122,8 @@
         "ModelIdentifier": "773641573",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -3135,7 +3165,8 @@
         "ModelIdentifier": "773481986",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -3177,7 +3208,8 @@
         "ModelIdentifier": "773474024",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -3219,7 +3251,8 @@
         "ModelIdentifier": "773448963",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.LeaderLine",
@@ -3379,7 +3412,8 @@
         "ModelIdentifier": "773641573",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -3421,7 +3455,8 @@
         "ModelIdentifier": "773481986",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -3463,7 +3498,8 @@
         "ModelIdentifier": "773474024",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.LeaderLine",
@@ -3539,7 +3575,8 @@
         "ModelIdentifier": "773448963",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.LeaderLine",
@@ -3675,7 +3712,8 @@
         "ModelIdentifier": "773641573",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -3717,7 +3755,8 @@
         "ModelIdentifier": "773481986",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -3759,7 +3798,8 @@
         "ModelIdentifier": "773474024",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -3801,7 +3841,8 @@
         "ModelIdentifier": "773448963",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.LeaderLine",
@@ -3877,7 +3918,8 @@
         "ModelIdentifier": "773447707",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.LeaderLine",
@@ -3947,7 +3989,8 @@
         "ModelIdentifier": "773447707",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.LeaderLine",
@@ -4110,7 +4153,8 @@
         "ModelIdentifier": "773641573",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -4152,7 +4196,8 @@
         "ModelIdentifier": "773481986",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -4194,7 +4239,8 @@
         "ModelIdentifier": "773474024",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -4244,7 +4290,8 @@
         "ModelIdentifier": "773448963",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -4289,7 +4336,8 @@
         "ModelIdentifier": "773447707",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -4331,7 +4379,8 @@
         "ModelIdentifier": "773498812",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -4373,7 +4422,8 @@
         "ModelIdentifier": "771773296",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -4415,7 +4465,8 @@
         "ModelIdentifier": "771773055",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -4457,7 +4508,8 @@
         "ModelIdentifier": "771773399",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -4499,7 +4551,8 @@
         "ModelIdentifier": "771773160",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -4541,7 +4594,8 @@
         "ModelIdentifier": "771773502",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -4583,7 +4637,8 @@
         "ModelIdentifier": "771773265",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -4625,7 +4680,8 @@
         "ModelIdentifier": "771773605",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -4667,7 +4723,8 @@
         "ModelIdentifier": "771773368",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -4709,7 +4766,8 @@
         "ModelIdentifier": "771773708",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -4761,7 +4819,8 @@
         "ModelIdentifier": "771773086",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -4803,7 +4862,8 @@
         "ModelIdentifier": "771773677",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -4845,7 +4905,8 @@
         "ModelIdentifier": "771773945",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -4892,7 +4953,8 @@
         "ModelIdentifier": "771773976",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -4934,7 +4996,8 @@
         "ModelIdentifier": "771773574",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -4976,7 +5039,8 @@
         "ModelIdentifier": "771773191",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -5021,7 +5085,8 @@
         "ModelIdentifier": "771772981",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -5063,7 +5128,8 @@
         "ModelIdentifier": "771772950",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -5105,7 +5171,8 @@
         "ModelIdentifier": "774510345",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -5147,7 +5214,8 @@
         "ModelIdentifier": "774510300",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -5189,7 +5257,8 @@
         "ModelIdentifier": "771772819",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -5461,7 +5530,8 @@
         "ModelIdentifier": "771772919",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -5538,7 +5608,8 @@
         "ModelIdentifier": "771773914",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -5612,7 +5683,8 @@
         "ModelIdentifier": "771773811",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -5659,7 +5731,8 @@
         "ModelIdentifier": "771773883",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -5733,7 +5806,8 @@
         "ModelIdentifier": "771773471",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -5780,7 +5854,8 @@
         "ModelIdentifier": "771773780",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -5822,7 +5897,8 @@
         "ModelIdentifier": "773968253",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Text",
@@ -6641,7 +6717,8 @@
         "ModelIdentifier": "773498812",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -6683,7 +6760,8 @@
         "ModelIdentifier": "773447707",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Mark",
@@ -6796,7 +6874,8 @@
         "ModelIdentifier": "771772919",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -7030,7 +7109,8 @@
         "ModelIdentifier": "771772819",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -7072,7 +7152,8 @@
         "ModelIdentifier": "774510300",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -7114,7 +7195,8 @@
         "ModelIdentifier": "774510345",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -7156,7 +7238,8 @@
         "ModelIdentifier": "771772950",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -7198,7 +7281,8 @@
         "ModelIdentifier": "771772981",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Mark",
@@ -7279,7 +7363,8 @@
         "ModelIdentifier": "771773191",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -7321,7 +7406,8 @@
         "ModelIdentifier": "771773574",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -7363,7 +7449,8 @@
         "ModelIdentifier": "771773976",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -7405,7 +7492,8 @@
         "ModelIdentifier": "771773945",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -7447,7 +7535,8 @@
         "ModelIdentifier": "771773677",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -7489,7 +7578,8 @@
         "ModelIdentifier": "771773086",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -7531,7 +7621,8 @@
         "ModelIdentifier": "771773708",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -7573,7 +7664,8 @@
         "ModelIdentifier": "771773368",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -7615,7 +7707,8 @@
         "ModelIdentifier": "771773605",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -7657,7 +7750,8 @@
         "ModelIdentifier": "771773265",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -7699,7 +7793,8 @@
         "ModelIdentifier": "771773502",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -7741,7 +7836,8 @@
         "ModelIdentifier": "771773160",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -7783,7 +7879,8 @@
         "ModelIdentifier": "771773399",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -7825,7 +7922,8 @@
         "ModelIdentifier": "771773055",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -7867,7 +7965,8 @@
         "ModelIdentifier": "771773296",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Mark",
@@ -7948,7 +8047,8 @@
         "ModelIdentifier": "771773914",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -8022,7 +8122,8 @@
         "ModelIdentifier": "771773811",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -8064,7 +8165,8 @@
         "ModelIdentifier": "771773883",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -8138,7 +8240,8 @@
         "ModelIdentifier": "771773471",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -8180,7 +8283,8 @@
         "ModelIdentifier": "771773780",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -8222,7 +8326,8 @@
         "ModelIdentifier": "773968253",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -8264,7 +8369,8 @@
         "ModelIdentifier": "773498812",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -8338,7 +8444,8 @@
         "ModelIdentifier": "771772919",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -8586,7 +8693,8 @@
         "ModelIdentifier": "771772819",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -8628,7 +8736,8 @@
         "ModelIdentifier": "774510300",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -8670,7 +8779,8 @@
         "ModelIdentifier": "774510345",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -8712,7 +8822,8 @@
         "ModelIdentifier": "771772950",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -8754,7 +8865,8 @@
         "ModelIdentifier": "771772981",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -8796,7 +8908,8 @@
         "ModelIdentifier": "771773191",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -8838,7 +8951,8 @@
         "ModelIdentifier": "771773574",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -8880,7 +8994,8 @@
         "ModelIdentifier": "771773976",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -8922,7 +9037,8 @@
         "ModelIdentifier": "771773945",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -8964,7 +9080,8 @@
         "ModelIdentifier": "771773677",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -9006,7 +9123,8 @@
         "ModelIdentifier": "771773086",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -9048,7 +9166,8 @@
         "ModelIdentifier": "771773708",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -9090,7 +9209,8 @@
         "ModelIdentifier": "771773368",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -9132,7 +9252,8 @@
         "ModelIdentifier": "771773605",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -9174,7 +9295,8 @@
         "ModelIdentifier": "771773265",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -9216,7 +9338,8 @@
         "ModelIdentifier": "771773502",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -9258,7 +9381,8 @@
         "ModelIdentifier": "771773160",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -9300,7 +9424,8 @@
         "ModelIdentifier": "771773399",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -9342,7 +9467,8 @@
         "ModelIdentifier": "771773055",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.LeaderLine",
@@ -9398,7 +9524,8 @@
         "ModelIdentifier": "771773296",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -9440,7 +9567,8 @@
         "ModelIdentifier": "771773914",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -9514,7 +9642,8 @@
         "ModelIdentifier": "771773811",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -9556,7 +9685,8 @@
         "ModelIdentifier": "771773883",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.LeaderLine",
@@ -9644,7 +9774,8 @@
         "ModelIdentifier": "771773471",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -9686,7 +9817,8 @@
         "ModelIdentifier": "771773780",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -9728,7 +9860,8 @@
         "ModelIdentifier": "773968253",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.WeldMark",
@@ -9803,7 +9936,8 @@
         "ModelIdentifier": "773447707",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.LeaderLine",
@@ -9859,7 +9993,8 @@
         "ModelIdentifier": "773498812",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Connection",
@@ -9983,7 +10118,8 @@
         "ModelIdentifier": "771772919",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -10217,7 +10353,8 @@
         "ModelIdentifier": "771772819",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -10259,7 +10396,8 @@
         "ModelIdentifier": "774510300",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -10301,7 +10439,8 @@
         "ModelIdentifier": "774510345",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Mark",
@@ -10382,7 +10521,8 @@
         "ModelIdentifier": "771772950",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Mark",
@@ -10463,7 +10603,8 @@
         "ModelIdentifier": "771772981",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -10505,7 +10646,8 @@
         "ModelIdentifier": "771773191",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -10547,7 +10689,8 @@
         "ModelIdentifier": "771773574",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -10589,7 +10732,8 @@
         "ModelIdentifier": "771773976",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -10631,7 +10775,8 @@
         "ModelIdentifier": "771773945",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -10673,7 +10818,8 @@
         "ModelIdentifier": "771773677",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -10715,7 +10861,8 @@
         "ModelIdentifier": "771773086",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -10757,7 +10904,8 @@
         "ModelIdentifier": "771773708",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -10799,7 +10947,8 @@
         "ModelIdentifier": "771773368",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -10841,7 +10990,8 @@
         "ModelIdentifier": "771773605",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -10883,7 +11033,8 @@
         "ModelIdentifier": "771773265",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -10925,7 +11076,8 @@
         "ModelIdentifier": "771773502",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -10967,7 +11119,8 @@
         "ModelIdentifier": "771773160",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -11009,7 +11162,8 @@
         "ModelIdentifier": "771773399",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -11051,7 +11205,8 @@
         "ModelIdentifier": "771773055",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -11093,7 +11248,8 @@
         "ModelIdentifier": "771773296",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -11135,7 +11291,8 @@
         "ModelIdentifier": "771773914",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -11209,7 +11366,8 @@
         "ModelIdentifier": "771773811",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -11251,7 +11409,8 @@
         "ModelIdentifier": "771773883",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -11325,7 +11484,8 @@
         "ModelIdentifier": "771773471",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -11367,7 +11527,8 @@
         "ModelIdentifier": "771773780",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -11409,7 +11570,8 @@
         "ModelIdentifier": "773968253",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.WeldMark",
@@ -11484,7 +11646,8 @@
         "ModelIdentifier": "773498812",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -11526,7 +11689,8 @@
         "ModelIdentifier": "773447707",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -11600,7 +11764,8 @@
         "ModelIdentifier": "771772919",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -11834,7 +11999,8 @@
         "ModelIdentifier": "771772819",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -11876,7 +12042,8 @@
         "ModelIdentifier": "774510300",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -11918,7 +12085,8 @@
         "ModelIdentifier": "774510345",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -11960,7 +12128,8 @@
         "ModelIdentifier": "771772950",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -12002,7 +12171,8 @@
         "ModelIdentifier": "771772981",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -12044,7 +12214,8 @@
         "ModelIdentifier": "771773191",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -12086,7 +12257,8 @@
         "ModelIdentifier": "771773574",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -12128,7 +12300,8 @@
         "ModelIdentifier": "771773976",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -12170,7 +12343,8 @@
         "ModelIdentifier": "771773945",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -12212,7 +12386,8 @@
         "ModelIdentifier": "771773677",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -12254,7 +12429,8 @@
         "ModelIdentifier": "771773086",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -12296,7 +12472,8 @@
         "ModelIdentifier": "771773708",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -12338,7 +12515,8 @@
         "ModelIdentifier": "771773368",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -12380,7 +12558,8 @@
         "ModelIdentifier": "771773605",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -12422,7 +12601,8 @@
         "ModelIdentifier": "771773265",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -12464,7 +12644,8 @@
         "ModelIdentifier": "771773502",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -12506,7 +12687,8 @@
         "ModelIdentifier": "771773160",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -12548,7 +12730,8 @@
         "ModelIdentifier": "771773399",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.LeaderLine",
@@ -12604,7 +12787,8 @@
         "ModelIdentifier": "771773055",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -12646,7 +12830,8 @@
         "ModelIdentifier": "771773296",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -12688,7 +12873,8 @@
         "ModelIdentifier": "771773914",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -12762,7 +12948,8 @@
         "ModelIdentifier": "771773811",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -12804,7 +12991,8 @@
         "ModelIdentifier": "771773883",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.LeaderLine",
@@ -12892,7 +13080,8 @@
         "ModelIdentifier": "771773471",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -12934,7 +13123,8 @@
         "ModelIdentifier": "771773780",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -12976,7 +13166,8 @@
         "ModelIdentifier": "773968253",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.WeldMark",
@@ -13084,7 +13275,8 @@
         "ModelIdentifier": "773498812",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Connection",
@@ -13156,7 +13348,8 @@
         "ModelIdentifier": "771773780",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -13206,7 +13399,8 @@
         "ModelIdentifier": "771773471",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Mark",
@@ -13336,7 +13530,8 @@
         "ModelIdentifier": "771773883",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -13386,7 +13581,8 @@
         "ModelIdentifier": "771773811",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Mark",
@@ -13516,7 +13712,8 @@
         "ModelIdentifier": "771773914",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -13562,7 +13759,8 @@
         "ModelIdentifier": "771773296",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Mark",
@@ -13659,7 +13857,8 @@
         "ModelIdentifier": "771773055",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -13709,7 +13908,8 @@
         "ModelIdentifier": "771773399",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -13759,7 +13959,8 @@
         "ModelIdentifier": "771773160",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -13809,7 +14010,8 @@
         "ModelIdentifier": "771773502",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -13859,7 +14061,8 @@
         "ModelIdentifier": "771773265",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -13909,7 +14112,8 @@
         "ModelIdentifier": "771773605",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -13959,7 +14163,8 @@
         "ModelIdentifier": "771773368",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -14009,7 +14214,8 @@
         "ModelIdentifier": "771773708",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -14059,7 +14265,8 @@
         "ModelIdentifier": "771773086",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -14109,7 +14316,8 @@
         "ModelIdentifier": "771773677",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -14159,7 +14367,8 @@
         "ModelIdentifier": "771773945",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -14209,7 +14418,8 @@
         "ModelIdentifier": "771773976",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -14259,7 +14469,8 @@
         "ModelIdentifier": "771773574",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -14324,7 +14535,8 @@
         "ModelIdentifier": "771773191",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Mark",
@@ -14433,7 +14645,8 @@
         "ModelIdentifier": "771772981",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Mark",
@@ -14520,7 +14733,8 @@
         "ModelIdentifier": "771772950",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Mark",
@@ -14607,7 +14821,8 @@
         "ModelIdentifier": "774510345",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -14657,7 +14872,8 @@
         "ModelIdentifier": "774510300",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -14762,7 +14978,8 @@
         "ModelIdentifier": "771772819",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -15162,7 +15379,8 @@
         "ModelIdentifier": "771772919",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Mark",
@@ -15318,7 +15536,8 @@
         "ModelIdentifier": "773968253",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Text",
@@ -15388,7 +15607,8 @@
         "ModelIdentifier": "773474024",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -15430,7 +15650,8 @@
         "ModelIdentifier": "773481986",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.StraightDimensionSet",
@@ -15530,7 +15751,8 @@
         "ModelIdentifier": "773448963",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.StraightDimensionSet",
@@ -17211,7 +17433,8 @@
         "ModelIdentifier": "773447707",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.StraightDimensionSet",
@@ -18649,7 +18872,8 @@
         "ModelIdentifier": "773498812",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -18691,7 +18915,8 @@
         "ModelIdentifier": "771773780",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -18733,7 +18958,8 @@
         "ModelIdentifier": "771773471",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -18807,7 +19033,8 @@
         "ModelIdentifier": "771773883",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -18849,7 +19076,8 @@
         "ModelIdentifier": "771773811",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -18923,7 +19151,8 @@
         "ModelIdentifier": "771773914",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -18965,7 +19194,8 @@
         "ModelIdentifier": "771773296",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -19007,7 +19237,8 @@
         "ModelIdentifier": "771773055",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -19049,7 +19280,8 @@
         "ModelIdentifier": "771773399",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -19091,7 +19323,8 @@
         "ModelIdentifier": "771773160",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -19133,7 +19366,8 @@
         "ModelIdentifier": "771773502",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -19175,7 +19409,8 @@
         "ModelIdentifier": "771773265",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -19217,7 +19452,8 @@
         "ModelIdentifier": "771773605",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -19259,7 +19495,8 @@
         "ModelIdentifier": "771773368",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -19301,7 +19538,8 @@
         "ModelIdentifier": "771773708",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -19343,7 +19581,8 @@
         "ModelIdentifier": "771773086",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -19385,7 +19624,8 @@
         "ModelIdentifier": "771773677",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -19427,7 +19667,8 @@
         "ModelIdentifier": "771773945",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -19469,7 +19710,8 @@
         "ModelIdentifier": "771773976",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -19511,7 +19753,8 @@
         "ModelIdentifier": "771773574",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -19553,7 +19796,8 @@
         "ModelIdentifier": "771773191",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -19595,7 +19839,8 @@
         "ModelIdentifier": "771772981",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -19637,7 +19882,8 @@
         "ModelIdentifier": "771772950",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -19679,7 +19925,8 @@
         "ModelIdentifier": "774510345",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -19721,7 +19968,8 @@
         "ModelIdentifier": "774510300",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -19763,7 +20011,8 @@
         "ModelIdentifier": "771772819",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -19997,7 +20246,8 @@
         "ModelIdentifier": "771772919",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -20271,7 +20521,8 @@
         "ModelIdentifier": "773968253",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.LeaderLine",
@@ -20327,7 +20578,8 @@
         "ModelIdentifier": "773498812",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -20369,7 +20621,8 @@
         "ModelIdentifier": "771773780",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -20411,7 +20664,8 @@
         "ModelIdentifier": "771773471",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Mark",
@@ -20528,7 +20782,8 @@
         "ModelIdentifier": "771773883",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -20570,7 +20825,8 @@
         "ModelIdentifier": "771773811",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Mark",
@@ -20722,7 +20978,8 @@
         "ModelIdentifier": "771773914",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Mark",
@@ -20810,7 +21067,8 @@
         "ModelIdentifier": "771773296",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Mark",
@@ -20902,7 +21160,8 @@
         "ModelIdentifier": "771773055",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -20944,7 +21203,8 @@
         "ModelIdentifier": "771773399",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -20986,7 +21246,8 @@
         "ModelIdentifier": "771773160",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -21028,7 +21289,8 @@
         "ModelIdentifier": "771773502",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -21070,7 +21332,8 @@
         "ModelIdentifier": "771773265",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -21112,7 +21375,8 @@
         "ModelIdentifier": "771773605",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -21154,7 +21418,8 @@
         "ModelIdentifier": "771773368",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -21196,7 +21461,8 @@
         "ModelIdentifier": "771773708",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -21238,7 +21504,8 @@
         "ModelIdentifier": "771773086",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -21280,7 +21547,8 @@
         "ModelIdentifier": "771773677",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -21322,7 +21590,8 @@
         "ModelIdentifier": "771773945",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -21364,7 +21633,8 @@
         "ModelIdentifier": "771773976",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -21406,7 +21676,8 @@
         "ModelIdentifier": "771773574",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Mark",
@@ -21492,7 +21763,8 @@
         "ModelIdentifier": "771773191",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Mark",
@@ -21578,7 +21850,8 @@
         "ModelIdentifier": "771772981",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Mark",
@@ -21659,7 +21932,8 @@
         "ModelIdentifier": "771772950",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Mark",
@@ -21740,7 +22014,8 @@
         "ModelIdentifier": "774510345",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Mark",
@@ -21821,7 +22096,8 @@
         "ModelIdentifier": "774510300",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Mark",
@@ -21905,7 +22181,8 @@
         "ModelIdentifier": "771772819",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -22178,7 +22455,8 @@
         "ModelIdentifier": "771772919",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Mark",
@@ -22389,7 +22667,8 @@
         "ModelIdentifier": "773968253",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.StraightDimensionSet",
@@ -22971,7 +23250,8 @@
         "ModelIdentifier": "773498812",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.LeaderLine",
@@ -23112,7 +23392,8 @@
         "ModelIdentifier": "771772919",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -23519,7 +23800,8 @@
         "ModelIdentifier": "771772819",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Mark",
@@ -23606,7 +23888,8 @@
         "ModelIdentifier": "774510300",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -23648,7 +23931,8 @@
         "ModelIdentifier": "774510345",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -23690,7 +23974,8 @@
         "ModelIdentifier": "771772950",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -23732,7 +24017,8 @@
         "ModelIdentifier": "771772981",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Mark",
@@ -23838,7 +24124,8 @@
         "ModelIdentifier": "771773191",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -23888,7 +24175,8 @@
         "ModelIdentifier": "771773574",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -23930,7 +24218,8 @@
         "ModelIdentifier": "771773976",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -23972,7 +24261,8 @@
         "ModelIdentifier": "771773945",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -24022,7 +24312,8 @@
         "ModelIdentifier": "771773677",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -24064,7 +24355,8 @@
         "ModelIdentifier": "771773086",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -24106,7 +24398,8 @@
         "ModelIdentifier": "771773708",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -24156,7 +24449,8 @@
         "ModelIdentifier": "771773368",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -24198,7 +24492,8 @@
         "ModelIdentifier": "771773605",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -24248,7 +24543,8 @@
         "ModelIdentifier": "771773265",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -24290,7 +24586,8 @@
         "ModelIdentifier": "771773502",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -24340,7 +24637,8 @@
         "ModelIdentifier": "771773160",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -24382,7 +24680,8 @@
         "ModelIdentifier": "771773399",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -24424,7 +24723,8 @@
         "ModelIdentifier": "771773055",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Mark",
@@ -24519,7 +24819,8 @@
         "ModelIdentifier": "771773296",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Mark",
@@ -24606,7 +24907,8 @@
         "ModelIdentifier": "771773914",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Mark",
@@ -24728,7 +25030,8 @@
         "ModelIdentifier": "771773811",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -24778,7 +25081,8 @@
         "ModelIdentifier": "771773883",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Mark",
@@ -24908,7 +25212,8 @@
         "ModelIdentifier": "771773471",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -24958,7 +25263,8 @@
         "ModelIdentifier": "771773780",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -25000,7 +25306,8 @@
         "ModelIdentifier": "773968253",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Text",
@@ -28056,7 +28363,8 @@
         "ModelIdentifier": "773498812",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -28137,7 +28445,8 @@
         "ModelIdentifier": "771772919",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -28377,7 +28686,8 @@
         "ModelIdentifier": "771772819",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -28419,7 +28729,8 @@
         "ModelIdentifier": "774510300",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.LeaderLine",
@@ -28475,7 +28786,8 @@
         "ModelIdentifier": "774510345",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -28517,7 +28829,8 @@
         "ModelIdentifier": "771772950",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -28559,7 +28872,8 @@
         "ModelIdentifier": "771772981",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -28601,7 +28915,8 @@
         "ModelIdentifier": "771773191",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -28643,7 +28958,8 @@
         "ModelIdentifier": "771773574",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -28685,7 +29001,8 @@
         "ModelIdentifier": "771773976",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -28727,7 +29044,8 @@
         "ModelIdentifier": "771773945",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -28769,7 +29087,8 @@
         "ModelIdentifier": "771773677",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -28811,7 +29130,8 @@
         "ModelIdentifier": "771773086",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -28853,7 +29173,8 @@
         "ModelIdentifier": "771773708",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -28895,7 +29216,8 @@
         "ModelIdentifier": "771773368",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -28937,7 +29259,8 @@
         "ModelIdentifier": "771773605",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -28979,7 +29302,8 @@
         "ModelIdentifier": "771773265",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -29021,7 +29345,8 @@
         "ModelIdentifier": "771773502",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -29063,7 +29388,8 @@
         "ModelIdentifier": "771773160",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -29105,7 +29431,8 @@
         "ModelIdentifier": "771773399",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -29154,7 +29481,8 @@
         "ModelIdentifier": "771773055",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -29200,7 +29528,8 @@
         "ModelIdentifier": "771773296",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -29242,7 +29571,8 @@
         "ModelIdentifier": "771773914",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -29316,7 +29646,8 @@
         "ModelIdentifier": "771773811",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -29358,7 +29689,8 @@
         "ModelIdentifier": "771773883",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.LeaderLine",
@@ -29446,7 +29778,8 @@
         "ModelIdentifier": "771773471",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -29488,7 +29821,8 @@
         "ModelIdentifier": "771773780",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -29530,7 +29864,8 @@
         "ModelIdentifier": "773968253",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.AngleDimension",
@@ -29782,7 +30117,8 @@
         "ModelIdentifier": "773498812",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Mark",
@@ -29902,7 +30238,8 @@
         "ModelIdentifier": "771772919",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -30145,7 +30482,8 @@
         "ModelIdentifier": "771772819",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -30187,7 +30525,8 @@
         "ModelIdentifier": "774510300",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -30229,7 +30568,8 @@
         "ModelIdentifier": "774510345",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.LeaderLine",
@@ -30285,7 +30625,8 @@
         "ModelIdentifier": "771772950",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -30334,7 +30675,8 @@
         "ModelIdentifier": "771772981",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -30382,7 +30724,8 @@
         "ModelIdentifier": "771773191",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -30424,7 +30767,8 @@
         "ModelIdentifier": "771773574",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -30466,7 +30810,8 @@
         "ModelIdentifier": "771773976",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -30508,7 +30853,8 @@
         "ModelIdentifier": "771773945",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -30550,7 +30896,8 @@
         "ModelIdentifier": "771773677",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -30595,7 +30942,8 @@
         "ModelIdentifier": "771773086",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -30637,7 +30985,8 @@
         "ModelIdentifier": "771773708",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -30679,7 +31028,8 @@
         "ModelIdentifier": "771773368",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -30721,7 +31071,8 @@
         "ModelIdentifier": "771773605",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -30763,7 +31114,8 @@
         "ModelIdentifier": "771773265",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -30805,7 +31157,8 @@
         "ModelIdentifier": "771773502",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -30847,7 +31200,8 @@
         "ModelIdentifier": "771773160",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -30889,7 +31243,8 @@
         "ModelIdentifier": "771773399",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -30931,7 +31286,8 @@
         "ModelIdentifier": "771773055",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -30973,7 +31329,8 @@
         "ModelIdentifier": "771773296",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -31015,7 +31372,8 @@
         "ModelIdentifier": "771773914",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -31103,7 +31461,8 @@
         "ModelIdentifier": "771773811",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -31145,7 +31504,8 @@
         "ModelIdentifier": "771773883",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -31219,7 +31579,8 @@
         "ModelIdentifier": "771773471",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -31261,7 +31622,8 @@
         "ModelIdentifier": "771773780",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.Part",
@@ -31303,7 +31665,8 @@
         "ModelIdentifier": "773968253",
         "Hideable": "Tekla.Structures.Drawing.Hideable",
         "QueryReturnValue": "DOT_GR_OPERATION_OK"
-      }
+      },
+      "parent_view_id": "view_0"
     },
     {
       "type": "Tekla.Structures.Drawing.AngleDimension",
