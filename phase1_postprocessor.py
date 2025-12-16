@@ -24,6 +24,21 @@ def parse_point(point_str: str) -> Optional[Tuple[float, float, float]]:
 
 def get_object_2d_center(obj: Dict) -> Optional[Tuple[float, float]]:
     """Extract 2D center point from object properties."""
+    # Handle Part objects - they have geometry in geometric_data.part_geometry
+    if obj.get('type_name') == 'Part':
+        geom_data = obj.get('geometric_data', {})
+        part_geom = geom_data.get('part_geometry', {})
+
+        start_pt = part_geom.get('start_point')
+        end_pt = part_geom.get('end_point')
+
+        if start_pt and end_pt and isinstance(start_pt, dict) and isinstance(end_pt, dict):
+            # Use midpoint of start and end for part center in 2D
+            return ((start_pt['x'] + end_pt['x']) / 2, (start_pt['y'] + end_pt['y']) / 2)
+        elif start_pt and isinstance(start_pt, dict):
+            return (start_pt['x'], start_pt['y'])
+
+    # Handle other objects - they have points in properties as strings
     props = obj.get('properties', {})
 
     # Try different property names
