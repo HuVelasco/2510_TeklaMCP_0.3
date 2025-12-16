@@ -402,8 +402,13 @@ class VirtualFitter:
 
 def main():
     """Test Virtual Fitter with ML-processed data."""
-    # Load view-centric data from Phase 1
-    input_file = 'ml_training_data_view_centric.json'
+    import sys
+
+    # Use command line argument or default to B18
+    if len(sys.argv) > 1:
+        input_file = sys.argv[1]
+    else:
+        input_file = 'ml_training_data_B18_view_centric.json'
 
     print(f"Loading assembly data from: {input_file}")
     try:
@@ -418,7 +423,7 @@ def main():
     results = fitter.run()
 
     # Save results
-    output_file = 'virtual_fitter_results.json'
+    output_file = 'virtual_fitter_results_B18.json'
     with open(output_file, 'w', encoding='utf-8') as f:
         json.dump(results, f, indent=2)
 

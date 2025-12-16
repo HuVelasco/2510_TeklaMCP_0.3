@@ -370,7 +370,23 @@ def process_extraction(input_file: str, output_file: str):
 
 
 if __name__ == '__main__':
-    input_file = 'Server/TeklaMCP/extractions/tekla_extraction_ml_20251215_145213.jsonl'
-    output_file = 'ml_training_data.json'
+    import sys
+
+    # Use command line argument or default to latest extraction
+    if len(sys.argv) > 1:
+        input_file = sys.argv[1]
+    else:
+        # Find latest extraction file
+        import glob
+        import os
+
+        extraction_files = glob.glob('Server/TeklaMCP/extractions/tekla_extraction_ml_*.jsonl')
+        if extraction_files:
+            input_file = max(extraction_files, key=os.path.getmtime)
+            print(f"Using latest extraction: {input_file}")
+        else:
+            input_file = 'Server/TeklaMCP/extractions/tekla_extraction_ml_20251215_145213.jsonl'
+
+    output_file = 'ml_training_data_B18.json'
 
     process_extraction(input_file, output_file)
