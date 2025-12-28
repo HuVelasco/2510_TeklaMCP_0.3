@@ -165,6 +165,7 @@ namespace TeklaMCP
     public class DrawingExtractionRequest
     {
         public string DrawingMark { get; set; }  // Null = process all drawings
+        public string DrawingType { get; set; }  // "AssemblyDrawing", "SinglePartDrawing", or null = all types
         public int MaxDrawings { get; set; } = 10;
         public bool DiscoveryMode { get; set; } = true;
         public bool ExtractSolidVertices { get; set; } = false;  // False = only extract part points (StartPoint, EndPoint, ContourPoints)
@@ -1155,18 +1156,57 @@ namespace TeklaMCP
 
         private static string GenerateDiscoveryModeCode(DrawingExtractionRequest request)
         {
+            // Build drawing mark filter array for generated code
+            string drawingMarkFilterCode = "";
+            if (!string.IsNullOrEmpty(request.DrawingMark))
+            {
+                var marks = request.DrawingMark.Split(new[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries)
+                    .Select(m => "\"" + m.Trim().ToUpper() + "\"");
+                drawingMarkFilterCode = "var requestedMarks = new string[] { " + string.Join(", ", marks) + " };";
+            }
+
             return @"
 var dh = new Tekla.Structures.Drawing.DrawingHandler();
 var typeCount = new System.Collections.Generic.Dictionary<string, int>();
 var typeSamples = new System.Collections.Generic.Dictionary<string, object>();
 int drawingsProcessed = 0;
+int drawingsScanned = 0;
 int totalObjects = 0;
 
+// Drawing mark filter (null = discover all drawings)
+" + drawingMarkFilterCode + @"
+
 var drawingEnumerator = dh.GetDrawings();
-while (drawingEnumerator.MoveNext() && drawingsProcessed < " + request.MaxDrawings + @")
+while (drawingEnumerator.MoveNext())
 {
     var drawing = drawingEnumerator.Current as Tekla.Structures.Drawing.Drawing;
     if (drawing == null) continue;
+
+    drawingsScanned++;
+
+    // Filter by drawing mark if specified
+    bool shouldProcess = " + (string.IsNullOrEmpty(request.DrawingMark) ? "true" : @"false;
+    if (requestedMarks != null && requestedMarks.Length > 0)
+    {
+        string currentMark = drawing.Mark.Trim('[').Trim(']').ToUpper();
+        foreach (var requestedMark in requestedMarks)
+        {
+            if (currentMark == requestedMark)
+            {
+                shouldProcess = true;
+                break;
+            }
+        }
+    }") + @";
+
+    if (!shouldProcess) continue;
+
+    // Filter by drawing type if specified
+    " + (!string.IsNullOrEmpty(request.DrawingType) ?
+        $"if (drawing.GetType().Name != \"{request.DrawingType}\") continue;" : "") + @"
+
+    // Check if we've processed enough drawings
+    if (drawingsProcessed >= " + request.MaxDrawings + @") break;
 
     drawingsProcessed++;
 
@@ -1240,11 +1280,23 @@ result = report.ToString();
 
         private static string GenerateFullExtractionCode(DrawingExtractionRequest request)
         {
+            // Build drawing mark filter array for generated code
+            string drawingMarkFilterCode = "";
+            if (!string.IsNullOrEmpty(request.DrawingMark))
+            {
+                var marks = request.DrawingMark.Split(new[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries)
+                    .Select(m => "\"" + m.Trim().ToUpper() + "\"");
+                drawingMarkFilterCode = "var requestedMarks = new string[] { " + string.Join(", ", marks) + " };";
+            }
+
             return @"
 // PHASE 1 ML-OPTIMIZED EXTRACTION: View-centric with 2D/3D transformation matrices
 // WSL COMPATIBILITY: Save to project directory (WSL-accessible)
 var timestamp = System.DateTime.Now.ToString(""yyyyMMdd_HHmmss"");
 bool extractSolidVertices = " + request.ExtractSolidVertices.ToString().ToLower() + @";
+
+// Drawing mark filter (null = extract all drawings)
+" + drawingMarkFilterCode + @"
 
 // Create extractions directory
 var currentDir = System.IO.Directory.GetCurrentDirectory();
@@ -1260,6 +1312,7 @@ System.Console.WriteLine(""📁 ML-optimized extraction to: "" + outputPath);
 var startTime = System.DateTime.Now;
 var dh = new Tekla.Structures.Drawing.DrawingHandler();
 int drawingsProcessed = 0;
+int drawingsScanned = 0;
 int totalObjects = 0;
 long bytesWritten = 0;
 
@@ -1273,10 +1326,36 @@ var jsonSettings = new Newtonsoft.Json.JsonSerializerSettings
 using (var writer = new System.IO.StreamWriter(outputPath, false, System.Text.Encoding.UTF8))
 {
     var drawingEnumerator = dh.GetDrawings();
-    while (drawingEnumerator.MoveNext() && drawingsProcessed < " + request.MaxDrawings + @")
+    while (drawingEnumerator.MoveNext())
     {
         var drawing = drawingEnumerator.Current as Tekla.Structures.Drawing.Drawing;
         if (drawing == null) continue;
+
+        drawingsScanned++;
+
+        // Filter by drawing mark if specified
+        bool shouldProcess = " + (string.IsNullOrEmpty(request.DrawingMark) ? "true" : @"false;
+        if (requestedMarks != null && requestedMarks.Length > 0)
+        {
+            string currentMark = drawing.Mark.Trim('[').Trim(']').ToUpper();
+            foreach (var requestedMark in requestedMarks)
+            {
+                if (currentMark == requestedMark)
+                {
+                    shouldProcess = true;
+                    break;
+                }
+            }
+        }") + @";
+
+        if (!shouldProcess) continue;
+
+        // Filter by drawing type if specified
+        " + (!string.IsNullOrEmpty(request.DrawingType) ?
+            $"if (drawing.GetType().Name != \"{request.DrawingType}\") continue;" : "") + @"
+
+        // Check if we've processed enough drawings
+        if (drawingsProcessed >= " + request.MaxDrawings + @") break;
 
         drawingsProcessed++;
 
@@ -1793,50 +1872,157 @@ using (var writer = new System.IO.StreamWriter(outputPath, false, System.Text.En
                                 }
 
                                 // For ContourPlate and PolyBeam: Contour points
-                                var contourProp = modelPart.GetType().GetProperty(""Contour"");
-                                if (contourProp != null)
+                                try
                                 {
-                                    var contour = contourProp.GetValue(modelPart, null);
-                                    if (contour != null)
+                                    var contourProp = modelPart.GetType().GetProperty(""Contour"");
+                                    if (contourProp != null)
                                     {
-                                        var contourPointsProp = contour.GetType().GetProperty(""ContourPoints"");
-                                        if (contourPointsProp != null)
+                                        var contour = contourProp.GetValue(modelPart, null);
+                                        if (contour != null)
                                         {
-                                            var contourPts = contourPointsProp.GetValue(contour, null) as System.Collections.IEnumerable;
-                                            if (contourPts != null)
+                                            var contourPointsProp = contour.GetType().GetProperty(""ContourPoints"");
+                                            if (contourPointsProp != null)
                                             {
-                                                var contourPointsList = new System.Collections.Generic.List<object>();
-                                                foreach (var pt in contourPts)
+                                                var contourPts = contourPointsProp.GetValue(contour, null) as System.Collections.IEnumerable;
+                                                if (contourPts != null)
                                                 {
-                                                    if (pt != null)
+                                                    var contourPointsList = new System.Collections.Generic.List<object>();
+                                                    var contourDebugInfo = new System.Collections.Generic.List<string>();
+                                                    int ptCount = 0;
+                                                    int nullPts = 0;
+                                                    int missingProps = 0;
+                                                    int nullValues = 0;
+
+                                                    foreach (var pt in contourPts)
                                                     {
-                                                        var xProp = pt.GetType().GetProperty(""X"");
-                                                        var yProp = pt.GetType().GetProperty(""Y"");
-                                                        var zProp = pt.GetType().GetProperty(""Z"");
-                                                        if (xProp != null && yProp != null && zProp != null)
+                                                        ptCount++;
+                                                        if (pt != null)
                                                         {
-                                                            var x = xProp.GetValue(pt, null);
-                                                            var y = yProp.GetValue(pt, null);
-                                                            var z = zProp.GetValue(pt, null);
-                                                            if (x != null && y != null && z != null)
+                                                            // Try X/Y/Z as fields (ContourPoint uses fields not properties)
+                                                            var xField = pt.GetType().GetField(""X"");
+                                                            var yField = pt.GetType().GetField(""Y"");
+                                                            var zField = pt.GetType().GetField(""Z"");
+
+                                                            if (xField != null && yField != null && zField != null)
                                                             {
-                                                                contourPointsList.Add(new {
-                                                                    x = System.Math.Round(System.Convert.ToDouble(x), 2),
-                                                                    y = System.Math.Round(System.Convert.ToDouble(y), 2),
-                                                                    z = System.Math.Round(System.Convert.ToDouble(z), 2)
-                                                                });
+                                                                var x = xField.GetValue(pt);
+                                                                var y = yField.GetValue(pt);
+                                                                var z = zField.GetValue(pt);
+                                                                if (x != null && y != null && z != null)
+                                                                {
+                                                                    contourPointsList.Add(new {
+                                                                        x = System.Math.Round(System.Convert.ToDouble(x), 2),
+                                                                        y = System.Math.Round(System.Convert.ToDouble(y), 2),
+                                                                        z = System.Math.Round(System.Convert.ToDouble(z), 2)
+                                                                    });
+                                                                }
+                                                                else
+                                                                {
+                                                                    nullValues++;
+                                                                }
+                                                            }
+                                                            else
+                                                            {
+                                                                // X/Y/Z not found - try to access through nested Point property
+                                                                var pointProp = pt.GetType().GetProperty(""Point"");
+                                                                if (pointProp != null)
+                                                                {
+                                                                    var pointObj = pointProp.GetValue(pt, null);
+                                                                    if (pointObj != null)
+                                                                    {
+                                                                        var px = pointObj.GetType().GetProperty(""X"");
+                                                                        var py = pointObj.GetType().GetProperty(""Y"");
+                                                                        var pz = pointObj.GetType().GetProperty(""Z"");
+                                                                        if (px != null && py != null && pz != null)
+                                                                        {
+                                                                            var x = px.GetValue(pointObj, null);
+                                                                            var y = py.GetValue(pointObj, null);
+                                                                            var z = pz.GetValue(pointObj, null);
+                                                                            if (x != null && y != null && z != null)
+                                                                            {
+                                                                                contourPointsList.Add(new {
+                                                                                    x = System.Math.Round(System.Convert.ToDouble(x), 2),
+                                                                                    y = System.Math.Round(System.Convert.ToDouble(y), 2),
+                                                                                    z = System.Math.Round(System.Convert.ToDouble(z), 2)
+                                                                                });
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                nullValues++;
+                                                                            }
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            missingProps++;
+                                                                            if (ptCount == 1) contourDebugInfo.Add(""nested_point_no_xyz"");
+                                                                        }
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        missingProps++;
+                                                                        if (ptCount == 1) contourDebugInfo.Add(""point_prop_null"");
+                                                                    }
+                                                                }
+                                                                else
+                                                                {
+                                                                    missingProps++;
+                                                                    if (ptCount == 1)
+                                                                    {
+                                                                        contourDebugInfo.Add(""pt_type:"" + pt.GetType().Name);
+                                                                        var ptProps = pt.GetType().GetProperties();
+                                                                        var propNames = new System.Collections.Generic.List<string>();
+                                                                        foreach (var ptPropInfo in ptProps)
+                                                                        {
+                                                                            propNames.Add(ptPropInfo.Name);
+                                                                        }
+                                                                        if (propNames.Count > 0)
+                                                                        {
+                                                                            contourDebugInfo.Add(""props:"" + string.Join(""|"", propNames.ToArray()));
+                                                                        }
+                                                                    }
+                                                                }
                                                             }
                                                         }
+                                                        else
+                                                        {
+                                                            nullPts++;
+                                                        }
+                                                    }
+
+                                                    partGeometry[""contour_iter_count""] = ptCount;
+                                                    if (contourPointsList.Count > 0)
+                                                    {
+                                                        partGeometry[""contour_points""] = contourPointsList;
+                                                        partGeometry[""contour_points_count""] = contourPointsList.Count;
+                                                    }
+                                                    else
+                                                    {
+                                                        partGeometry[""contour_debug""] = ""pts:"" + ptCount + "",null:"" + nullPts + "",noprop:"" + missingProps + "",nullval:"" + nullValues + (contourDebugInfo.Count > 0 ? "",info:"" + string.Join("","", contourDebugInfo.ToArray()) : """");
                                                     }
                                                 }
-                                                if (contourPointsList.Count > 0)
+                                                else
                                                 {
-                                                    partGeometry[""contour_points""] = contourPointsList;
-                                                    partGeometry[""contour_points_count""] = contourPointsList.Count;
+                                                    partGeometry[""contour_debug""] = ""contourPts cast to IEnumerable failed or null"";
                                                 }
                                             }
+                                            else
+                                            {
+                                                partGeometry[""contour_debug""] = ""ContourPoints property not found on Contour object"";
+                                            }
+                                        }
+                                        else
+                                        {
+                                            partGeometry[""contour_debug""] = ""Contour property value is null"";
                                         }
                                     }
+                                    else
+                                    {
+                                        partGeometry[""contour_debug""] = ""Contour property not found on "" + partTypeName;
+                                    }
+                                }
+                                catch (Exception contourEx)
+                                {
+                                    partGeometry[""contour_error""] = contourEx.Message;
                                 }
 
                                 var modelSolid = modelPart.GetSolid();
