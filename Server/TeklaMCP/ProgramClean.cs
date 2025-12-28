@@ -1855,6 +1855,10 @@ using (var writer = new System.IO.StreamWriter(outputPath, false, System.Text.En
                                 var partTypeName = modelPart.GetType().Name;
                                 partGeometry[""part_type_model""] = partTypeName;
 
+                                // ENHANCEMENT: Extract Part Name and ID
+                                partGeometry[""part_name""] = modelPart.Name != null ? modelPart.Name : """";
+                                partGeometry[""part_id""] = modelPart.Identifier != null ? modelPart.Identifier.ID.ToString() : """";
+
                                 // For Beam: StartPoint and EndPoint
                                 var beam = modelPart as Tekla.Structures.Model.Beam;
                                 if (beam != null)
@@ -1910,11 +1914,28 @@ using (var writer = new System.IO.StreamWriter(outputPath, false, System.Text.En
                                                                 var z = zField.GetValue(pt);
                                                                 if (x != null && y != null && z != null)
                                                                 {
-                                                                    contourPointsList.Add(new {
-                                                                        x = System.Math.Round(System.Convert.ToDouble(x), 2),
-                                                                        y = System.Math.Round(System.Convert.ToDouble(y), 2),
-                                                                        z = System.Math.Round(System.Convert.ToDouble(z), 2)
-                                                                    });
+                                                                    // Extract additional ContourPoint properties
+                                                                    var pointData = new System.Collections.Generic.Dictionary<string, object>();
+                                                                    pointData[""x""] = System.Math.Round(System.Convert.ToDouble(x), 2);
+                                                                    pointData[""y""] = System.Math.Round(System.Convert.ToDouble(y), 2);
+                                                                    pointData[""z""] = System.Math.Round(System.Convert.ToDouble(z), 2);
+
+                                                                    // Extract all properties (like Chamfer)
+                                                                    var contourPtProps = pt.GetType().GetProperties();
+                                                                    foreach (var cpProp in contourPtProps)
+                                                                    {
+                                                                        try
+                                                                        {
+                                                                            var cpValue = cpProp.GetValue(pt, null);
+                                                                            if (cpValue != null)
+                                                                            {
+                                                                                pointData[cpProp.Name.ToLower()] = cpValue.ToString();
+                                                                            }
+                                                                        }
+                                                                        catch { /* Skip properties that can't be accessed */ }
+                                                                    }
+
+                                                                    contourPointsList.Add(pointData);
                                                                 }
                                                                 else
                                                                 {
@@ -1940,11 +1961,31 @@ using (var writer = new System.IO.StreamWriter(outputPath, false, System.Text.En
                                                                             var z = pz.GetValue(pointObj, null);
                                                                             if (x != null && y != null && z != null)
                                                                             {
-                                                                                contourPointsList.Add(new {
-                                                                                    x = System.Math.Round(System.Convert.ToDouble(x), 2),
-                                                                                    y = System.Math.Round(System.Convert.ToDouble(y), 2),
-                                                                                    z = System.Math.Round(System.Convert.ToDouble(z), 2)
-                                                                                });
+                                                                                // Extract additional ContourPoint properties (nested Point case)
+                                                                                var pointData = new System.Collections.Generic.Dictionary<string, object>();
+                                                                                pointData[""x""] = System.Math.Round(System.Convert.ToDouble(x), 2);
+                                                                                pointData[""y""] = System.Math.Round(System.Convert.ToDouble(y), 2);
+                                                                                pointData[""z""] = System.Math.Round(System.Convert.ToDouble(z), 2);
+
+                                                                                // Extract all properties (like Chamfer)
+                                                                                var contourPtProps = pt.GetType().GetProperties();
+                                                                                foreach (var cpProp in contourPtProps)
+                                                                                {
+                                                                                    try
+                                                                                    {
+                                                                                        if (cpProp.Name != ""Point"")  // Skip the Point property itself
+                                                                                        {
+                                                                                            var cpValue = cpProp.GetValue(pt, null);
+                                                                                            if (cpValue != null)
+                                                                                            {
+                                                                                                pointData[cpProp.Name.ToLower()] = cpValue.ToString();
+                                                                                            }
+                                                                                        }
+                                                                                    }
+                                                                                    catch { /* Skip properties that can't be accessed */ }
+                                                                                }
+
+                                                                                contourPointsList.Add(pointData);
                                                                             }
                                                                             else
                                                                             {

@@ -129,9 +129,10 @@ def main():
         print("  2. View drawing summary")
         print("  3. Search for drawing by mark")
         print("  4. Show dimension details")
-        print("  5. Exit")
+        print("  5. Export drawing(s) to JSON file")
+        print("  6. Exit")
 
-        choice = input("\nEnter choice (1-5): ").strip()
+        choice = input("\nEnter choice (1-6): ").strip()
 
         if choice == '1':
             mark = input("Enter drawing mark (e.g., EP1001): ").strip()
@@ -228,6 +229,44 @@ def main():
                 print(f"\nDrawing '{mark}' not found")
 
         elif choice == '5':
+            # Export drawing(s) to JSON file
+            print("\n" + "="*80)
+            print("EXPORT TO JSON FILE")
+            print("="*80)
+            print("\nExport options:")
+            print("  1. Export specific drawing by mark")
+            print("  2. Export all drawings")
+            print("  3. Cancel")
+
+            export_choice = input("\nEnter choice (1-3): ").strip()
+
+            if export_choice == '1':
+                mark = input("Enter drawing mark to export (e.g., B2): ").strip()
+                found = False
+                for drawing in drawings:
+                    if mark.upper() in drawing.get('mark', '').upper():
+                        output_file = f"exported_{mark}.json"
+                        with open(output_file, 'w', encoding='utf-8') as f:
+                            json.dump(drawing, f, indent=2, ensure_ascii=False)
+                        print(f"\n✓ Exported to: {output_file}")
+                        found = True
+                        break
+
+                if not found:
+                    print(f"\nDrawing '{mark}' not found")
+
+            elif export_choice == '2':
+                output_file = "exported_all_drawings.json"
+                with open(output_file, 'w', encoding='utf-8') as f:
+                    json.dump(drawings, f, indent=2, ensure_ascii=False)
+                print(f"\n✓ Exported {len(drawings)} drawings to: {output_file}")
+
+            elif export_choice == '3':
+                print("\nExport cancelled")
+            else:
+                print("\nInvalid export choice")
+
+        elif choice == '6':
             print("\nExiting...")
             break
 
