@@ -31,14 +31,9 @@ namespace TeklaDrawingExtractor
         private Button btnExtractSingleObject;
         private RichTextBox txtDebugOutput;
 
-        // Extraction Options
-        private CheckBox chkExtractProfiles;
-        private CheckBox chkExtractDimensionValues;
-        private CheckBox chkExtractBoltPositions;
-        private CheckBox chkExtractChamfers;
+        // Extraction Options (only optional filters for ML training)
         private CheckBox chkExtractSolidVertices;
         private CheckBox chkIncludeDebugInfo;
-        private CheckBox chkIncludeSecondaryParts;
 
         // Organization Options
         private RadioButton rbHierarchical;
@@ -195,52 +190,27 @@ namespace TeklaDrawingExtractor
         {
             var grpOptions = new GroupBox
             {
-                Text = "⚙️ Extraction Options",
+                Text = "⚙️ ML Training Extraction (ALL objects extracted)",
                 Location = new Point(10, y),
-                Size = new Size(860, 130)
+                Size = new Size(860, 110)
             };
             this.Controls.Add(grpOptions);
 
-            chkExtractProfiles = new CheckBox
+            // Information label
+            var lblInfo = new Label
             {
-                Text = "✓ Extract part profiles & materials (RECOMMENDED)",
+                Text = "ℹ️ For ML training: ALL object types and ALL views are extracted automatically.\n" +
+                       "Parts, dimensions, bolts, marks, text - everything is included.",
                 Location = new Point(10, 25),
-                Size = new Size(400, 20),
-                Checked = true
+                Size = new Size(820, 35),
+                ForeColor = Color.DarkBlue
             };
-            grpOptions.Controls.Add(chkExtractProfiles);
-
-            chkExtractDimensionValues = new CheckBox
-            {
-                Text = "✓ Extract dimension values (CRITICAL)",
-                Location = new Point(10, 50),
-                Size = new Size(400, 20),
-                Checked = true
-            };
-            grpOptions.Controls.Add(chkExtractDimensionValues);
-
-            chkExtractBoltPositions = new CheckBox
-            {
-                Text = "✓ Extract bolt positions",
-                Location = new Point(10, 75),
-                Size = new Size(400, 20),
-                Checked = true
-            };
-            grpOptions.Controls.Add(chkExtractBoltPositions);
-
-            chkExtractChamfers = new CheckBox
-            {
-                Text = "✓ Extract chamfer values",
-                Location = new Point(10, 100),
-                Size = new Size(400, 20),
-                Checked = true
-            };
-            grpOptions.Controls.Add(chkExtractChamfers);
+            grpOptions.Controls.Add(lblInfo);
 
             chkExtractSolidVertices = new CheckBox
             {
                 Text = "☐ Extract solid vertices (slow, large files)",
-                Location = new Point(450, 25),
+                Location = new Point(10, 65),
                 Size = new Size(400, 20),
                 Checked = false
             };
@@ -249,22 +219,13 @@ namespace TeklaDrawingExtractor
             chkIncludeDebugInfo = new CheckBox
             {
                 Text = "☐ Include debug information",
-                Location = new Point(450, 50),
+                Location = new Point(450, 65),
                 Size = new Size(400, 20),
                 Checked = false
             };
             grpOptions.Controls.Add(chkIncludeDebugInfo);
 
-            chkIncludeSecondaryParts = new CheckBox
-            {
-                Text = "☐ Include secondary parts (ContourPlates, PolyBeams)",
-                Location = new Point(450, 75),
-                Size = new Size(400, 20),
-                Checked = false
-            };
-            grpOptions.Controls.Add(chkIncludeSecondaryParts);
-
-            return y + 140;
+            return y + 120;
         }
 
         private int CreateJsonOrganizationSection(int y)
@@ -522,16 +483,34 @@ namespace TeklaDrawingExtractor
             // Drawing selection (from Document Manager or all drawings)
             _config.MaxDrawings = (int)numMaxDrawings.Value;
 
-            // ML Training: Extract ALL object types and ALL views (no filtering)
+            // WARNING: >10 drawings will take a long time (requirement #8)
+            if (_config.MaxDrawings > 10)
+            {
+                var result = MessageBox.Show(
+                    $"You are about to extract {_config.MaxDrawings} drawings.\n\n" +
+                    "This will take a long time and create large files.\n\n" +
+                    "Do you want to continue?",
+                    "Warning: Large Extraction",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Warning
+                );
 
-            // Extraction options
-            _config.ExtractProfiles = chkExtractProfiles.Checked;
-            _config.ExtractDimensionValues = chkExtractDimensionValues.Checked;
-            _config.ExtractBoltPositions = chkExtractBoltPositions.Checked;
-            _config.ExtractChamfers = chkExtractChamfers.Checked;
+                if (result != DialogResult.Yes)
+                {
+                    return;
+                }
+            }
+
+            // ML Training: Extract ALL object types and ALL views (no filtering)
+            _config.ExtractProfiles = true;  // Always extract
+            _config.ExtractDimensionValues = true;  // Always extract
+            _config.ExtractBoltPositions = true;  // Always extract
+            _config.ExtractChamfers = true;  // Always extract
+            _config.IncludeSecondaryParts = true;  // Always include ALL parts
+
+            // Optional settings (only these two)
             _config.ExtractSolidVertices = chkExtractSolidVertices.Checked;
             _config.IncludeDebugInfo = chkIncludeDebugInfo.Checked;
-            _config.IncludeSecondaryParts = chkIncludeSecondaryParts.Checked;
 
             // Organization options
             _config.GroupByViews = chkGroupByViews.Checked;
