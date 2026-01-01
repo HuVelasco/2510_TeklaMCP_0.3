@@ -1,0 +1,40 @@
+{
+  "summary": {
+    "total_images": 95,
+    "total_annotations": 878,
+    "avg_per_image": 9.242105263157894
+  },
+  "class_distribution": {
+    "StraightDimension": {
+      "count": 878,
+      "percentage": 100.0
+    }
+  },
+  "spatial_analysis": {},
+  "annotation_quality": {
+    "per_image_stats": {
+      "min": 0,
+      "max": 22,
+      "mean": 9.755555555555556,
+      "median": 11.0,
+      "std": 5.860055197144498
+    }
+  },
+  "split_statistics": {
+    "train": {
+      "images": 62,
+      "annotations": 631,
+      "avg_per_image": 10.17741935483871
+    },
+    "val": {
+      "images": 14,
+      "annotations": 109,
+      "avg_per_image": 7.785714285714286
+    },
+    "test": {
+      "images": 19,
+      "annotations": 138,
+      "avg_per_image": 7.2631578947368425
+    }
+  }
+}

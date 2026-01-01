@@ -1,0 +1,71 @@
+{
+  "drawings": [
+    {
+      "mark": "[ST2004]",
+      "type": "AssemblyDrawing",
+      "unique_parts": 0,
+      "dimensions": 211,
+      "views": 12
+    },
+    {
+      "mark": "[ST2004]",
+      "type": "AssemblyDrawing",
+      "unique_parts": 0,
+      "dimensions": 211,
+      "views": 12
+    },
+    {
+      "mark": "[ST2004]",
+      "type": "AssemblyDrawing",
+      "unique_parts": 0,
+      "dimensions": 211,
+      "views": 12
+    },
+    {
+      "mark": "[ST2004]",
+      "type": "AssemblyDrawing",
+      "unique_parts": 0,
+      "dimensions": 211,
+      "views": 12
+    },
+    {
+      "mark": "[ST2004]",
+      "type": "AssemblyDrawing",
+      "unique_parts": 0,
+      "dimensions": 211,
+      "views": 12
+    },
+    {
+      "mark": "[ST2004]",
+      "type": "AssemblyDrawing",
+      "unique_parts": 0,
+      "dimensions": 211,
+      "views": 12
+    },
+    {
+      "mark": "[ST2004]",
+      "type": "AssemblyDrawing",
+      "unique_parts": 0,
+      "dimensions": 211,
+      "views": 12
+    },
+    {
+      "mark": "[ST2004]",
+      "type": "unknown",
+      "unique_parts": 0,
+      "dimensions": 211,
+      "views": 12
+    }
+  ],
+  "part_distribution": {
+    "unknown": 440,
+    "plate": 11,
+    "stair_component": 11
+  },
+  "dimension_distribution": {
+    "StraightDimension": 1256,
+    "AngleDimension": 32,
+    "StraightDimensionSet": 400
+  },
+  "relationships": []
+}

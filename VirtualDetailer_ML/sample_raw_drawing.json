@@ -1,0 +1,877 @@
+{
+    "mark": "[EP2004]",
+    "drawing_type": "AssemblyDrawing",
+    "drawing_type_full": "Tekla.Structures.Drawing.AssemblyDrawing",
+    "views": [
+        {
+            "view_id": "view_0",
+            "view_index": 0,
+            "name": "",
+            "view_type": "TopView",
+            "coordinate_system_3d": {
+                "origin": {
+                    "x": 11719.706,
+                    "y": 1736.795,
+                    "z": 4840.295
+                },
+                "axis_x": {
+                    "x": 0.0,
+                    "y": -1.0,
+                    "z": -0.000266
+                },
+                "axis_y": {
+                    "x": 0.0,
+                    "y": -0.000266,
+                    "z": 1.0
+                },
+                "normal": {
+                    "x": -1.0,
+                    "y": 0.0,
+                    "z": 0.0
+                }
+            },
+            "coordinate_system_2d": {
+                "origin_x": 11719.706,
+                "origin_y": 1736.795,
+                "origin_z": 4840.295
+            },
+            "width": 0.0,
+            "height": 0.0,
+            "frame_origin": {
+                "x": -120.29748811548043,
+                "y": -110.56514094953167
+            }
+        },
+        {
+            "view_id": "view_1",
+            "view_index": 1,
+            "name": "",
+            "view_type": "FrontView",
+            "coordinate_system_3d": {
+                "origin": {
+                    "x": 11719.706,
+                    "y": 1736.795,
+                    "z": 4840.295
+                },
+                "axis_x": {
+                    "x": -1.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "axis_y": {
+                    "x": 0.0,
+                    "y": -0.000266,
+                    "z": 1.0
+                },
+                "normal": {
+                    "x": 0.0,
+                    "y": 1.0,
+                    "z": 0.000266
+                }
+            },
+            "coordinate_system_2d": {
+                "origin_x": 11719.706,
+                "origin_y": 1736.795,
+                "origin_z": 4840.295
+            },
+            "width": 0.0,
+            "height": 0.0,
+            "frame_origin": {
+                "x": -235.01799532617946,
+                "y": -109.35401100156099
+            }
+        }
+    ],
+    "view_count": 2,
+    "objects": [
+        {
+            "type": "Tekla.Structures.Drawing.StraightDimension",
+            "type_name": "StraightDimension",
+            "related_objects": [
+                "Part: Part",
+                "Part: Part"
+            ],
+            "geometric_data": {
+                "dimension_points": []
+            },
+            "properties": {
+                "StartPoint": "(-127.000, 0.010, 0.000)",
+                "EndPoint": "(-11.894, 77.781, 0.000)",
+                "Value": "Tekla.Structures.Drawing.ContainerElement",
+                "Attributes": "Tekla.Structures.Drawing.StraightDimension+StraightDimensionAttributes",
+                "Distance": "74.8790624748003",
+                "UpDirection": "(0.000, -1.000, 0.000)",
+                "Hideable": "Tekla.Structures.Drawing.Hideable",
+                "QueryReturnValue": "DOT_GR_OPERATION_OK"
+            }
+        },
+        {
+            "type": "Tekla.Structures.Drawing.StraightDimension",
+            "type_name": "StraightDimension",
+            "related_objects": [
+                "Part: Part",
+                "Part: Part"
+            ],
+            "geometric_data": {
+                "dimension_points": []
+            },
+            "properties": {
+                "Attributes": "Tekla.Structures.Drawing.StraightDimension+StraightDimensionAttributes",
+                "StartPoint": "(-11.894, 77.781, 0.000)",
+                "EndPoint": "(127.000, 0.010, 0.000)",
+                "Value": "Tekla.Structures.Drawing.ContainerElement",
+                "Distance": "152.649654077846",
+                "UpDirection": "(0.000, -1.000, 0.000)",
+                "Hideable": "Tekla.Structures.Drawing.Hideable",
+                "QueryReturnValue": "DOT_GR_OPERATION_OK"
+            }
+        },
+        {
+            "type": "Tekla.Structures.Drawing.LeaderLine",
+            "type_name": "LeaderLine",
+            "related_objects": [
+                "Mark: Mark"
+            ],
+            "properties": {
+                "StartPoint": "(-46.697, 361.638, 0.000)",
+                "EndPoint": "(-58.697, 361.638, 0.000)",
+                "ElbowPoints": "Tekla.Structures.Drawing.PointList",
+                "LeaderLineType": "ExtensionLeaderLine",
+                "Attributes": "Tekla.Structures.Drawing.DrawingObject+NoAttributes",
+                "QueryReturnValue": "DOT_GR_OPERATION_OK"
+            }
+        },
+        {
+            "type": "Tekla.Structures.Drawing.StraightDimensionSet",
+            "type_name": "StraightDimensionSet",
+            "related_objects": [
+                "Part: Part",
+                "Part: Part"
+            ],
+            "geometric_data": {
+                "dimension_points": []
+            },
+            "properties": {
+                "Attributes": "Tekla.Structures.Drawing.StraightDimensionSet+StraightDimensionSetAttributes",
+                "Distance": "74.8790624748003",
+                "LeftTagLineOffset": "0",
+                "RightTagLineOffset": "0",
+                "Hideable": "Tekla.Structures.Drawing.Hideable",
+                "QueryReturnValue": "DOT_GR_OPERATION_OK"
+            }
+        },
+        {
+            "type": "Tekla.Structures.Drawing.StraightDimension",
+            "type_name": "StraightDimension",
+            "related_objects": [
+                "Part: Part",
+                "Bolt: Bolt"
+            ],
+            "geometric_data": {
+                "dimension_points": []
+            },
+            "properties": {
+                "Attributes": "Tekla.Structures.Drawing.StraightDimension+StraightDimensionAttributes",
+                "StartPoint": "(-127.000, 254.010, 0.000)",
+                "EndPoint": "(-76.200, 50.765, 0.000)",
+                "Value": "Tekla.Structures.Drawing.ContainerElement",
+                "Distance": "95.1688883121283",
+                "UpDirection": "(0.000, 1.000, 0.000)",
+                "Hideable": "Tekla.Structures.Drawing.Hideable",
+                "QueryReturnValue": "DOT_GR_OPERATION_OK"
+            }
+        },
+        {
+            "type": "Tekla.Structures.Drawing.StraightDimension",
+            "type_name": "StraightDimension",
+            "related_objects": [
+                "Bolt: Bolt",
+                "Part: Part"
+            ],
+            "geometric_data": {
+                "dimension_points": []
+            },
+            "properties": {
+                "Attributes": "Tekla.Structures.Drawing.StraightDimension+StraightDimensionAttributes",
+                "StartPoint": "(76.200, 50.765, 0.000)",
+                "EndPoint": "(127.000, 254.010, 0.000)",
+                "Value": "Tekla.Structures.Drawing.ContainerElement",
+                "Distance": "298.414485587793",
+                "UpDirection": "(0.000, 1.000, 0.000)",
+                "Hideable": "Tekla.Structures.Drawing.Hideable",
+                "QueryReturnValue": "DOT_GR_OPERATION_OK"
+            }
+        },
+        {
+            "type": "Tekla.Structures.Drawing.StraightDimension",
+            "type_name": "StraightDimension",
+            "related_objects": [
+                "Part: Part",
+                "Bolt: Bolt"
+            ],
+            "geometric_data": {
+                "dimension_points": []
+            },
+            "properties": {
+                "Attributes": "Tekla.Structures.Drawing.StraightDimension+StraightDimensionAttributes",
+                "StartPoint": "(127.000, 0.010, 0.000)",
+                "EndPoint": "(-76.200, 50.765, 0.000)",
+                "Value": "Tekla.Structures.Drawing.ContainerElement",
+                "Distance": "59.5252010153436",
+                "UpDirection": "(1.000, 0.000, 0.000)",
+                "Hideable": "Tekla.Structures.Drawing.Hideable",
+                "QueryReturnValue": "DOT_GR_OPERATION_OK"
+            }
+        },
+        {
+            "type": "Tekla.Structures.Drawing.StraightDimension",
+            "type_name": "StraightDimension",
+            "related_objects": [
+                "Bolt: Bolt"
+            ],
+            "geometric_data": {
+                "dimension_points": []
+            },
+            "properties": {
+                "Attributes": "Tekla.Structures.Drawing.StraightDimension+StraightDimensionAttributes",
+                "StartPoint": "(-76.200, 50.765, 0.000)",
+                "EndPoint": "(-76.200, 203.164, 0.000)",
+                "Value": "Tekla.Structures.Drawing.ContainerElement",
+                "Distance": "262.725197964348",
+                "UpDirection": "(1.000, 0.000, 0.000)",
+                "Hideable": "Tekla.Structures.Drawing.Hideable",
+                "QueryReturnValue": "DOT_GR_OPERATION_OK"
+            }
+        },
+        {
+            "type": "Tekla.Structures.Drawing.StraightDimension",
+            "type_name": "StraightDimension",
+            "related_objects": [
+                "Bolt: Bolt",
+                "Part: Part"
+            ],
+            "geometric_data": {
+                "dimension_points": []
+            },
+            "properties": {
+                "Attributes": "Tekla.Structures.Drawing.StraightDimension+StraightDimensionAttributes",
+                "StartPoint": "(-76.200, 203.164, 0.000)",
+                "EndPoint": "(127.000, 254.010, 0.000)",
+                "Value": "Tekla.Structures.Drawing.ContainerElement",
+                "Distance": "262.725197967935",
+                "UpDirection": "(1.000, 0.000, 0.000)",
+                "Hideable": "Tekla.Structures.Drawing.Hideable",
+                "QueryReturnValue": "DOT_GR_OPERATION_OK"
+            }
+        },
+        {
+            "type": "Tekla.Structures.Drawing.StraightDimensionSet",
+            "type_name": "StraightDimensionSet",
+            "related_objects": [
+                "Part: Part",
+                "Bolt: Bolt"
+            ],
+            "geometric_data": {
+                "dimension_points": []
+            },
+            "properties": {
+                "Attributes": "Tekla.Structures.Drawing.StraightDimensionSet+StraightDimensionSetAttributes",
+                "Distance": "59.5252010153436",
+                "LeftTagLineOffset": "0",
+                "RightTagLineOffset": "0",
+                "Hideable": "Tekla.Structures.Drawing.Hideable",
+                "QueryReturnValue": "DOT_GR_OPERATION_OK"
+            }
+        },
+        {
+            "type": "Tekla.Structures.Drawing.StraightDimension",
+            "type_name": "StraightDimension",
+            "related_objects": [
+                "Bolt: Bolt"
+            ],
+            "geometric_data": {
+                "dimension_points": []
+            },
+            "properties": {
+                "StartPoint": "(-76.200, 50.765, 0.000)",
+                "EndPoint": "(76.200, 50.765, 0.000)",
+                "Value": "Tekla.Structures.Drawing.ContainerElement",
+                "Attributes": "Tekla.Structures.Drawing.StraightDimension+StraightDimensionAttributes",
+                "Distance": "298.41448559138",
+                "UpDirection": "(0.000, 1.000, 0.000)",
+                "Hideable": "Tekla.Structures.Drawing.Hideable",
+                "QueryReturnValue": "DOT_GR_OPERATION_OK"
+            }
+        },
+        {
+            "type": "Tekla.Structures.Drawing.LeaderLine",
+            "type_name": "LeaderLine",
+            "related_objects": [
+                "Mark: Mark"
+            ],
+            "properties": {
+                "StartPoint": "(72.927, 77.814, 0.000)",
+                "EndPoint": "(72.927, 15.703, 0.000)",
+                "ElbowPoints": "Tekla.Structures.Drawing.PointList",
+                "LeaderLineType": "NormalLeaderLine",
+                "Attributes": "Tekla.Structures.Drawing.DrawingObject+NoAttributes",
+                "QueryReturnValue": "DOT_GR_OPERATION_OK"
+            }
+        },
+        {
+            "type": "Tekla.Structures.Drawing.LeaderLine",
+            "type_name": "LeaderLine",
+            "related_objects": [
+                "Mark: Mark"
+            ],
+            "properties": {
+                "StartPoint": "(-46.697, 207.757, 0.000)",
+                "EndPoint": "(-46.697, 361.638, 0.000)",
+                "ElbowPoints": "Tekla.Structures.Drawing.PointList",
+                "LeaderLineType": "NormalLeaderLine",
+                "Attributes": "Tekla.Structures.Drawing.DrawingObject+NoAttributes",
+                "QueryReturnValue": "DOT_GR_OPERATION_OK"
+            }
+        },
+        {
+            "type": "Tekla.Structures.Drawing.LeaderLine",
+            "type_name": "LeaderLine",
+            "related_objects": [
+                "Mark: Mark"
+            ],
+            "properties": {
+                "StartPoint": "(12.000, 0.000, 0.000)",
+                "EndPoint": "(0.000, 0.000, 0.000)",
+                "ElbowPoints": "Tekla.Structures.Drawing.PointList",
+                "LeaderLineType": "ExtensionLeaderLine",
+                "Attributes": "Tekla.Structures.Drawing.DrawingObject+NoAttributes",
+                "QueryReturnValue": "DOT_GR_OPERATION_OK"
+            }
+        },
+        {
+            "type": "Tekla.Structures.Drawing.Connection",
+            "type_name": "Connection",
+            "related_objects": [
+                "Mark: Mark"
+            ],
+            "properties": {
+                "ModelIdentifier": "773428002",
+                "Hideable": "Tekla.Structures.Drawing.Hideable",
+                "Attributes": "Tekla.Structures.Drawing.DrawingObject+NoAttributes",
+                "QueryReturnValue": "DOT_GR_OPERATION_OK"
+            }
+        },
+        {
+            "type": "Tekla.Structures.Drawing.StraightDimension",
+            "type_name": "StraightDimension",
+            "related_objects": [
+                "Part: Part",
+                "Part: Part"
+            ],
+            "geometric_data": {
+                "dimension_points": []
+            },
+            "properties": {
+                "Attributes": "Tekla.Structures.Drawing.StraightDimension+StraightDimensionAttributes",
+                "StartPoint": "(111.071, 217.535, 0.000)",
+                "EndPoint": "(9.457, 254.010, 0.000)",
+                "Value": "Tekla.Structures.Drawing.ContainerElement",
+                "Distance": "69.8364868727296",
+                "UpDirection": "(1.000, 0.000, 0.000)",
+                "Hideable": "Tekla.Structures.Drawing.Hideable",
+                "QueryReturnValue": "DOT_GR_OPERATION_OK"
+            }
+        },
+        {
+            "type": "Tekla.Structures.Drawing.StraightDimension",
+            "type_name": "StraightDimension",
+            "related_objects": [
+                "Part: Part"
+            ],
+            "geometric_data": {
+                "dimension_points": []
+            },
+            "properties": {
+                "Attributes": "Tekla.Structures.Drawing.StraightDimension+StraightDimensionAttributes",
+                "StartPoint": "(127.000, 0.010, 0.000)",
+                "EndPoint": "(127.000, 254.010, 0.000)",
+                "Value": "Tekla.Structures.Drawing.ContainerElement",
+                "Distance": "113.506243997022",
+                "UpDirection": "(1.000, 0.000, 0.000)",
+                "Hideable": "Tekla.Structures.Drawing.Hideable",
+                "QueryReturnValue": "DOT_GR_OPERATION_OK"
+            }
+        },
+        {
+            "type": "Tekla.Structures.Drawing.ReferenceModel",
+            "type_name": "ReferenceModel",
+            "properties": {
+                "Attributes": "Tekla.Structures.Drawing.ReferenceModel+ReferenceModelAttributes",
+                "ModelIdentifier": "768786213",
+                "Hideable": "Tekla.Structures.Drawing.Hideable",
+                "QueryReturnValue": "DOT_GR_OPERATION_OK"
+            }
+        },
+        {
+            "type": "Tekla.Structures.Drawing.Mark",
+            "type_name": "Mark",
+            "related_objects": [
+                "LeaderLine: LeaderLine",
+                "LeaderLine: LeaderLine",
+                "Connection: Connection"
+            ],
+            "properties": {
+                "Attributes": "Tekla.Structures.Drawing.Mark+MarkAttributes",
+                "InsertionPoint": "(0.000, 0.000, 0.000)",
+                "Placing": "Tekla.Structures.Drawing.LeaderLinePlacing",
+                "IsAssociativeNote": "False",
+                "Hideable": "Tekla.Structures.Drawing.Hideable",
+                "QueryReturnValue": "DOT_GR_OPERATION_OK"
+            }
+        },
+        {
+            "type": "Tekla.Structures.Drawing.Mark",
+            "type_name": "Mark",
+            "related_objects": [
+                "Part: Part"
+            ],
+            "properties": {
+                "Attributes": "Tekla.Structures.Drawing.Mark+MarkAttributes",
+                "InsertionPoint": "(0.000, 0.000, 0.000)",
+                "Placing": "Tekla.Structures.Drawing.AlongLinePlacing",
+                "IsAssociativeNote": "False",
+                "Hideable": "Tekla.Structures.Drawing.Hideable",
+                "QueryReturnValue": "DOT_GR_OPERATION_OK"
+            }
+        },
+        {
+            "type": "Tekla.Structures.Drawing.ReferenceModel",
+            "type_name": "ReferenceModel",
+            "properties": {
+                "Attributes": "Tekla.Structures.Drawing.ReferenceModel+ReferenceModelAttributes",
+                "ModelIdentifier": "768318490",
+                "Hideable": "Tekla.Structures.Drawing.Hideable",
+                "QueryReturnValue": "DOT_GR_OPERATION_OK"
+            }
+        },
+        {
+            "type": "Tekla.Structures.Drawing.Bolt",
+            "type_name": "Bolt",
+            "related_objects": [
+                "Mark: Mark"
+            ],
+            "geometric_data": {
+                "bolt_geometry": {
+                    "positions": []
+                }
+            },
+            "properties": {
+                "Attributes": "Tekla.Structures.Drawing.Bolt+BoltAttributes",
+                "ModelIdentifier": "773429004",
+                "Hideable": "Tekla.Structures.Drawing.Hideable",
+                "QueryReturnValue": "DOT_GR_OPERATION_OK"
+            }
+        },
+        {
+            "type": "Tekla.Structures.Drawing.Part",
+            "type_name": "Part",
+            "related_objects": [
+                "StraightDimension: StraightDimension",
+                "StraightDimensionSet: StraightDimensionSet"
+            ],
+            "geometric_data": {
+                "part_geometry": {
+                    "vertices": [],
+                    "part_type_model": "Beam",
+                    "start_point": {
+                        "x": 11719.71,
+                        "y": 1746.39,
+                        "z": 4840.29
+                    },
+                    "end_point": {
+                        "x": 11719.71,
+                        "y": 1746.32,
+                        "z": 4586.29
+                    },
+                    "bounding_box_model": {
+                        "min": {
+                            "x": 11592.706101234158,
+                            "y": 1727.2698897158664,
+                            "z": 4586.28750179269
+                        },
+                        "max": {
+                            "x": 11846.706102072349,
+                            "y": 1746.3874926653364,
+                            "z": 4840.292562235777
+                        },
+                        "type": "model_global_coordinates"
+                    },
+                    "vertices_model": "disabled",
+                    "vertices_note": "Skipped for Beam - use start_point and end_point instead (sufficient for simple beams)"
+                }
+            },
+            "properties": {
+                "Attributes": "Tekla.Structures.Drawing.Part+PartAttributes",
+                "ModelIdentifier": "773427957",
+                "Hideable": "Tekla.Structures.Drawing.Hideable",
+                "QueryReturnValue": "DOT_GR_OPERATION_OK"
+            }
+        },
+        {
+            "type": "Tekla.Structures.Drawing.StraightDimensionSet",
+            "type_name": "StraightDimensionSet",
+            "related_objects": [
+                "Part: Part"
+            ],
+            "geometric_data": {
+                "dimension_points": []
+            },
+            "properties": {
+                "Attributes": "Tekla.Structures.Drawing.StraightDimensionSet+StraightDimensionSetAttributes",
+                "Distance": "157.371736339944",
+                "LeftTagLineOffset": "0",
+                "RightTagLineOffset": "0",
+                "Hideable": "Tekla.Structures.Drawing.Hideable",
+                "QueryReturnValue": "DOT_GR_OPERATION_OK"
+            }
+        },
+        {
+            "type": "Tekla.Structures.Drawing.StraightDimension",
+            "type_name": "StraightDimension",
+            "related_objects": [
+                "Part: Part"
+            ],
+            "geometric_data": {
+                "dimension_points": []
+            },
+            "properties": {
+                "StartPoint": "(-127.000, 254.010, 0.000)",
+                "EndPoint": "(127.000, 254.010, 0.000)",
+                "Value": "Tekla.Structures.Drawing.ContainerElement",
+                "Attributes": "Tekla.Structures.Drawing.StraightDimension+StraightDimensionAttributes",
+                "Distance": "157.371736339944",
+                "UpDirection": "(0.000, 1.000, 0.000)",
+                "Hideable": "Tekla.Structures.Drawing.Hideable",
+                "QueryReturnValue": "DOT_GR_OPERATION_OK"
+            }
+        },
+        {
+            "type": "Tekla.Structures.Drawing.Bolt",
+            "type_name": "Bolt",
+            "related_objects": [
+                "StraightDimension: StraightDimension",
+                "StraightDimensionSet: StraightDimensionSet",
+                "StraightDimension: StraightDimension",
+                "StraightDimension: StraightDimension",
+                "StraightDimensionSet: StraightDimensionSet",
+                "StraightDimension: StraightDimension",
+                "StraightDimension: StraightDimension",
+                "StraightDimension: StraightDimension"
+            ],
+            "geometric_data": {
+                "bolt_geometry": {
+                    "positions": []
+                }
+            },
+            "properties": {
+                "Attributes": "Tekla.Structures.Drawing.Bolt+BoltAttributes",
+                "ModelIdentifier": "773429004",
+                "Hideable": "Tekla.Structures.Drawing.Hideable",
+                "QueryReturnValue": "DOT_GR_OPERATION_OK"
+            }
+        },
+        {
+            "type": "Tekla.Structures.Drawing.Mark",
+            "type_name": "Mark",
+            "related_objects": [
+                "LeaderLine: LeaderLine",
+                "Part: Part"
+            ],
+            "properties": {
+                "Attributes": "Tekla.Structures.Drawing.Mark+MarkAttributes",
+                "InsertionPoint": "(98.764, 4.603, 0.000)",
+                "Placing": "Tekla.Structures.Drawing.LeaderLinePlacing",
+                "IsAssociativeNote": "False",
+                "Hideable": "Tekla.Structures.Drawing.Hideable",
+                "QueryReturnValue": "DOT_GR_OPERATION_OK"
+            }
+        },
+        {
+            "type": "Tekla.Structures.Drawing.Mark",
+            "type_name": "Mark",
+            "related_objects": [
+                "LeaderLine: LeaderLine",
+                "LeaderLine: LeaderLine",
+                "Bolt: Bolt"
+            ],
+            "properties": {
+                "Attributes": "Tekla.Structures.Drawing.Mark+MarkAttributes",
+                "InsertionPoint": "(-152.628, 348.130, 0.000)",
+                "Placing": "Tekla.Structures.Drawing.LeaderLinePlacing",
+                "IsAssociativeNote": "False",
+                "Hideable": "Tekla.Structures.Drawing.Hideable",
+                "QueryReturnValue": "DOT_GR_OPERATION_OK"
+            }
+        },
+        {
+            "type": "Tekla.Structures.Drawing.StraightDimensionSet",
+            "type_name": "StraightDimensionSet",
+            "related_objects": [
+                "Part: Part",
+                "Bolt: Bolt"
+            ],
+            "geometric_data": {
+                "dimension_points": []
+            },
+            "properties": {
+                "Attributes": "Tekla.Structures.Drawing.StraightDimensionSet+StraightDimensionSetAttributes",
+                "Distance": "95.1688883121283",
+                "LeftTagLineOffset": "0",
+                "RightTagLineOffset": "0",
+                "Hideable": "Tekla.Structures.Drawing.Hideable",
+                "QueryReturnValue": "DOT_GR_OPERATION_OK"
+            }
+        },
+        {
+            "type": "Tekla.Structures.Drawing.StraightDimensionSet",
+            "type_name": "StraightDimensionSet",
+            "related_objects": [
+                "Part: Part",
+                "Part: Part"
+            ],
+            "geometric_data": {
+                "dimension_points": []
+            },
+            "properties": {
+                "Attributes": "Tekla.Structures.Drawing.StraightDimensionSet+StraightDimensionSetAttributes",
+                "Distance": "69.8364868727296",
+                "LeftTagLineOffset": "0",
+                "RightTagLineOffset": "0",
+                "Hideable": "Tekla.Structures.Drawing.Hideable",
+                "QueryReturnValue": "DOT_GR_OPERATION_OK"
+            }
+        },
+        {
+            "type": "Tekla.Structures.Drawing.ReferenceModel",
+            "type_name": "ReferenceModel",
+            "properties": {
+                "Attributes": "Tekla.Structures.Drawing.ReferenceModel+ReferenceModelAttributes",
+                "ModelIdentifier": "768318490",
+                "Hideable": "Tekla.Structures.Drawing.Hideable",
+                "QueryReturnValue": "DOT_GR_OPERATION_OK"
+            }
+        },
+        {
+            "type": "Tekla.Structures.Drawing.LeaderLine",
+            "type_name": "LeaderLine",
+            "related_objects": [
+                "WeldMark: WeldMark"
+            ],
+            "properties": {
+                "StartPoint": "(9.514, 147.631, 0.000)",
+                "EndPoint": "(187.767, 50.081, 0.000)",
+                "ElbowPoints": "Tekla.Structures.Drawing.PointList",
+                "LeaderLineType": "NormalLeaderLine",
+                "Attributes": "Tekla.Structures.Drawing.DrawingObject+NoAttributes",
+                "QueryReturnValue": "DOT_GR_OPERATION_OK"
+            }
+        },
+        {
+            "type": "Tekla.Structures.Drawing.StraightDimensionSet",
+            "type_name": "StraightDimensionSet",
+            "related_objects": [
+                "Part: Part"
+            ],
+            "geometric_data": {
+                "dimension_points": []
+            },
+            "properties": {
+                "Attributes": "Tekla.Structures.Drawing.StraightDimensionSet+StraightDimensionSetAttributes",
+                "Distance": "113.506243997022",
+                "LeftTagLineOffset": "0",
+                "RightTagLineOffset": "0",
+                "Hideable": "Tekla.Structures.Drawing.Hideable",
+                "QueryReturnValue": "DOT_GR_OPERATION_OK"
+            }
+        },
+        {
+            "type": "Tekla.Structures.Drawing.LeaderLine",
+            "type_name": "LeaderLine",
+            "related_objects": [
+                "Mark: Mark"
+            ],
+            "properties": {
+                "StartPoint": "(9.525, 127.010, 0.000)",
+                "EndPoint": "(12.000, 0.000, 0.000)",
+                "ElbowPoints": "Tekla.Structures.Drawing.PointList",
+                "LeaderLineType": "NormalLeaderLine",
+                "Attributes": "Tekla.Structures.Drawing.DrawingObject+NoAttributes",
+                "QueryReturnValue": "DOT_GR_OPERATION_OK"
+            }
+        },
+        {
+            "type": "Tekla.Structures.Drawing.WeldMark",
+            "type_name": "WeldMark",
+            "related_objects": [
+                "LeaderLine: LeaderLine"
+            ],
+            "properties": {
+                "ModelIdentifier": "0",
+                "Attributes": "Tekla.Structures.Drawing.WeldMark+WeldMarkAttributes",
+                "InsertionPoint": "(187.767, 50.081, 0.000)",
+                "Hideable": "Tekla.Structures.Drawing.Hideable",
+                "QueryReturnValue": "DOT_GR_OPERATION_OK"
+            }
+        },
+        {
+            "type": "Tekla.Structures.Drawing.Part",
+            "type_name": "Part",
+            "related_objects": [
+                "Mark: Mark",
+                "StraightDimension: StraightDimension",
+                "StraightDimensionSet: StraightDimensionSet"
+            ],
+            "geometric_data": {
+                "part_geometry": {
+                    "vertices": [],
+                    "part_type_model": "ContourPlate",
+                    "bounding_box_model": {
+                        "min": {
+                            "x": 11707.812495070493,
+                            "y": 1746.3296150177443,
+                            "z": 4622.789865532221
+                        },
+                        "max": {
+                            "x": 11717.337499540587,
+                            "y": 1847.9608733785667,
+                            "z": 4762.516892939448
+                        },
+                        "type": "model_global_coordinates"
+                    },
+                    "vertices_model": "disabled",
+                    "vertices_note": "Disabled by parameter - use part_type_model, start_point, end_point, contour_points, or set extract_solid_vertices=true"
+                }
+            },
+            "properties": {
+                "Attributes": "Tekla.Structures.Drawing.Part+PartAttributes",
+                "ModelIdentifier": "773428722",
+                "Hideable": "Tekla.Structures.Drawing.Hideable",
+                "QueryReturnValue": "DOT_GR_OPERATION_OK"
+            }
+        },
+        {
+            "type": "Tekla.Structures.Drawing.Part",
+            "type_name": "Part",
+            "related_objects": [
+                "Mark: Mark",
+                "StraightDimension: StraightDimension",
+                "StraightDimensionSet: StraightDimensionSet",
+                "StraightDimension: StraightDimension",
+                "StraightDimension: StraightDimension",
+                "StraightDimensionSet: StraightDimensionSet",
+                "StraightDimension: StraightDimension",
+                "StraightDimension: StraightDimension",
+                "StraightDimensionSet: StraightDimensionSet",
+                "StraightDimension: StraightDimension",
+                "StraightDimension: StraightDimension",
+                "StraightDimensionSet: StraightDimensionSet",
+                "StraightDimension: StraightDimension",
+                "StraightDimensionSet: StraightDimensionSet"
+            ],
+            "geometric_data": {
+                "part_geometry": {
+                    "vertices": [],
+                    "part_type_model": "Beam",
+                    "start_point": {
+                        "x": 11719.71,
+                        "y": 1746.39,
+                        "z": 4840.29
+                    },
+                    "end_point": {
+                        "x": 11719.71,
+                        "y": 1746.32,
+                        "z": 4586.29
+                    },
+                    "bounding_box_model": {
+                        "min": {
+                            "x": 11592.706101234158,
+                            "y": 1727.2698897158664,
+                            "z": 4586.28750179269
+                        },
+                        "max": {
+                            "x": 11846.706102072349,
+                            "y": 1746.3874926653364,
+                            "z": 4840.292562235777
+                        },
+                        "type": "model_global_coordinates"
+                    },
+                    "vertices_model": "disabled",
+                    "vertices_note": "Skipped for Beam - use start_point and end_point instead (sufficient for simple beams)"
+                }
+            },
+            "properties": {
+                "Attributes": "Tekla.Structures.Drawing.Part+PartAttributes",
+                "ModelIdentifier": "773427957",
+                "Hideable": "Tekla.Structures.Drawing.Hideable",
+                "QueryReturnValue": "DOT_GR_OPERATION_OK"
+            }
+        },
+        {
+            "type": "Tekla.Structures.Drawing.Part",
+            "type_name": "Part",
+            "related_objects": [
+                "StraightDimension: StraightDimension",
+                "StraightDimensionSet: StraightDimensionSet",
+                "StraightDimension: StraightDimension"
+            ],
+            "geometric_data": {
+                "part_geometry": {
+                    "vertices": [],
+                    "part_type_model": "ContourPlate",
+                    "bounding_box_model": {
+                        "min": {
+                            "x": 11707.812495070493,
+                            "y": 1746.3296150177443,
+                            "z": 4622.789865532221
+                        },
+                        "max": {
+                            "x": 11717.337499540587,
+                            "y": 1847.9608733785667,
+                            "z": 4762.516892939448
+                        },
+                        "type": "model_global_coordinates"
+                    },
+                    "vertices_model": "disabled",
+                    "vertices_note": "Disabled by parameter - use part_type_model, start_point, end_point, contour_points, or set extract_solid_vertices=true"
+                }
+            },
+            "properties": {
+                "Attributes": "Tekla.Structures.Drawing.Part+PartAttributes",
+                "ModelIdentifier": "773428722",
+                "Hideable": "Tekla.Structures.Drawing.Hideable",
+                "QueryReturnValue": "DOT_GR_OPERATION_OK"
+            }
+        },
+        {
+            "type": "Tekla.Structures.Drawing.Connection",
+            "type_name": "Connection",
+            "properties": {
+                "ModelIdentifier": "773428002",
+                "Hideable": "Tekla.Structures.Drawing.Hideable",
+                "Attributes": "Tekla.Structures.Drawing.DrawingObject+NoAttributes",
+                "QueryReturnValue": "DOT_GR_OPERATION_OK"
+            }
+        },
+        {
+            "type": "Tekla.Structures.Drawing.ReferenceModel",
+            "type_name": "ReferenceModel",
+            "properties": {
+                "Attributes": "Tekla.Structures.Drawing.ReferenceModel+ReferenceModelAttributes",
+                "ModelIdentifier": "768786213",
+                "Hideable": "Tekla.Structures.Drawing.Hideable",
+                "QueryReturnValue": "DOT_GR_OPERATION_OK"
+            }
+        }
+    ],
+    "object_count": 40
+}

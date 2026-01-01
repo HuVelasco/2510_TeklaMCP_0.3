@@ -1,0 +1,17 @@
+{
+  "total_drawings": 95,
+  "train_count": 66,
+  "val_count": 14,
+  "test_count": 15,
+  "random_seed": 42,
+  "source_file": "C:\\Users\\hugov\\ClaudeProjects\\2510_TeklaMCP_0.3\\Server\\TeklaMCP\\extractions\\tekla_extraction_ml_20251220_FINAL.jsonl",
+  "statistics": {
+    "total_drawings": 95,
+    "assembly_drawings": 14,
+    "part_drawings": 81,
+    "total_parts": 218,
+    "total_dimensions": 2474,
+    "total_objects": 3219,
+    "avg_dims_per_drawing": 26.042105263157893
+  }
+}

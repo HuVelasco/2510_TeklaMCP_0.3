@@ -1,0 +1,37 @@
+{
+  "drawing": "[ST1006]",
+  "metadata": {
+    "unique_part_count": 42,
+    "unique_model_object_count": 50,
+    "total_drawing_object_count": 1086,
+    "views_count": 1,
+    "dimension_count": 254
+  },
+  "unique_parts": [
+    {
+      "model_id": "673629780",
+      "type": "Part",
+      "views_appearing_in": 11
+    },
+    {
+      "model_id": "668587007",
+      "type": "Part",
+      "views_appearing_in": 11
+    },
+    {
+      "model_id": "668587996",
+      "type": "Part",
+      "views_appearing_in": 11
+    },
+    {
+      "model_id": "668587687",
+      "type": "Part",
+      "views_appearing_in": 11
+    },
+    {
+      "model_id": "668587584",
+      "type": "Part",
+      "views_appearing_in": 11
+    }
+  ]
+}

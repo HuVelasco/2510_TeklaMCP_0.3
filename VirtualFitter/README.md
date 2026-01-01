@@ -1,46 +1,37 @@
-# Virtual Fitter - Automatic Dimension Creation Tool
+# Fitter Analyzer - Core Assembly Dimension Analysis
 
-**CORRECTED IMPLEMENTATION** - This is the REAL Virtual Fitter
+**Simplified console tool for analyzing assembly dimensions in Tekla drawings**
 
-## ⚠️ Important Correction
+## Purpose
 
-My previous implementation was completely wrong. I misunderstood the core requirement:
+The Fitter Analyzer is a **lightweight analysis tool** that identifies required dimensions in Tekla assembly drawings. It runs the core dimension detection algorithm and outputs a summary report.
 
-### ❌ What I Built Before (WRONG)
-- Python analysis tool that just reads data
-- Doesn't create any dimensions in Tekla
-- Just outputs JSON files
-- Not what you asked for at all
-
-### ✅ What You Actually Asked For (NOW IMPLEMENTED)
-- **C# WinForms GUI application**
-- **Actually CREATES dimensions** in Tekla drawings
-- **Marks created dimensions** with [VF] prefix (red, bold)
-- **Button to select** all created dimensions
-- **Suggests missing views** when needed
-- **Standalone executable** (not MCP tool)
+**This is a foundation tool** - it performs analysis only, leaving dimension creation and advanced features for future development.
 
 ---
 
-## What This Tool Does
+## What It Does
 
-The Virtual Fitter is a GUI application that:
+1. ✅ **Connects to Tekla** - Reads the currently open drawing
+2. ✅ **Identifies parts** - Finds main part and secondary parts in assembly
+3. ✅ **Analyzes dimensions** - Detects what dimensions are needed (X, Y, Z positioning)
+4. ✅ **Generates summary** - Outputs detailed report of required dimensions
+5. ✅ **Saves report** - Writes summary to text file for review
 
-1. **Analyzes assemblies** in open Tekla drawings
-2. **Identifies secondary parts** that need positioning dimensions
-3. **Determines required dimensions** (length, horizontal pos, vertical pos)
-4. **Creates dimensions** directly in the Tekla drawing
-5. **Marks them for easy identification** ([VF] prefix, red color, bold)
-6. **Allows bulk selection** of all created dimensions
-7. **Suggests additional views** if current views aren't sufficient
+## What It Does NOT Do
+
+- ❌ **Does not create dimensions** - Analysis only, no modifications
+- ❌ **No GUI** - Console application, not Windows Forms
+- ❌ **No dimension placement** - Just identifies what's needed
+- ❌ **No view management** - No view sufficiency checks (yet)
 
 ---
 
 ## How to Use
 
 ### Prerequisites
-- Tekla Structures 2025 installed
-- Drawing with assembly open
+- Tekla Structures 2025 installed and running
+- Assembly drawing open in Tekla
 - .NET Framework 4.8
 
 ### Build & Run
@@ -50,251 +41,273 @@ The Virtual Fitter is a GUI application that:
 cd VirtualFitter
 dotnet build VirtualFitter.csproj
 
-# Or use Visual Studio
-# Open VirtualFitter.sln and press F5
+# Or use build.bat
+build.bat
+
+# Run the analyzer
+bin\Debug\FitterAnalyzer.exe
 ```
 
 ### Workflow
 
 1. **Open Tekla Structures** with a drawing containing an assembly
+2. **Run FitterAnalyzer.exe**
+3. **Review console output** showing analysis summary
+4. **Check generated file** `FitterAnalysis_[DrawingMark]_[timestamp].txt`
 
-2. **Launch Virtual Fitter** (VirtualFitter.exe)
+### Example Output
 
-3. **Click "1. Analyze Assembly"**
-   - Scans the current drawing
-   - Identifies parts and existing dimensions
-   - Determines what dimensions are missing
-   - Checks if available views are sufficient
-   - Shows results in the window
+```
+Fitter Analyzer - Assembly Dimension Analysis
+==============================================
 
-4. **Review Analysis Results**
-   ```
-   === ASSEMBLY ANALYSIS ===
-   Drawing: B18
-   Parts found: 15
-   Existing dimensions: 23
-   Available views: 3
+Connected to Tekla Structures
 
-   === REQUIRED DIMENSIONS ===
-   Missing dimensions: 12
+Analyzing drawing: B18
 
-   Dimensions to create:
-     - Length: Length of W21X50
-     - Horizontal Position: Horizontal position of W14X90
-     - Vertical Position: Vertical position of W21X50
-     ...
+=== FITTER ANALYSIS SUMMARY ===
 
-   === VIEW ANALYSIS ===
-   Sufficient views: NO
+Total Parts: 15
+Existing Dimensions: 23
+Required Dimensions: 12
 
-   MISSING VIEWS:
-     - Top View (for horizontal positioning)
-     - Front View (for vertical positioning and lengths)
-   ```
+DIMENSION BREAKDOWN:
+  Along Main Axis (X): 4 dimensions
+  Normal to Axis (Y): 4 dimensions
+  Vertical (Z): 4 dimensions
 
-5. **Add Missing Views** (if suggested)
-   - Create suggested views in Tekla
-   - Re-run analysis
+DETAILS:
+  - Along Main Axis (X): 2500.0mm (W21X50)
+  - Normal to Axis (Y): 150.0mm (W14X90)
+  - Vertical (Z): 200.0mm (W21X50)
+  ...
 
-6. **Click "2. Create Dimensions"**
-   - Confirms number of dimensions to create
-   - Creates all dimensions in appropriate views
-   - Marks them with [VF] prefix
-   - Makes them RED and BOLD
-   - Shows success/failure counts
-
-7. **Click "Select Created Dims"** (green button)
-   - Selects all [VF] dimensions in Tekla
-   - You can then move, modify, or delete them as needed
-
-8. **Review in Tekla Drawing**
-   - All created dimensions are visible
-   - Easy to identify (red, bold, [VF] prefix)
-   - Can be modified like any other dimension
-
----
-
-## Features
-
-### ✅ Dimension Creation
-- **Automatic positioning** - Determines optimal placement
-- **Smart view selection** - Places each dimension in best view
-- **Proper spacing** - Avoids overlap with existing dimensions
-
-### ✅ Easy Identification
-- **[VF] prefix** in dimension labels
-- **Red color** for high visibility
-- **Bold text** to stand out
-- **User property** "VirtualFitter=Created"
-
-### ✅ Bulk Selection
-- **Select all created dimensions** with one click
-- **Easy cleanup** if you want to delete them
-- **Easy modification** to adjust positions
-
-### ✅ View Sufficiency Check
-- **Analyzes available views** before creation
-- **Suggests missing views** with explanations
-- **Prevents creation** in insufficient views
-
----
-
-## Types of Dimensions Created
-
-For each **secondary part** in the assembly:
-
-1. **Length Dimension**
-   - Measures part length
-   - Placed in front/side view
-
-2. **Horizontal Position**
-   - Distance from reference (usually main part edge)
-   - Placed in top view
-
-3. **Vertical Position**
-   - Height from reference elevation
-   - Placed in front/elevation view
-
-4. **Angle** (if part is rotated)
-   - Angular position
-   - Placed in appropriate view
+Summary saved to: FitterAnalysis_B18_20251216_081530.txt
+```
 
 ---
 
 ## Architecture
 
+### File Structure
+
 ```
 VirtualFitter/
-├── Program.cs              # Application entry point
-├── MainForm.cs             # GUI (buttons, status, results)
-├── AssemblyAnalyzer.cs     # Analyzes assembly, finds missing dims
-├── DimensionCreator.cs     # Creates dimensions in Tekla
-└── VirtualFitter.csproj    # Project file
+├── FitterAnalyzer.cs      # Core analysis algorithm
+├── Program.cs             # Console application entry point
+├── VirtualFitter.csproj   # Project file
+└── README.md              # This file
 ```
 
-### Main Components
+### Core Algorithm (FitterAnalyzer.cs)
 
-**AssemblyAnalyzer**
-- Scans drawing for parts and views
-- Identifies secondary parts (not main part)
-- Determines required dimensions per part
-- Checks view sufficiency
-- Returns analysis result
+The analysis algorithm:
 
-**DimensionCreator**
-- Takes list of required dimensions
-- Creates each dimension in Tekla API
-- Places in optimal view
-- Marks with [VF] identifier
-- Returns success/failure counts
+1. **Identifies main part** - Typically the longest beam in assembly
+2. **Gets main part axis** - Local coordinate system (X direction)
+3. **Finds secondary parts** - Parts that need positioning dimensions
+4. **Calculates offsets** - Position relative to main part in 3 axes:
+   - **Along main axis (X)** - Longitudinal position
+   - **Normal to axis (Y)** - Perpendicular horizontal offset
+   - **Vertical (Z)** - Height offset
+5. **Filters by threshold** - Only reports dimensions > 1mm
 
-**MainForm (GUI)**
-- Analyze button → Runs analyzer
-- Create button → Runs dimension creator
-- Select button → Selects all [VF] dimensions
-- Clear button → Resets for new analysis
+### Analysis Result Data
+
+```csharp
+public class RequiredDimension
+{
+    public string Type { get; set; }          // "Along Main Axis (X)", "Normal to Axis (Y)", "Vertical (Z)"
+    public string Description { get; set; }    // Descriptive text
+    public string PartProfile { get; set; }    // e.g., "W21X50"
+    public double Value { get; set; }          // Dimension value in mm
+}
+```
+
+---
+
+## Design Philosophy
+
+### Why Simplified?
+
+This tool was **intentionally simplified** to focus on the core algorithm:
+
+- **Easier to understand** - No GUI complexity
+- **Easier to test** - Console output, file output
+- **Foundation for improvement** - Clean baseline for future enhancements
+- **No distractions** - Just the dimension detection logic
+
+### Future Development Path
+
+The simplified version provides a **clean foundation** for:
+
+1. **Algorithm refinement** - Improve dimension detection logic
+2. **Optimization integration** - Add operations research techniques
+3. **ML integration** - Train models on analysis results
+4. **Feature additions** - View analysis, dimension creation, etc.
+
+Start simple, iterate intelligently.
+
+---
+
+## Key Improvements from Virtual Fitter
+
+### Removed Complexity
+
+| Feature | Virtual Fitter | Fitter Analyzer |
+|---------|----------------|-----------------|
+| GUI (WinForms) | ✅ Had complex UI | ❌ Removed - console only |
+| Dimension creation | ✅ Created in Tekla | ❌ Removed - analysis only |
+| View management | ✅ View sufficiency checks | ❌ Removed for now |
+| Selection tools | ✅ Select created dims | ❌ N/A (no creation) |
+| Dependencies | System.Drawing, System.Windows.Forms | Only Tekla APIs |
+
+### Simplified Focus
+
+**Before (Virtual Fitter):**
+- 3 files: AssemblyAnalyzer.cs, DimensionCreator.cs, MainForm.cs
+- 650+ lines of code
+- GUI logic mixed with analysis
+- Dimension creation mixed with detection
+
+**After (Fitter Analyzer):**
+- 2 files: FitterAnalyzer.cs, Program.cs
+- ~400 lines of code
+- Pure analysis algorithm
+- Clear, focused purpose
 
 ---
 
 ## Technical Details
 
-### Marking Strategy
+### Dependencies
 
-Created dimensions are marked using:
-
-```csharp
-// 1. User property
-dimension.SetUserProperty("VirtualFitter", "Created");
-
-// 2. Visual attributes
-attrs.Font.Bold = true;
-attrs.Font.Color = new Color(1.0, 0.0, 0.0); // Red
-
-// 3. Prefix in label (future enhancement)
-// label = "[VF] " + actualValue;
+```xml
+<Reference Include="System" />
+<Reference Include="System.Core" />
+<Reference Include="Tekla.Structures" />
+<Reference Include="Tekla.Structures.Model" />
+<Reference Include="Tekla.Structures.Drawing" />
+<Reference Include="Tekla.Structures.Geometry3d" />
 ```
 
-### Selection Method
+### Dimension Detection Logic
 
 ```csharp
-// Get all created dimensions
-var objectsToSelect = new DrawingObjectEnumerator();
-foreach (var dim in createdDimensions)
+// Get offset from main part to secondary part
+var offset = secondaryPos - mainPos;
+
+// Project onto 3 orthogonal axes
+var alongAxis = Vector.Dot(offset, mainPartAxis);    // X direction
+var normalY = Vector.Dot(offset, yAxis);             // Y direction (perpendicular)
+var normalZ = Vector.Dot(offset, zAxis);             // Z direction (vertical)
+
+// Only report if > 1mm
+if (Math.Abs(value) > 1.0)
 {
-    objectsToSelect.Add(dim);
+    requiredDimensions.Add(new RequiredDimension { ... });
 }
-
-// Select in Tekla
-var picker = drawingHandler.GetPicker();
-picker.PickObjects(objectsToSelect);
 ```
 
 ---
 
-## Comparison with Previous (Wrong) Implementation
+## Comparison: Analysis Output vs. Creation Tool
 
-| Feature | Old (Python, WRONG) | New (C#, CORRECT) |
-|---------|---------------------|-------------------|
-| Creates dimensions | ❌ No | ✅ Yes |
-| Modifies Tekla drawing | ❌ No | ✅ Yes |
-| GUI application | ❌ No (command-line) | ✅ Yes (WinForms) |
-| Select created dims | ❌ No | ✅ Yes (button) |
-| Marks dimensions | ❌ N/A | ✅ Yes ([VF], red, bold) |
-| Suggests views | ❌ Sort of | ✅ Yes (clear suggestions) |
-| Uses OR techniques | ✅ Yes (PuLP) | ⏳ To be added |
-| Standalone app | ❌ No (Python script) | ✅ Yes (.exe) |
+### This Tool (Fitter Analyzer)
+- **Output:** Text file with required dimensions
+- **Use case:** Understanding what dimensions are needed
+- **Workflow:** Analyze → Review → Manual creation (if desired)
 
----
-
-## Next Steps (Enhancements)
-
-### Priority 1: Operations Research Integration
-Currently uses heuristics. Should add:
-- Optimization for dimension placement
-- Minimize dimension line crossings
-- Optimal view selection via solver
-- Constraint satisfaction for spacing
-
-### Priority 2: Advanced Features
-- **Delete created dimensions** button
-- **Undo last creation** option
-- **Preview mode** (show where dims will go)
-- **Customizable marking** (color, prefix, etc.)
-
-### Priority 3: Smart Analysis
-- **Learn from existing drawings** (ML)
-- **Suggest dimension types** based on patterns
-- **Detect over-dimensioned** parts
-- **Conflict detection** with existing dims
+### Future Tool (To Be Developed)
+- **Output:** Actual dimensions in Tekla drawing
+- **Use case:** Automated dimension placement
+- **Workflow:** Analyze → Optimize placement → Create → Review
 
 ---
 
-## Why This Is Production-Ready
+## Testing
 
-✅ **Modifies actual drawings** - Creates real Tekla dimensions
-✅ **Easy identification** - [VF] prefix, red color, bold
-✅ **Bulk selection** - One-click select all created
-✅ **View checking** - Warns if views insufficient
-✅ **User control** - Clear buttons, confirmation dialogs
-✅ **Error handling** - Reports failures gracefully
-✅ **Standalone** - .exe file, not embedded in Tekla
+### Test Workflow
+
+1. Open a test assembly drawing in Tekla (e.g., B18)
+2. Run FitterAnalyzer.exe
+3. Verify console output shows:
+   - Connected to Tekla ✓
+   - Drawing mark identified ✓
+   - Parts counted ✓
+   - Dimensions analyzed ✓
+   - Summary generated ✓
+   - File saved ✓
+4. Open generated text file
+5. Verify dimension list makes sense for the assembly
+
+### Test Drawings
+
+Use assembly drawings with:
+- Clear main part (longest beam)
+- Multiple secondary parts (bracings, stiffeners)
+- Known dimension requirements
+
+Good test case: **Drawing B18** (15 parts, known dimension layout)
 
 ---
 
-## Apologies
+## Roadmap (Future Development)
 
-I completely misunderstood your original request and built an analysis tool instead of a dimension creation tool. This corrected implementation:
+### Phase 1: Algorithm Enhancement (Priority)
+- [ ] Improve main part detection (handle edge cases)
+- [ ] Add angle/rotation dimension detection
+- [ ] Better filtering of duplicate dimensions
+- [ ] Handle non-beam parts (plates, etc.)
 
-- ✅ Actually creates dimensions in Tekla
-- ✅ Has a GUI with buttons
-- ✅ Marks created dimensions for easy identification
-- ✅ Allows selecting all created dimensions
-- ✅ Is a standalone .exe application
+### Phase 2: Analysis Features
+- [ ] View sufficiency analysis
+- [ ] Conflict detection with existing dimensions
+- [ ] Quality metrics (completeness score)
+- [ ] Multi-assembly support
 
-This is what you asked for from the beginning. Sorry for the confusion!
+### Phase 3: Optimization Integration
+- [ ] Operations research for placement
+- [ ] Constraint satisfaction for spacing
+- [ ] Multi-objective optimization
+
+### Phase 4: Dimension Creation (Optional)
+- [ ] Create dimensions in Tekla (if needed)
+- [ ] Interactive placement refinement
+- [ ] Batch processing
 
 ---
 
-**Status:** Ready for testing and enhancement
+## Why This Approach Works
+
+1. **Focused scope** - Does one thing well (analysis)
+2. **Clean foundation** - Easy to understand and modify
+3. **Testable** - Console I/O, file output
+4. **No technical debt** - Removed unused complexity
+5. **Clear path forward** - Foundation for future enhancements
+
+---
+
+## Migration Notes
+
+If you had the previous Virtual Fitter:
+
+**What Changed:**
+- Renamed: VirtualFitter → FitterAnalyzer
+- Removed: GUI (MainForm.cs)
+- Removed: Dimension creation (DimensionCreator.cs)
+- Simplified: AssemblyAnalyzer → FitterAnalyzer
+- Output: Console + text file (instead of GUI display)
+
+**Why:**
+- Focus on core algorithm
+- Eliminate unnecessary complexity
+- Prepare for targeted improvements
+- Make testing and iteration easier
+
+---
+
+**Status:** Production-ready for analysis
 **Platform:** Windows, .NET Framework 4.8, Tekla Structures 2025
-**Type:** Standalone GUI Application (.exe)
+**Type:** Console Application (.exe)
+**Purpose:** Foundation tool for dimension analysis and future development

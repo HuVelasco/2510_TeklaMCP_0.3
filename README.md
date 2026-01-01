@@ -1,6 +1,22 @@
 # TeklaMCP v0.3.0 - Production Release
 *Complete CRUD Operations with Part-Based Tools*
 
+## ⚠️ CRITICAL - C# 5.0 Code Generation Limitations
+
+**MUST READ BEFORE MODIFYING EXTRACTION CODE:**
+
+📄 **[docs/GENERATED_CODE_LIMITATIONS.md](docs/GENERATED_CODE_LIMITATIONS.md)** - Full documentation
+
+**Quick Summary:**
+- Extraction code uses **C# 5.0 legacy compiler** (Tekla embedded scripting)
+- ❌ NO `$"{variable}"`, `obj?.Property`, `using` statements
+- ✅ USE `"text " + variable`, explicit null checks, fully qualified names
+- ❌ **CRITICAL:** `ArrayList` has NO `MoveNext()` in C# 5.0 - cast to `IEnumerable` first
+
+See **[CLAUDE.md](CLAUDE.md) Section 6** for development guidelines.
+
+---
+
 ## 🚀 Production Overview
 
 TeklaMCP v0.3.0 is a production-ready Model Control Protocol (MCP) server that provides seamless integration between Claude Code and Tekla Structures. This version features complete CRUD operations, clean architecture, and 15 fully functional MCP tools for comprehensive structural modeling.

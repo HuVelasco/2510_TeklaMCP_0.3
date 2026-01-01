@@ -38,7 +38,18 @@
       "Bash(wc:*)",
       "Bash(ls:*)",
       "Bash(tasklist:*)",
-      "Bash(pip install:*)"
+      "Bash(pip install:*)",
+      "Bash(powershell -Command:*)",
+      "Bash(start /B dotnet run:*)",
+      "Bash(xargs:*)",
+      "Bash(find:*)",
+      "Bash(mkdir:*)",
+      "Bash(dotnet restore:*)",
+      "Bash(findstr:*)",
+      "Bash(./TeklaDrawingExtractor.exe)",
+      "Bash(git reset:*)",
+      "Bash(start /B TeklaDrawingExtractor/bin/Release/net48/TeklaDrawingExtractor.exe)",
+      "Bash(start TeklaDrawingExtractor.exe)"
     ],
     "deny": [],
     "ask": []

@@ -1,0 +1,14 @@
+# VirtualDetailer ML Dataset Configuration
+# Generated: generate_dataset.py
+
+path: C:\Users\hugov\ClaudeProjects\2510_TeklaMCP_0.3\VirtualDetailer_ML\data
+train: images/train
+val: images/val
+test: images/test
+
+names:
+  0: StraightDimension
+  1: AngleDimension
+  2: RadiusDimension
+  3: DiameterDimension
+  4: ArcLengthDimension

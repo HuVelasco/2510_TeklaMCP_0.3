@@ -1,0 +1,374 @@
+[
+  {
+    "mark": "[ST2004]",
+    "drawing_type": "AssemblyDrawing",
+    "assembly_prefix": "unknown",
+    "part_type": "unknown",
+    "unique_parts": 0,
+    "total_objects": 929,
+    "views": {
+      "count": 12,
+      "objects_with_parent_view": 0,
+      "coverage_percent": 0.0
+    },
+    "parts": {
+      "total_instances": 462,
+      "unique_count": 0,
+      "duplication_ratio": 0,
+      "with_classification": 0,
+      "categories": {}
+    },
+    "dimensions": {
+      "total": 211,
+      "with_3d_coords": 0,
+      "types": {
+        "StraightDimension": 157,
+        "AngleDimension": 4,
+        "StraightDimensionSet": 50
+      }
+    },
+    "metadata": {
+      "title": "Unknown",
+      "extraction_timestamp": "Unknown",
+      "total_dimensions": 0
+    },
+    "object_types": {
+      "Part": 462,
+      "StraightDimension": 157,
+      "LeaderLine": 143,
+      "Mark": 53,
+      "StraightDimensionSet": 50,
+      "ReferenceModel": 16,
+      "Connection": 11,
+      "Text": 9,
+      "WeldMark": 7,
+      "SectionMark": 6
+    }
+  },
+  {
+    "mark": "[ST2004]",
+    "drawing_type": "AssemblyDrawing",
+    "assembly_prefix": "unknown",
+    "part_type": "unknown",
+    "unique_parts": 0,
+    "total_objects": 929,
+    "views": {
+      "count": 12,
+      "objects_with_parent_view": 0,
+      "coverage_percent": 0.0
+    },
+    "parts": {
+      "total_instances": 462,
+      "unique_count": 0,
+      "duplication_ratio": 0,
+      "with_classification": 0,
+      "categories": {}
+    },
+    "dimensions": {
+      "total": 211,
+      "with_3d_coords": 0,
+      "types": {
+        "StraightDimension": 157,
+        "AngleDimension": 4,
+        "StraightDimensionSet": 50
+      }
+    },
+    "metadata": {
+      "title": "Unknown",
+      "extraction_timestamp": "Unknown",
+      "total_dimensions": 0
+    },
+    "object_types": {
+      "Part": 462,
+      "StraightDimension": 157,
+      "LeaderLine": 143,
+      "Mark": 53,
+      "StraightDimensionSet": 50,
+      "ReferenceModel": 16,
+      "Connection": 11,
+      "Text": 9,
+      "WeldMark": 7,
+      "SectionMark": 6
+    }
+  },
+  {
+    "mark": "[ST2004]",
+    "drawing_type": "AssemblyDrawing",
+    "assembly_prefix": "unknown",
+    "part_type": "unknown",
+    "unique_parts": 0,
+    "total_objects": 929,
+    "views": {
+      "count": 12,
+      "objects_with_parent_view": 0,
+      "coverage_percent": 0.0
+    },
+    "parts": {
+      "total_instances": 462,
+      "unique_count": 0,
+      "duplication_ratio": 0,
+      "with_classification": 0,
+      "categories": {}
+    },
+    "dimensions": {
+      "total": 211,
+      "with_3d_coords": 0,
+      "types": {
+        "StraightDimension": 157,
+        "AngleDimension": 4,
+        "StraightDimensionSet": 50
+      }
+    },
+    "metadata": {
+      "title": "Unknown",
+      "extraction_timestamp": "Unknown",
+      "total_dimensions": 0
+    },
+    "object_types": {
+      "Part": 462,
+      "StraightDimension": 157,
+      "LeaderLine": 143,
+      "Mark": 53,
+      "StraightDimensionSet": 50,
+      "ReferenceModel": 16,
+      "Connection": 11,
+      "Text": 9,
+      "WeldMark": 7,
+      "SectionMark": 6
+    }
+  },
+  {
+    "mark": "[ST2004]",
+    "drawing_type": "AssemblyDrawing",
+    "assembly_prefix": "unknown",
+    "part_type": "unknown",
+    "unique_parts": 0,
+    "total_objects": 929,
+    "views": {
+      "count": 12,
+      "objects_with_parent_view": 0,
+      "coverage_percent": 0.0
+    },
+    "parts": {
+      "total_instances": 462,
+      "unique_count": 0,
+      "duplication_ratio": 0,
+      "with_classification": 0,
+      "categories": {}
+    },
+    "dimensions": {
+      "total": 211,
+      "with_3d_coords": 0,
+      "types": {
+        "StraightDimension": 157,
+        "AngleDimension": 4,
+        "StraightDimensionSet": 50
+      }
+    },
+    "metadata": {
+      "title": "Unknown",
+      "extraction_timestamp": "Unknown",
+      "total_dimensions": 0
+    },
+    "object_types": {
+      "Part": 462,
+      "StraightDimension": 157,
+      "LeaderLine": 143,
+      "Mark": 53,
+      "StraightDimensionSet": 50,
+      "ReferenceModel": 16,
+      "Connection": 11,
+      "Text": 9,
+      "WeldMark": 7,
+      "SectionMark": 6
+    }
+  },
+  {
+    "mark": "[ST2004]",
+    "drawing_type": "AssemblyDrawing",
+    "assembly_prefix": "unknown",
+    "part_type": "unknown",
+    "unique_parts": 0,
+    "total_objects": 929,
+    "views": {
+      "count": 12,
+      "objects_with_parent_view": 0,
+      "coverage_percent": 0.0
+    },
+    "parts": {
+      "total_instances": 462,
+      "unique_count": 0,
+      "duplication_ratio": 0,
+      "with_classification": 0,
+      "categories": {}
+    },
+    "dimensions": {
+      "total": 211,
+      "with_3d_coords": 0,
+      "types": {
+        "StraightDimension": 157,
+        "AngleDimension": 4,
+        "StraightDimensionSet": 50
+      }
+    },
+    "metadata": {
+      "title": "Unknown",
+      "extraction_timestamp": "Unknown",
+      "total_dimensions": 0
+    },
+    "object_types": {
+      "Part": 462,
+      "StraightDimension": 157,
+      "LeaderLine": 143,
+      "Mark": 53,
+      "StraightDimensionSet": 50,
+      "ReferenceModel": 16,
+      "Connection": 11,
+      "Text": 9,
+      "WeldMark": 7,
+      "SectionMark": 6
+    }
+  },
+  {
+    "mark": "[ST2004]",
+    "drawing_type": "AssemblyDrawing",
+    "assembly_prefix": "unknown",
+    "part_type": "unknown",
+    "unique_parts": 0,
+    "total_objects": 929,
+    "views": {
+      "count": 12,
+      "objects_with_parent_view": 0,
+      "coverage_percent": 0.0
+    },
+    "parts": {
+      "total_instances": 462,
+      "unique_count": 0,
+      "duplication_ratio": 0,
+      "with_classification": 0,
+      "categories": {}
+    },
+    "dimensions": {
+      "total": 211,
+      "with_3d_coords": 0,
+      "types": {
+        "StraightDimension": 157,
+        "AngleDimension": 4,
+        "StraightDimensionSet": 50
+      }
+    },
+    "metadata": {
+      "title": "Unknown",
+      "extraction_timestamp": "Unknown",
+      "total_dimensions": 0
+    },
+    "object_types": {
+      "Part": 462,
+      "StraightDimension": 157,
+      "LeaderLine": 143,
+      "Mark": 53,
+      "StraightDimensionSet": 50,
+      "ReferenceModel": 16,
+      "Connection": 11,
+      "Text": 9,
+      "WeldMark": 7,
+      "SectionMark": 6
+    }
+  },
+  {
+    "mark": "[ST2004]",
+    "drawing_type": "AssemblyDrawing",
+    "assembly_prefix": "unknown",
+    "part_type": "unknown",
+    "unique_parts": 0,
+    "total_objects": 929,
+    "views": {
+      "count": 12,
+      "objects_with_parent_view": 0,
+      "coverage_percent": 0.0
+    },
+    "parts": {
+      "total_instances": 462,
+      "unique_count": 0,
+      "duplication_ratio": 0,
+      "with_classification": 0,
+      "categories": {}
+    },
+    "dimensions": {
+      "total": 211,
+      "with_3d_coords": 0,
+      "types": {
+        "StraightDimension": 157,
+        "AngleDimension": 4,
+        "StraightDimensionSet": 50
+      }
+    },
+    "metadata": {
+      "title": "Unknown",
+      "extraction_timestamp": "Unknown",
+      "total_dimensions": 0
+    },
+    "object_types": {
+      "Part": 462,
+      "StraightDimension": 157,
+      "LeaderLine": 143,
+      "Mark": 53,
+      "StraightDimensionSet": 50,
+      "ReferenceModel": 16,
+      "Connection": 11,
+      "Text": 9,
+      "WeldMark": 7,
+      "SectionMark": 6
+    }
+  },
+  {
+    "mark": "[ST2004]",
+    "drawing_type": "unknown",
+    "assembly_prefix": "",
+    "part_type": "unknown",
+    "unique_parts": 0,
+    "total_objects": 929,
+    "views": {
+      "count": 12,
+      "objects_with_parent_view": 0,
+      "coverage_percent": 0.0
+    },
+    "parts": {
+      "total_instances": 462,
+      "unique_count": 0,
+      "duplication_ratio": 0,
+      "with_classification": 462,
+      "categories": {
+        "unknown": 440,
+        "plate": 11,
+        "stair_component": 11
+      }
+    },
+    "dimensions": {
+      "total": 211,
+      "with_3d_coords": 0,
+      "types": {
+        "StraightDimension": 157,
+        "AngleDimension": 4,
+        "StraightDimensionSet": 50
+      }
+    },
+    "metadata": {
+      "title": "[ST2004]",
+      "extraction_timestamp": "2025-12-16 13:35:39",
+      "total_dimensions": 211
+    },
+    "object_types": {
+      "Part": 462,
+      "StraightDimension": 157,
+      "LeaderLine": 143,
+      "Mark": 53,
+      "StraightDimensionSet": 50,
+      "ReferenceModel": 16,
+      "Connection": 11,
+      "Text": 9,
+      "WeldMark": 7,
+      "SectionMark": 6
+    }
+  }
+]

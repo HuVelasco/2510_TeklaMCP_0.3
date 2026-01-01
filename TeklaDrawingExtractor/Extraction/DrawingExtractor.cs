@@ -459,7 +459,7 @@ namespace TeklaDrawingExtractor.Extraction
                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
                 Formatting = _config.PrettyFormat ? Formatting.Indented : Formatting.None,
                 NullValueHandling = NullValueHandling.Ignore,
-                DefaultValueHandling = DefaultValueHandling.Ignore
+                DefaultValueHandling = DefaultValueHandling.Include  // Include ViewIndex=0
             };
 
             if (_config.UseJsonL)

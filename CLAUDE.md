@@ -93,7 +93,53 @@ curl -X POST "http://localhost:8080/create-beam" -d '{...}'
 - **Verify round-trip** - create then read objects
 - **Both Claude Code AND Desktop** if available
 
-## 6. Tekla API Integration
+## 6. Tekla API Integration & C# Version Limitations
+
+### **CRITICAL: Dynamic Code Uses C# 5.0 Compiler** ⚠️
+
+**Generated code strings** (in `ProgramClean.cs`) run with **C# 5.0 legacy compiler**.
+
+**See `docs/GENERATED_CODE_LIMITATIONS.md` for full details**
+
+#### Quick Reference - C# 5.0 Restrictions:
+
+❌ **NOT ALLOWED:**
+```csharp
+$"{variable}"           // String interpolation - C# 6.0
+obj?.Property           // Null-conditional - C# 6.0
+using Tekla.Structures  // Using directives in dynamic code
+```
+
+✅ **MUST USE:**
+```csharp
+"text " + variable                              // String concatenation
+(obj != null) ? obj.Property : null            // Explicit null check
+Tekla.Structures.Model.Model                   // Fully qualified names
+```
+
+#### ArrayList Collection Issue (CRITICAL):
+
+❌ **WRONG:**
+```csharp
+var children = obj.GetChildren();  // Returns ArrayList
+while (children.MoveNext())        // ERROR: ArrayList has no MoveNext
+```
+
+✅ **CORRECT:**
+```csharp
+var children = obj.GetChildren();
+var enumerable = children as System.Collections.IEnumerable;
+if (enumerable != null) {
+    foreach (var child in enumerable) { /* process */ }
+}
+```
+
+#### Where This Applies:
+- `GenerateFullExtractionCode()` - Lines 1314+
+- `GenerateDiscoveryModeCode()` - Lines 1229+
+- All code inside `@"..."` string literals
+
+### **Tekla API Integration**
 - **Key namespaces:** `Tekla.Structures.Model`, `Tekla.Structures.Geometry3d`
 - **Always commit changes:** `Model.CommitChanges()` after Insert/Modify
 - **Reference guide:** See `@HugoNotes\07.Model-Object-Tekla-Info.md`
