@@ -1,0 +1,27 @@
+﻿# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# .NET build artifacts
+bin/
+obj/
+*.user
+
+# Logs and temp
+*.log
+*.json
+!package.json
+
+# IDE
+.vs/
+.vscode/
+
+# Private
+.claude/
+.mcp.json
+HugoNotes/
+*.md
+!README.md

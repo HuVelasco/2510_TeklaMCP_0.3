@@ -1,0 +1,4 @@
+fastmcp
+aiohttp
+pydantic
+-e ../../../2511_UBIM_DataBridge
